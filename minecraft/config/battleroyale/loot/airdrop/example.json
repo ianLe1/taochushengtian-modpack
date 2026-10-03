@@ -1,0 +1,53 @@
+[
+  {
+    "lootId": 201,
+    "default": true,
+    "name": "Netherite Airdrop",
+    "color": "#FFFF00",
+    "entry": {
+      "lootType": "multi",
+      "entries": [
+        {
+          "lootType": "item",
+          "item": "minecraft:netherite_helmet",
+          "count": 1
+        },
+        {
+          "lootType": "item",
+          "item": "minecraft:netherite_chestplate",
+          "count": 1
+        },
+        {
+          "lootType": "weight",
+          "entries": [
+            {
+              "weight": 20.0,
+              "entry": {
+                "lootType": "item",
+                "item": "minecraft:netherite_sword",
+                "count": 1
+              }
+            },
+            {
+              "weight": 20.0,
+              "entry": {
+                "lootType": "item",
+                "item": "minecraft:netherite_axe",
+                "count": 1
+              }
+            }
+          ]
+        },
+        {
+          "lootType": "random",
+          "chance": 0.05,
+          "entry": {
+            "lootType": "item",
+            "item": "minecraft:enchanted_golden_apple",
+            "count": 1
+          }
+        }
+      ]
+    }
+  }
+]

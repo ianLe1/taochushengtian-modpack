@@ -1,0 +1,18 @@
+filename = 'pinout-0.2.1.jar'
+name = 'CC;CPG: Pinout'
+side = 'both'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '0.2.1'
+
+[download]
+hash = '37c7598d3bb712dfc825bf7391e5291b25c927117f65102dd86f1d72982a50e7c0df5b3742fc87a18056a2caf26e90d62aa8a2137625f871d4ec51af914effdd'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/sMa4MaGz/versions/UJtJCpBi/pinout-0.2.1.jar'
+
+[update.modrinth]
+mod-id = 'sMa4MaGz'
+version = 'UJtJCpBi'

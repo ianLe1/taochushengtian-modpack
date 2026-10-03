@@ -1,0 +1,33 @@
+filename = 'create_aeronautics_easy_assembly-1.1.0.jar'
+name = 'Create Aeronautics : Easy Assembly'
+side = 'server'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = 'create_aeronautics_easy_assembly-1.1.0.jar'
+
+[download]
+hash = '40d9c3d9bad97b23d679aaeca3fae9389bede60d'
+hash-format = 'sha1'
+mode = 'metadata:curseforge'
+url = ''
+
+[update.curseforge]
+file-id = 8864838
+project-id = 1685449
+
+[[x-prismlauncher-dependencies]]
+addonId = '676721'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = '328085'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = '238222'
+type = 'OPTIONAL'
+
+[[x-prismlauncher-dependencies]]
+addonId = '1312371'
+type = 'REQUIRED'

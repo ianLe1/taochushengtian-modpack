@@ -1,0 +1,18 @@
+filename = 'darkmodeeverywhere-neoforge-1.21.1-1.4.0.jar'
+name = 'Dark Mode Everywhere'
+side = 'client'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'beta'
+x-prismlauncher-version-number = '1.21-1.4.0a'
+
+[download]
+hash = '1f8a16805638e00ae3d875d9c7a04e1f7a9423d732f6c9161e22d1b6e6691e28e766cf4904d17c2ce459ecb526ea79a410cf0a53b1c40b246a14691612cad375'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/k3lrwGqk/versions/PEHRE9ut/darkmodeeverywhere-neoforge-1.21.1-1.4.0.jar'
+
+[update.modrinth]
+mod-id = 'k3lrwGqk'
+version = 'PEHRE9ut'

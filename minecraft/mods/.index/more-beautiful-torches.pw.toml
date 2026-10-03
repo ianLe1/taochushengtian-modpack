@@ -1,0 +1,21 @@
+filename = 'more_beautiful_torches-merged-1.21.1-3.1.1.jar'
+name = 'More Beautiful Torches'
+side = ''
+x-prismlauncher-loaders = [ 'neoforge', 'fabric' ]
+x-prismlauncher-mc-versions = [ '1.21', '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '3.1.1'
+
+[download]
+hash = '7b82b76857279d3678a2bf52a45291514859156905f20280459101d09de1b202894f2c0fc6d87abe08634c2c30579f3a227f51d390ee2e8710b41ca1c0bb4f48'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/C341qvJ5/versions/DYBZS4s2/more_beautiful_torches-merged-1.21.1-3.1.1.jar'
+
+[update.modrinth]
+mod-id = 'C341qvJ5'
+version = 'DYBZS4s2'
+
+[[x-prismlauncher-dependencies]]
+addonId = '9leXt4A5'
+type = 'REQUIRED'

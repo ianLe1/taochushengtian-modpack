@@ -1,0 +1,47 @@
+#Tunable frequency range for walkie-talkies and Radio Stations.
+#The in-game slider always spans exactly this range: dragging all the way
+#left lands on min-frequency, all the way right lands on max-frequency.
+#Values are edited at 0.1 resolution (e.g. 100.2).
+[frequency]
+	#Minimum tunable frequency.
+	# Default: 80.0
+	# Range: 0.0 ~ 99999.0
+	min-frequency = 80.0
+	#Maximum tunable frequency. If this ends up lower than min-frequency,
+	#it's treated as equal to min-frequency (single fixed channel).
+	# Default: 999.9
+	# Range: 0.0 ~ 99999.0
+	max-frequency = 999.9
+
+[station]
+	#How close (in blocks) a player must be to a powered-on Radio Station
+	#with an active microphone module for their voice to be picked up and
+	#relayed onto the station's frequency.
+	# Default: 5.0
+	# Range: 0.0 ~ 256.0
+	mic-range = 5.0
+	#Server-side radio effect on voice picked up by a Radio Station's microphone.
+	#Off by default: the client applies the radio effect on playback instead,
+	#which costs no server CPU and avoids a decode/re-encode quality loss.
+	#Enable this only if you need the effect for players without this mod
+	#installed - do not run both, or the effect is applied twice.
+	radio-effect = false
+	#Show the Plasmo Voice speaker icon floating above a Radio Station
+	#while it is playing audio. Turn this off for a more immersive look.
+	show-voice-icon = false
+	#Range (in blocks) of the Interception Module. A Radio Station holding one
+	#forces whatever its microphone picks up onto the frequency of every other
+	#Radio Station within this distance, ignoring what those stations are tuned to.
+	#Distances are measured in real world space, so stations riding a Sable
+	#sub-level are compared where they actually are, not where they are stored.
+	#Set to 0 to disable the module entirely.
+	# Default: 100.0
+	# Range: 0.0 ~ 1024.0
+	interception-radius = 100.0
+
+[debug]
+	#Log this mod's activity to the console: station registration, voice
+	#transmissions, and which optional integrations were detected.
+	#Only enable this when diagnosing a problem. Genuine errors are always
+	#logged regardless of this setting.
+	debug-logging = false

@@ -1,0 +1,325 @@
+[
+  {
+    "lootId": 0,
+    "default": true,
+    "name": "All entry type example",
+    "color": "#FFFFFFAA",
+    "entry": {
+      "lootType": "multi",
+      "entries": [
+        {
+          "lootType": "item",
+          "item": "minecraft:leather_helmet",
+          "count": 1,
+          "nbt": "{components:{\"minecraft:damage\":27}}"
+        },
+        {
+          "lootType": "item",
+          "item": "minecraft:leather_chestplate",
+          "count": 1
+        },
+        {
+          "lootType": "weight",
+          "entries": [
+            {
+              "weight": 20.0,
+              "entry": {
+                "lootType": "item",
+                "item": "minecraft:wooden_sword",
+                "count": 1
+              }
+            },
+            {
+              "weight": 20.0,
+              "entry": {
+                "lootType": "item",
+                "item": "minecraft:wooden_axe",
+                "count": 1
+              }
+            },
+            {
+              "weight": 20.0,
+              "entry": {
+                "lootType": "empty",
+                "type": "item"
+              }
+            }
+          ]
+        },
+        {
+          "lootType": "random",
+          "chance": 0.5,
+          "entry": {
+            "lootType": "item",
+            "item": "minecraft:melon_slice",
+            "count": 1
+          }
+        },
+        {
+          "lootType": "repeat",
+          "min": 0,
+          "max": 5,
+          "entry": {
+            "lootType": "item",
+            "item": "minecraft:grass",
+            "count": 5
+          }
+        },
+        {
+          "lootType": "time",
+          "start": 200,
+          "end": 12000,
+          "entry": {
+            "lootType": "item",
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        }
+      ]
+    }
+  },
+  {
+    "lootId": 1,
+    "name": "Basic Combat Gear",
+    "color": "#FFFFFFAA",
+    "entry": {
+      "lootType": "multi",
+      "entries": [
+        {
+          "lootType": "item",
+          "item": "minecraft:iron_helmet",
+          "count": 1
+        },
+        {
+          "lootType": "item",
+          "item": "minecraft:iron_chestplate",
+          "count": 1
+        },
+        {
+          "lootType": "weight",
+          "entries": [
+            {
+              "weight": 20.0,
+              "entry": {
+                "lootType": "item",
+                "item": "minecraft:iron_sword",
+                "count": 1
+              }
+            },
+            {
+              "weight": 20.0,
+              "entry": {
+                "lootType": "item",
+                "item": "minecraft:iron_axe",
+                "count": 1
+              }
+            }
+          ]
+        },
+        {
+          "lootType": "random",
+          "chance": 0.2,
+          "entry": {
+            "lootType": "item",
+            "item": "minecraft:cooked_beef",
+            "count": 1
+          }
+        }
+      ]
+    }
+  },
+  {
+    "lootId": 2,
+    "name": "Advanced loot example",
+    "color": "#FFFFFFAA",
+    "entry": {
+      "lootType": "bound",
+      "countEmpty": true,
+      "countLootTime": true,
+      "min": 2,
+      "max": 4,
+      "keepEmpty": false,
+      "entries": [
+        {
+          "lootType": "extra",
+          "countEmpty": false,
+          "keepCheck": true,
+          "check": {
+            "lootType": "random",
+            "chance": 0.01,
+            "entry": {
+              "lootType": "empty",
+              "type": "item"
+            }
+          },
+          "extra": {
+            "lootType": "message",
+            "onlyGamePlayer": false,
+            "sendPosition": true,
+            "message": "Rare loot generated!",
+            "messageColor": "#FF0000"
+          }
+        },
+        {
+          "lootType": "regex",
+          "invert": false,
+          "regex": "minecraft:",
+          "entry": {
+            "lootType": "multi",
+            "entries": [
+              {
+                "lootType": "biome",
+                "invert": false,
+                "filter": [
+                  "minecraft:plains"
+                ],
+                "entry": {
+                  "lootType": "structure",
+                  "invert": false,
+                  "filter": [
+                    "minecraft:village_plains"
+                  ],
+                  "entry": {
+                    "lootType": "item",
+                    "item": "minecraft:diamond_helmet",
+                    "count": 1,
+                    "nbt": ""
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "lootType": "clean",
+          "entry": {
+            "lootType": "shuffle",
+            "keepEmpty": true,
+            "min": 0,
+            "max": 2,
+            "entry": {
+              "lootType": "multi",
+              "entries": [
+                {
+                  "lootType": "empty",
+                  "type": "item"
+                },
+                {
+                  "lootType": "empty",
+                  "type": "entity"
+                },
+                {
+                  "lootType": "item",
+                  "item": "minecraft:grass_block",
+                  "count": 1,
+                  "nbt": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "lootType": "shape",
+          "invert": false,
+          "shapeEntry": {
+            "zoneShapeType": "sphere",
+            "start": {
+              "center": {
+                "centerType": "fixed",
+                "fixed": "0.000000,0.000000,0.000000",
+                "randomRange": 0.0,
+                "playerCenterLerp": 0.0
+              },
+              "dimension": {
+                "dimensionType": "fixed",
+                "fixed": "200.000000,200.000000,200.000000",
+                "randomRange": 0.0
+              },
+              "rotation": {
+                "rotationType": "fixed",
+                "fixed": 0.0,
+                "randomRange": 0.0
+              }
+            },
+            "end": {
+              "center": {
+                "centerType": "fixed",
+                "fixed": "0.000000,0.000000,0.000000",
+                "randomRange": 0.0,
+                "playerCenterLerp": 0.0
+              },
+              "dimension": {
+                "dimensionType": "fixed",
+                "fixed": "10.000000,10.000000,10.000000",
+                "randomRange": 0.0
+              },
+              "rotation": {
+                "rotationType": "fixed",
+                "fixed": 0.0,
+                "randomRange": 0.0
+              }
+            },
+            "allowBadShape": false
+          },
+          "entry": {
+            "lootType": "item",
+            "item": "minecraft:diamond_sword",
+            "count": 1,
+            "nbt": ""
+          }
+        }
+      ]
+    }
+  },
+  {
+    "lootId": 3,
+    "name": "Function loot entry",
+    "color": "#FFFFFFAA",
+    "entry": {
+      "lootType": "multi",
+      "entries": [
+        {
+          "lootType": "message",
+          "onlyGamePlayer": true,
+          "sendPosition": true,
+          "message": "Chest Golem generated",
+          "messageColor": "#FF0000"
+        },
+        {
+          "lootType": "golem",
+          "entity": "minecraft:copper_golem",
+          "count": 5,
+          "nbt": "",
+          "range": 5,
+          "attempts": 4
+        },
+        {
+          "lootType": "golem",
+          "entity": "minecraft:iron_golem",
+          "count": 5,
+          "nbt": "",
+          "range": 20,
+          "attempts": 4
+        },
+        {
+          "lootType": "event",
+          "protocol": "cbr:0.4.3",
+          "jsonTag": {
+            "description": "Create event for other mod to subscribe",
+            "boolTrue": true,
+            "boolFalse": false,
+            "float": 0.333,
+            "double": 0.88888888,
+            "long": 4294967294,
+            "int": 666666,
+            "short": 25565,
+            "randomUUID": "dcfdcdba-f24f-49c4-87be-9ab4ae94d798",
+            "tagInTag": {
+              "additional data": "some structured data"
+            }
+          }
+        }
+      ]
+    }
+  }
+]

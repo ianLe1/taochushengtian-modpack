@@ -1,0 +1,347 @@
+[
+  {
+    "zoneId": 0,
+    "zoneName": "First speed rectangle",
+    "zoneColor": "#00FFFF33",
+    "zoneDelay": 0,
+    "zoneTime": 99999,
+    "zoneFunc": {
+      "zoneFuncType": "effect",
+      "moveDelay": 0,
+      "moveTime": 10,
+      "tickFrequency": 1,
+      "tickOffset": 0,
+      "effects": [
+        {
+          "type": "minecraft:speed",
+          "duration": 20,
+          "serverLevel": 3
+        }
+      ]
+    },
+    "zoneShape": {
+      "zoneShapeType": "rectangle",
+      "start": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "0.000000,0.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "0.000000,0.000000,0.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "2022.000000,53.000000,-9059.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "2.000000,2.000000,15.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 1,
+    "zoneName": "Rotating ellipsoid",
+    "zoneColor": "#FF000033",
+    "zoneDelay": 0,
+    "zoneTime": 99999,
+    "zoneFunc": {
+      "zoneFuncType": "noFunc",
+      "moveDelay": 0,
+      "moveTime": 200
+    },
+    "zoneShape": {
+      "zoneShapeType": "ellipsoid",
+      "start": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "2013.000000,57.000000,-9043.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "6.000000,4.000000,2.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "2013.000000,57.000000,-9043.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "6.000000,4.000000,2.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 3600.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 2,
+    "zoneName": "Firework hexagon",
+    "zoneColor": "#00FF0033",
+    "zoneDelay": 0,
+    "zoneTime": 99999,
+    "zoneFunc": {
+      "zoneFuncType": "firework",
+      "moveDelay": 0,
+      "moveTime": 10,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "trackPlayer": true,
+      "amount": 1,
+      "interval": 20,
+      "verticalRange": 1,
+      "horizontalRange": 1,
+      "outside": false
+    },
+    "zoneShape": {
+      "zoneShapeType": "hexagon",
+      "start": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "2011.000000,53.000000,-9052.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "4.000000,1.000000,4.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "2011.000000,53.000000,-9052.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "4.000000,1.000000,4.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 3,
+    "zoneName": "Floating cube particle",
+    "zoneColor": "#0000FF33",
+    "zoneDelay": 0,
+    "zoneTime": 99999,
+    "zoneFunc": {
+      "zoneFuncType": "particle",
+      "moveDelay": 0,
+      "moveTime": 10,
+      "tickFrequency": 1,
+      "tickOffset": 0,
+      "particles": [
+        0,
+        1,
+        2
+      ],
+      "selectCount": 1,
+      "channel": "zone3",
+      "cooldown": 5
+    },
+    "zoneShape": {
+      "zoneShapeType": "cube",
+      "start": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "0.000000,0.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "0.000000,0.000000,0.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "1999.000000,55.500000,-9045.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "2.000000,2.000000,2.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 4,
+    "zoneName": "Boost sphere",
+    "zoneColor": "#FFFFFF33",
+    "zoneDelay": 0,
+    "zoneTime": 99999,
+    "zoneFunc": {
+      "zoneFuncType": "boost",
+      "moveDelay": 0,
+      "moveTime": 10,
+      "tickFrequency": 1,
+      "tickOffset": 0,
+      "boost": 100
+    },
+    "zoneShape": {
+      "zoneShapeType": "sphere",
+      "start": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "0.000000,0.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "0.000000,0.000000,0.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "1982.000000,53.000000,-9047.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "5.000000,5.000000,5.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 5,
+    "zoneName": "Muteki Star",
+    "zoneColor": "#FFD700AA",
+    "zoneDelay": 0,
+    "zoneTime": 99999,
+    "zoneFunc": {
+      "zoneFuncType": "muteki",
+      "moveDelay": 200,
+      "moveTime": 100,
+      "tickFrequency": 1,
+      "tickOffset": 0,
+      "mutekiTime": 20
+    },
+    "zoneShape": {
+      "zoneShapeType": "star",
+      "start": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "1970.000000,53.000000,-9040.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "6.000000,1.000000,3.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "1970.000000,53.000000,-9040.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "2.000000,0.500000,6.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": true
+    }
+  }
+]

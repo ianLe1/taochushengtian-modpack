@@ -1,0 +1,18 @@
+filename = 'cratedelight-26.07.01-1.21-neoforge.jar'
+name = 'Crate Delight'
+side = 'both'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21', '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '26.07.01-1.21-neoforge'
+
+[download]
+hash = '8378c2b0289f2b76a805034d9b6694b6a256e4a9805d2a44cd8dc39c528993a549c436a4474d82b858efca7cae3b8201347f3305d386244e171dfb67e760b772'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/9rlXSyLg/versions/8x7j76JV/cratedelight-26.07.01-1.21-neoforge.jar'
+
+[update.modrinth]
+mod-id = '9rlXSyLg'
+version = '8x7j76JV'

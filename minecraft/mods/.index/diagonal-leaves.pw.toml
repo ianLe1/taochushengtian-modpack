@@ -1,0 +1,18 @@
+filename = 'diagonal_leaves-neoforge-1.21.1-0.1.1.jar'
+name = 'Diagonal Leaves'
+side = 'server'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'alpha'
+x-prismlauncher-version-number = '0.1.1-neoforge'
+
+[download]
+hash = 'c14be4dd25df6eee9932c39a80ce7e331446324d62bdaeb64fd4bfe3298708503cf9cf4ba18fd0a213b0cfa1fdde32136a8edc0c1019b156de15b7321477fc6e'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/WLTayYUn/versions/2tMNDYdB/diagonal_leaves-neoforge-1.21.1-0.1.1.jar'
+
+[update.modrinth]
+mod-id = 'WLTayYUn'
+version = '2tMNDYdB'

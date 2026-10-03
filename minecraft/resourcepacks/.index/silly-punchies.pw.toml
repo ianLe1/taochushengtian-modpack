@@ -1,0 +1,21 @@
+filename = 'Silly Punchies-0.1.zip'
+name = 'Silly Punchies!'
+side = 'client'
+x-prismlauncher-loaders = []
+x-prismlauncher-mc-versions = [ '1.20.1', '1.21.1', '1.21.4', '1.21.5', '1.21.6', '1.21.7', '1.21.8', '1.21.9', '1.21.10', '1.21.11' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '0.1'
+
+[download]
+hash = '384517406e0addf53c1525751cc3990dabcd203377261183a1d900f90aac7d0cfa7196a38d26ef5f8bc3f14e83d844a6edf1bf6296f6040f97aeec8291e220df'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/AZeNVpR2/versions/uRylUNFC/Silly Punchies-0.1.zip'
+
+[update.modrinth]
+mod-id = 'AZeNVpR2'
+version = 'uRylUNFC'
+
+[[x-prismlauncher-dependencies]]
+addonId = '8aoMKplv'
+type = 'REQUIRED'

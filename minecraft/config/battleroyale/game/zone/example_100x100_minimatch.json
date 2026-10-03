@@ -1,0 +1,817 @@
+[
+  {
+    "zoneId": 0,
+    "zoneName": "Blue border",
+    "zoneColor": "#0000FFFF",
+    "zoneDelay": 0,
+    "zoneTime": 99999,
+    "zoneFunc": {
+      "zoneFuncType": "safe",
+      "moveDelay": 0,
+      "moveTime": 0,
+      "tickFrequency": 200,
+      "tickOffset": 0,
+      "damage": 666.0
+    },
+    "zoneShape": {
+      "zoneShapeType": "circle",
+      "start": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "0.000000,-64.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "50.000000,384.000000,50.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 1,
+    "zoneName": "Game Start Message",
+    "zoneColor": "#FFAA00AA",
+    "zoneDelay": 0,
+    "zoneTime": 80,
+    "zoneFunc": {
+      "zoneFuncType": "message",
+      "moveDelay": 0,
+      "moveTime": 0,
+      "tickFrequency": 25,
+      "tickOffset": 10,
+      "setTitleAnimation": true,
+      "fadeInTicks": 10,
+      "stayTicks": 80,
+      "fadeOutTicks": 20,
+      "sendTitles": true,
+      "title": "",
+      "subtitle": "",
+      "sendActionBar": false
+    },
+    "zoneShape": {
+      "zoneShapeType": "circle",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 0.99,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "scale": 0.99,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 4,
+    "zoneName": "5s Muteki Time",
+    "zoneColor": "#FFD700AA",
+    "zoneDelay": 0,
+    "zoneTime": 100,
+    "zoneFunc": {
+      "zoneFuncType": "muteki",
+      "moveDelay": 0,
+      "moveTime": 100,
+      "tickFrequency": 20,
+      "tickOffset": -1,
+      "mutekiTime": 30
+    },
+    "zoneShape": {
+      "zoneShapeType": "circle",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": "-5.000000,0.000000,-5.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": "-5.000000,-320.000000,-5.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 5,
+    "zoneName": "Initial boost zone (Muteki countdown)",
+    "zoneColor": "#FFFFFF00",
+    "preZoneDelayId": 4,
+    "zoneDelay": 100,
+    "zoneTime": 19,
+    "zoneFunc": {
+      "zoneFuncType": "boost",
+      "moveDelay": 0,
+      "moveTime": 0,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "boost": 0
+    },
+    "zoneShape": {
+      "zoneShapeType": "circle",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": "-5.000000,0.000000,-5.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": "-5.000000,-320.000000,-5.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 2,
+    "zoneName": "Levitation Effect",
+    "zoneColor": "#AAAAAA11",
+    "zoneDelay": 0,
+    "zoneTime": 200,
+    "zoneFunc": {
+      "zoneFuncType": "effect",
+      "moveDelay": 0,
+      "moveTime": 20,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "effects": [
+        {
+          "type": "minecraft:glowing",
+          "duration": 20,
+          "serverLevel": 1
+        }
+      ]
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 1.01,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 1.01,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 88,
+    "zoneName": "Initial hotbar \u0026 inventory item",
+    "zoneColor": "#FFAA0000",
+    "preZoneDelayId": 0,
+    "zoneDelay": 60,
+    "zoneTime": 19,
+    "zoneFunc": {
+      "zoneFuncType": "inventory",
+      "moveDelay": 0,
+      "moveTime": 0,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "skipNonEmptySlot": false,
+      "dropBeforeReplace": false,
+      "firstSlotIndex": 0,
+      "lastSlotIndex": 35,
+      "lootEntry": {},
+      "lootSpawnerLootId": 0
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 1.01,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "scale": 1.01,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 89,
+    "zoneName": "Initial equipment",
+    "zoneColor": "#FFAA0000",
+    "preZoneDelayId": 0,
+    "zoneDelay": 60,
+    "zoneTime": 19,
+    "zoneFunc": {
+      "zoneFuncType": "inventory",
+      "moveDelay": 0,
+      "moveTime": 0,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "skipNonEmptySlot": false,
+      "dropBeforeReplace": false,
+      "firstSlotIndex": 36,
+      "lastSlotIndex": 39,
+      "lootEntry": {
+        "lootType": "multi",
+        "entries": [
+          {
+            "lootType": "empty",
+            "type": "item"
+          },
+          {
+            "lootType": "empty",
+            "type": "item"
+          },
+          {
+            "lootType": "item",
+            "item": "minecraft:diamond_chestplate",
+            "count": 1,
+            "nbt": "{}"
+          },
+          {
+            "lootType": "item",
+            "item": "minecraft:iron_helmet",
+            "count": 1,
+            "nbt": "{}"
+          }
+        ]
+      },
+      "lootSpawnerLootId": -1
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 1.01,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "scale": 1.01,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 90,
+    "zoneName": "Phase9Forecast",
+    "zoneColor": "#00FF0033",
+    "preZoneDelayId": 0,
+    "zoneDelay": 600,
+    "zoneTime": 103399,
+    "zoneFunc": {
+      "zoneFuncType": "noFunc",
+      "moveDelay": 0,
+      "moveTime": 20
+    },
+    "zoneShape": {
+      "zoneShapeType": "circle",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 90,
+          "progress": 0.0,
+          "rangeAsStartDimScale": true,
+          "useCircleRange": true,
+          "randomRange": 0.5,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 90,
+          "progress": 0.0,
+          "scale": 0.001,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    },
+    "zoneSpecial": {
+      "zoneSpecialType": "render",
+      "protocol": "cbr:direct",
+      "jsonTag": {
+        "hideInSpectate": true,
+        "heightOffset": 0.26,
+        "side": 0.5,
+        "3dDistance": false,
+        "distDim": "x",
+        "distMul": 1.0,
+        "distAdd": 0,
+        "innerColor": "#FFFFFF11"
+      }
+    }
+  },
+  {
+    "zoneId": 91,
+    "zoneName": "Phase9Shrink",
+    "zoneColor": "#0000FFAA",
+    "preZoneDelayId": 90,
+    "zoneDelay": 0,
+    "zoneTime": 103399,
+    "zoneFunc": {
+      "zoneFuncType": "safe",
+      "moveDelay": 200,
+      "moveTime": 3200,
+      "tickFrequency": 20,
+      "tickOffset": -1,
+      "damage": 3.6
+    },
+    "zoneShape": {
+      "zoneShapeType": "circle",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 90,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 90,
+          "progress": 0.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 90,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 90,
+          "progress": 1.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 92,
+    "zoneName": "Phase 9 create message",
+    "zoneColor": "#5555FFFF",
+    "preZoneDelayId": 90,
+    "zoneDelay": 0,
+    "zoneTime": 80,
+    "zoneFunc": {
+      "zoneFuncType": "message",
+      "moveDelay": 0,
+      "moveTime": 0,
+      "tickFrequency": 25,
+      "tickOffset": 10,
+      "setTitleAnimation": true,
+      "fadeInTicks": 10,
+      "stayTicks": 80,
+      "fadeOutTicks": 20,
+      "sendTitles": true,
+      "title": "",
+      "subtitle": "",
+      "sendActionBar": false
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 0.99,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "scale": 0.99,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 93,
+    "zoneName": "Phase 9 shrink message",
+    "zoneColor": "#FF5555FF",
+    "preZoneDelayId": 90,
+    "zoneDelay": 200,
+    "zoneTime": 80,
+    "zoneFunc": {
+      "zoneFuncType": "message",
+      "moveDelay": 0,
+      "moveTime": 0,
+      "tickFrequency": 25,
+      "tickOffset": 10,
+      "setTitleAnimation": true,
+      "fadeInTicks": 10,
+      "stayTicks": 80,
+      "fadeOutTicks": 20,
+      "sendTitles": true,
+      "title": "",
+      "subtitle": "",
+      "sendActionBar": false
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 0.99,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "scale": 0.99,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 94,
+    "zoneName": "Phase 9 boost zone (Shrink countdown)",
+    "zoneColor": "#FFFFFF00",
+    "preZoneDelayId": 90,
+    "zoneDelay": 0,
+    "zoneTime": 19,
+    "zoneFunc": {
+      "zoneFuncType": "boost",
+      "moveDelay": 0,
+      "moveTime": 0,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "boost": 200
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 0.99,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "scale": 0.99,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  }
+]

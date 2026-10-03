@@ -1,0 +1,18 @@
+filename = 'BEB-NeoForge-1.21-6.0.0.jar'
+name = 'Beautiful Enchanted Books [MOD EDITION]'
+side = 'both'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21', '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '6.0.0'
+
+[download]
+hash = '7cc5dc954d19c9f483254ddad0ac31d263c173d9c179931b5fc024c00badf6838ee131ccde5b15a7d10c9cabd1a9f70e894a5d39720fcaa30fd96efca33fc46a'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/pcqEicMM/versions/XeLhIDWZ/BEB-NeoForge-1.21-6.0.0.jar'
+
+[update.modrinth]
+mod-id = 'pcqEicMM'
+version = 'XeLhIDWZ'

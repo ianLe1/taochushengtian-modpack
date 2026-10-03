@@ -1,0 +1,25 @@
+filename = 'coastersengineered-1.21.1-1.1.1.jar'
+name = 'Coasters: Engineered'
+side = ''
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.1.1'
+
+[download]
+hash = '437633b806a579fbceec72894ebaacd151b77da0f6b951a957316171c199f67310bc270c4b0206566a4cb4ed7fd2968704d4f3c63922ae6ff5ea095978e64a80'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/guKf87OB/versions/pzBMM4ER/coastersengineered-1.21.1-1.1.1.jar'
+
+[update.modrinth]
+mod-id = 'guKf87OB'
+version = 'pzBMM4ER'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'LNytGWDc'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'W1ZUfWdr'
+type = 'REQUIRED'

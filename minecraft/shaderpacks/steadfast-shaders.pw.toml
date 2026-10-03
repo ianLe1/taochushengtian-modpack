@@ -1,0 +1,47 @@
+filename = 'Steadfast-0.8.0.zip'
+name = 'Steadfast'
+side = 'client'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = []
+x-prismlauncher-mc-versions = [
+    '1.18.2',
+    '1.19',
+    '1.19.1',
+    '1.19.2',
+    '1.19.3',
+    '1.19.4',
+    '1.20',
+    '1.20.1',
+    '1.20.2',
+    '1.20.3',
+    '1.20.4',
+    '1.20.5',
+    '1.20.6',
+    '1.21',
+    '1.21.1',
+    '1.21.2',
+    '1.21.3',
+    '1.21.4',
+    '1.21.5',
+    '1.21.6',
+    '1.21.7',
+    '1.21.8',
+    '1.21.9',
+    '1.21.10',
+    '1.21.11',
+    '26.1',
+    '26.1.1',
+    '26.1.2'
+]
+x-prismlauncher-release-type = 'beta'
+x-prismlauncher-version-number = '0.8.0'
+
+[download]
+hash = 'e286f148db28dd00b9059a7792cbead3f56191ca1efe4010cd98f84542d874d1857c567d606a8ecdd5f5a36bdbed6e4dbcf8ff2e47345187aa592150726fb41a'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/ch1yZBko/versions/zkmsy0i7/Steadfast-0.8.0.zip'
+
+[update.modrinth]
+mod-id = 'ch1yZBko'
+version = 'zkmsy0i7'

@@ -1,0 +1,66 @@
+# =====================================================================
+#  逃出生天 · 整合包版本管理仓库（白名单模式）
+#  设计参考：https://www.mcmod.cn/post/5088.html
+#  原则：默认忽略一切；只放行「实例定义 + 模组清单 + 配置 + 脚本」，
+#       任何二进制（jar / zip / 视频 / 存档 / 日志）都不入库。
+# =====================================================================
+/*
+
+# ---- 实例定义（Prism 认这两个文件 + 图标）----
+!/instance.cfg
+!/mmc-pack.json
+!/icon.png
+
+# ---- 仓库自身文件 ----
+!/.gitignore
+!/README.md
+!/键位方案.md
+!/键位改动表.md
+!/键位自检小抄.md
+
+# ---- 游戏目录 ----
+!/minecraft
+/minecraft/*
+
+# 模组清单：packwiz 元数据，Prism「检查模组更新」的下载依据
+!/minecraft/mods
+/minecraft/mods/*
+!/minecraft/mods/.index/
+!/minecraft/mods/.index/*.pw.toml
+
+# 资源包清单
+!/minecraft/resourcepacks
+/minecraft/resourcepacks/*
+!/minecraft/resourcepacks/.index/
+!/minecraft/resourcepacks/.index/*.pw.toml
+
+# 光影清单
+!/minecraft/shaderpacks
+/minecraft/shaderpacks/*
+!/minecraft/shaderpacks/*.pw.toml
+
+# 模组配置与 KubeJS 脚本
+!/minecraft/config/
+!/minecraft/kubejs/
+
+# 键位轮盘定义（options.txt 不入库，理由见 README）
+!/minecraft/keybind_bundles.json
+
+# =====================================================================
+#  黑名单（写在白名单之后，后写的规则生效）
+# =====================================================================
+
+# 任何二进制 / 压缩包，永不出现在本仓库
+*.jar
+*.zip
+*.mrpack
+*.mp4
+*.mp3
+*.ogg
+
+# 客户端本地状态与体积型缓存
+/minecraft/config/create_fire_control/
+/minecraft/config/xaero/
+/minecraft/config/taw/*.tsv
+/minecraft/config/**/*.bak.*
+/minecraft/config/**/*.lock

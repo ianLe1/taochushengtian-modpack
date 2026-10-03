@@ -1,0 +1,3 @@
+#[STARTUP] Whether the branch/trunk placement should query the level for adjacent blockstates if none are found in the tree positions.
+#Enabling this will make connections more accurate, specifically near the tree base, at the cost of performance.
+tree_fix_scan_level_on_miss = false

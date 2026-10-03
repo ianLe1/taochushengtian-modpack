@@ -1,0 +1,18 @@
+filename = 'keywheel-neoforge-1.1.7-1.21.1-java21.jar'
+name = 'Screw it! Too many keybinds - Keybind Wheel'
+side = 'server'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = 'keywheel-neoforge-1.1.7-1.21.1-java21.jar'
+
+[download]
+hash = '9c2b5731c097dbd7f5042ed54723c6141e0cc9da'
+hash-format = 'sha1'
+mode = 'metadata:curseforge'
+url = ''
+
+[update.curseforge]
+file-id = 8459900
+project-id = 1569840

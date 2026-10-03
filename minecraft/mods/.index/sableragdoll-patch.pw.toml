@@ -1,0 +1,32 @@
+filename = 'sable_player_ragdoll_patch-1.21.1-1.9.jar'
+name = 'Sable: Ragdoll - Patch'
+side = 'both'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.9'
+
+[download]
+hash = '789484c4c1695f21e3d231bd22ef56e6006ace4e90f5b0fb2aed9d70f40182edc05255bbf50b68160bef77d28a94d4511b6b1c9e3ce0ccd06c18272c2c1db705'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/4q2Q9rk1/versions/B5ewlofo/sable_player_ragdoll_patch-1.21.1-1.9.jar'
+
+[update.modrinth]
+mod-id = '4q2Q9rk1'
+version = 'B5ewlofo'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'I3mWDgfy'
+type = 'REQUIRED'
+version = 'CyKh8XSr'
+
+[[x-prismlauncher-dependencies]]
+addonId = '6awFMFjR'
+type = 'OPTIONAL'
+version = 'yx32Af0N'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'uetGbPKW'
+type = 'REQUIRED'
+version = 'DwA6a1pT'

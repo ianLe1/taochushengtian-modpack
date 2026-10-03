@@ -1,0 +1,18 @@
+filename = "Weskerson's 3D Items 3D book compatibility.zip"
+name = "Weskerson's 3d (patch Compatibility) for Bray & Cyber's 3D Books"
+side = 'client'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = []
+x-prismlauncher-mc-versions = [ '26.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = 'V03'
+
+[download]
+hash = '51c6281fc11b15e22dd8a46677c9892d6753c50bf200b940aadf17db1508228f81b1bc96017f2ec518b6d32352a0da72b77b26b9b12a7e13b267ceb296d17cec'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/rzHyPFST/versions/peR0ap1j/Weskerson%27s 3D Items 3D book compatibility.zip'
+
+[update.modrinth]
+mod-id = 'rzHyPFST'
+version = 'peR0ap1j'

@@ -1,0 +1,21 @@
+filename = 'Flashback-0.39.10-for-MC1.21.1.jar'
+name = 'Flashback'
+side = 'client'
+x-prismlauncher-loaders = [ 'fabric' ]
+x-prismlauncher-mc-versions = [ '1.21', '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '0.39.10'
+
+[download]
+hash = '97ec529d8d420ebe68df851979f3544c1d290088c2c9ce1458ee046fb5011cfb12459f0bf78cf38e42b74dca1bae6986b89336b4e5764f0587ba13a3f3d437f7'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/4das1Fjq/versions/nPzvTtsX/Flashback-0.39.10-for-MC1.21.1.jar'
+
+[update.modrinth]
+mod-id = '4das1Fjq'
+version = 'nPzvTtsX'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'P7dR8mSH'
+type = 'REQUIRED'

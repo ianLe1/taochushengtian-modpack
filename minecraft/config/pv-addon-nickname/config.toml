@@ -1,0 +1,5 @@
+# Nickname format applied to Plasmo Voice player info.
+# Built-in placeholders: %player_name%, %player_uuid%, %player_displayname%
+# On Bukkit/Paper with PlaceholderAPI installed, all PAPI placeholders work.
+# On Fabric with PB4 placeholder-api installed, %namespace:placeholder% syntax works.
+format = "%player_displayname%"

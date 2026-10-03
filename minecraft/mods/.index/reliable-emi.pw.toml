@@ -1,0 +1,25 @@
+filename = 'remi-neoforge-1.21.1-4.7.9.jar'
+name = 'Reliable EMI'
+side = ''
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '4.7.9-1.21.1-neoforge'
+
+[download]
+hash = 'edd25c5cb8a83a4c0a046d8afd40b5f5b5242b5dd3689b3a951cd47ace3f84942f9b60ed2a1fd802fe16ad884128b92faba4ca6c28b3c265e6e6a70f6b99fc9a'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/N9WucjHL/versions/iOekvzRL/remi-neoforge-1.21.1-4.7.9.jar'
+
+[update.modrinth]
+mod-id = 'N9WucjHL'
+version = 'iOekvzRL'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'fRiHVvU7'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = '1eAoo2KR'
+type = 'REQUIRED'

@@ -1,0 +1,18 @@
+filename = 'toroidal_world-0.19.3+mc1.21.1.jar'
+name = 'Toroidal World (NeoForge and Fabric)'
+side = ''
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge', 'fabric' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'beta'
+x-prismlauncher-version-number = '0.19.3+mc1.21.1'
+
+[download]
+hash = '9d8d2fdc17aabe6471a61f74532225f96eb6d75607a7c83a5200dc492b9f7cde574b853059694e7118afdacf72cb35e9cfaaadba0f2ea265d5b4d293ddfcaf52'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/CdjG7l5z/versions/8YTSYi9y/toroidal_world-0.19.3%2Bmc1.21.1.jar'
+
+[update.modrinth]
+mod-id = 'CdjG7l5z'
+version = '8YTSYi9y'

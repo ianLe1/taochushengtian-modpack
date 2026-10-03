@@ -1,0 +1,45 @@
+filename = 'tellus-atlas-wildlife-0.9.12.jar'
+name = 'Tellus: Atlas and Wildlife'
+side = 'both'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'beta'
+x-prismlauncher-version-number = '0.9.12'
+
+[download]
+hash = '1988ab58129c31f13fd2c04242a2b81c2935a04c10e2fef5f9ee459d8650f966f21d82b8a1d54fe631efb59c98116012ec7169530ad08633e27a9fe9c42f7f72'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/KwfT6WYP/versions/zny4Y1vI/tellus-atlas-wildlife-0.9.12.jar'
+
+[update.modrinth]
+mod-id = 'KwfT6WYP'
+version = 'zny4Y1vI'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'LOpKHB2A'
+type = 'OPTIONAL'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'F8BQNPWX'
+type = 'OPTIONAL'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'tTcL5uOD'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'Yd4wb5wZ'
+type = 'OPTIONAL'
+
+[[x-prismlauncher-dependencies]]
+addonId = '2cMuAZAp'
+type = 'OPTIONAL'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'HH4FjUqN'
+type = 'OPTIONAL'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'Vl1uNAuy'
+type = 'OPTIONAL'

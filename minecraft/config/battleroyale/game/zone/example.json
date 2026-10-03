@@ -1,0 +1,1168 @@
+[
+  {
+    "zoneId": 0,
+    "zoneName": "Blue opaque border",
+    "zoneColor": "#0000FFFF",
+    "zoneDelay": 0,
+    "zoneTime": 12000,
+    "zoneFunc": {
+      "zoneFuncType": "safe",
+      "moveDelay": 0,
+      "moveTime": 0,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "damage": 1.0
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "0.000000,-60.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "128.000000,255.000000,128.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "0.000000,-60.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "128.000000,255.000000,128.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 1,
+    "zoneName": "Self shrink aqua circle",
+    "zoneColor": "#00FFFFAA",
+    "zoneDelay": 0,
+    "zoneTime": 12000,
+    "zoneFunc": {
+      "zoneFuncType": "safe",
+      "moveDelay": 600,
+      "moveTime": 1200,
+      "tickFrequency": 20,
+      "tickOffset": -1,
+      "damage": 1.0
+    },
+    "zoneShape": {
+      "zoneShapeType": "circle",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "scale": 1.4142135623730951,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 1,
+          "progress": 0.0,
+          "randomRange": 64.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 1,
+          "progress": 0.0,
+          "scale": 0.5,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 2,
+    "zoneName": "Floating unsafe red rectangle",
+    "zoneColor": "#FF0000AA",
+    "zoneDelay": 200,
+    "zoneTime": 2400,
+    "zoneFunc": {
+      "zoneFuncType": "unsafe",
+      "moveDelay": 600,
+      "moveTime": 1200,
+      "tickFrequency": 20,
+      "tickOffset": -1,
+      "damage": 1.0
+    },
+    "zoneShape": {
+      "zoneShapeType": "rectangle",
+      "start": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "0.000000,-30.000000,0.000000",
+          "randomRange": 128.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "30.000000,20.000000,50.000000",
+          "randomRange": 10.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "0.000000,-50.000000,0.000000",
+          "randomRange": 64.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "30.000000,20.000000,50.000000",
+          "randomRange": 20.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 3,
+    "zoneName": "Relative Green Circle",
+    "zoneColor": "#00FF00AA",
+    "zoneDelay": 400,
+    "zoneTime": 11600,
+    "zoneFunc": {
+      "zoneFuncType": "firework",
+      "moveDelay": 600,
+      "moveTime": 1200,
+      "tickFrequency": 20,
+      "tickOffset": -1,
+      "trackPlayer": true,
+      "amount": 1,
+      "interval": 20,
+      "verticalRange": 5,
+      "horizontalRange": 3,
+      "outside": false
+    },
+    "zoneShape": {
+      "zoneShapeType": "circle",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 1,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 1,
+          "progress": 1.0,
+          "scale": 1.0,
+          "relative": "-50.000000,-230.000000,-50.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "relative",
+          "previousZoneId": 3,
+          "progress": 0.0,
+          "relative": "0.000000,20.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 3,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": "50.000000,-5.000000,50.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 4,
+    "zoneName": "Unwelcomed White Hexagon",
+    "zoneColor": "#FFFFFFAA",
+    "zoneDelay": 600,
+    "zoneTime": 11400,
+    "zoneFunc": {
+      "zoneFuncType": "unsafe",
+      "moveDelay": 600,
+      "moveTime": 600,
+      "tickFrequency": 20,
+      "tickOffset": -1,
+      "damage": 10.0
+    },
+    "zoneShape": {
+      "zoneShapeType": "hexagon",
+      "start": {
+        "center": {
+          "centerType": "relative",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "relative": "0.000000,0.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.2
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "scale": 1.0,
+          "relative": "-100.000000,-240.000000,-100.000000",
+          "randomRange": 10.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "relative",
+          "previousZoneId": 4,
+          "progress": 0.0,
+          "relative": "0.000000,10.000000,0.000000",
+          "randomRange": 100.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "0.000000,0.000000,0.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 5,
+    "zoneName": "Black Polygon Trap",
+    "zoneColor": "#00000022",
+    "zoneDelay": 100,
+    "zoneTime": 12000,
+    "zoneFunc": {
+      "zoneFuncType": "unsafe",
+      "moveDelay": 600,
+      "moveTime": 600,
+      "tickFrequency": 20,
+      "tickOffset": -1,
+      "damage": 0.001
+    },
+    "zoneShape": {
+      "zoneShapeType": "polygon",
+      "start": {
+        "center": {
+          "centerType": "lockPlayer",
+          "playerId": 0,
+          "selectStanding": true,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "80.000000,2.000000,80.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "0.000000,-60.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "15.000000,4.000000,15.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false,
+      "segments": 5
+    }
+  },
+  {
+    "zoneId": 6,
+    "zoneName": "Rotating Ellipse monitor",
+    "zoneColor": "#FFFF0022",
+    "zoneDelay": 200,
+    "zoneTime": 400,
+    "zoneFunc": {
+      "zoneFuncType": "firework",
+      "moveDelay": 0,
+      "moveTime": 400,
+      "tickFrequency": 10,
+      "tickOffset": -1,
+      "trackPlayer": false,
+      "amount": 1,
+      "interval": 0,
+      "verticalRange": 0,
+      "horizontalRange": 0,
+      "outside": false
+    },
+    "zoneShape": {
+      "zoneShapeType": "ellipse",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "128.000000,1.500000,12.800000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": -360.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 6,
+          "progress": 0.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "relative",
+          "previousZoneId": 6,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": 720.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 7,
+    "zoneName": "Bug Star",
+    "zoneColor": "#FFD70022",
+    "zoneDelay": 200,
+    "zoneTime": 700,
+    "zoneFunc": {
+      "zoneFuncType": "muteki",
+      "moveDelay": 200,
+      "moveTime": 400,
+      "tickFrequency": 20,
+      "tickOffset": -1,
+      "mutekiTime": 200
+    },
+    "zoneShape": {
+      "zoneShapeType": "star",
+      "start": {
+        "center": {
+          "centerType": "lockPlayer",
+          "playerId": 0,
+          "selectStanding": true,
+          "randomRange": 10.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "20.000000,5.000000,10.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": -360.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 7,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 1.0
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 7,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": "-40.000000,-2.000000,0.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "relative",
+          "previousZoneId": 7,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": 720.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": true
+    }
+  },
+  {
+    "zoneId": 10,
+    "zoneName": "1st boost sphere",
+    "zoneColor": "#0000FF77",
+    "zoneDelay": 200,
+    "zoneTime": 700,
+    "zoneFunc": {
+      "zoneFuncType": "boost",
+      "moveDelay": 200,
+      "moveTime": 400,
+      "tickFrequency": 20,
+      "tickOffset": -1,
+      "boost": 80
+    },
+    "zoneShape": {
+      "zoneShapeType": "sphere",
+      "start": {
+        "center": {
+          "centerType": "lockPlayer",
+          "playerId": 1,
+          "selectStanding": true,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "10.000000,10.000000,10.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "relative",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "relative": "0.000000,5.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 10,
+          "progress": 0.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 11,
+    "zoneName": "Particle Cube",
+    "zoneColor": "#0000FF55",
+    "zoneDelay": 200,
+    "zoneTime": 700,
+    "zoneFunc": {
+      "zoneFuncType": "particle",
+      "moveDelay": 200,
+      "moveTime": 400,
+      "tickFrequency": 20,
+      "tickOffset": -1,
+      "particles": [
+        1,
+        1,
+        2
+      ],
+      "selectCount": 1,
+      "channel": "zone11",
+      "cooldown": 50
+    },
+    "zoneShape": {
+      "zoneShapeType": "cube",
+      "start": {
+        "center": {
+          "centerType": "lockPlayer",
+          "playerId": 0,
+          "selectStanding": true,
+          "randomRange": 0.0,
+          "playerCenterLerp": -0.2
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "10.000000,10.000000,10.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "lockPlayer",
+          "playerId": 0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "relative",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "relative": "0.000000,9.990000,0.000000",
+          "randomRange": 20.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 11,
+          "progress": 0.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "previous",
+          "previousZoneId": 11,
+          "progress": 0.0,
+          "scale": 1.0,
+          "randomRange": 360.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 12,
+    "zoneName": "Speed effect Cuboid",
+    "zoneColor": "#00FF0099",
+    "zoneDelay": 200,
+    "zoneTime": 700,
+    "zoneFunc": {
+      "zoneFuncType": "effect",
+      "moveDelay": 200,
+      "moveTime": 400,
+      "tickFrequency": 20,
+      "tickOffset": -1,
+      "effects": [
+        {
+          "type": "minecraft:speed",
+          "duration": 20,
+          "serverLevel": 1
+        },
+        {
+          "type": "minecraft:jump_boost",
+          "duration": 20,
+          "serverLevel": 1
+        }
+      ]
+    },
+    "zoneShape": {
+      "zoneShapeType": "cuboid",
+      "start": {
+        "center": {
+          "centerType": "lockPlayer",
+          "playerId": 0,
+          "selectStanding": true,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.2
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "20.000000,10.000000,10.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "lockPlayer",
+          "playerId": 0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "relative",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "relative": "0.000000,9.990000,0.000000",
+          "randomRange": 20.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 11,
+          "progress": 0.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "previous",
+          "previousZoneId": 11,
+          "progress": 0.0,
+          "scale": 1.0,
+          "randomRange": 360.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 13,
+    "zoneName": "Harmonious ellipsoid spectator",
+    "zoneColor": "#FF000066",
+    "zoneDelay": 600,
+    "zoneTime": 1800,
+    "zoneFunc": {
+      "zoneFuncType": "noFunc",
+      "moveDelay": 0,
+      "moveTime": 1200
+    },
+    "zoneShape": {
+      "zoneShapeType": "ellipsoid",
+      "start": {
+        "center": {
+          "centerType": "relative",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "relative": "0.000000,50.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "15.000000,5.000000,8.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 13,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 13,
+          "progress": 0.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 5400.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 14,
+    "zoneName": "Triple zone notification",
+    "zoneColor": "#FFAA00AA",
+    "zoneDelay": 0,
+    "zoneTime": 80,
+    "zoneFunc": {
+      "zoneFuncType": "message",
+      "moveDelay": 0,
+      "moveTime": 40,
+      "tickFrequency": 25,
+      "tickOffset": 10,
+      "setTitleAnimation": true,
+      "fadeInTicks": 10,
+      "stayTicks": 80,
+      "fadeOutTicks": 20,
+      "sendTitles": true,
+      "title": "",
+      "subtitle": "",
+      "sendActionBar": true,
+      "actionBar": ""
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "0.000000,255.000000,0.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "scale": 0.99,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 15,
+    "zoneName": "Event Zone example",
+    "zoneColor": "#FFFFFFFF",
+    "zoneDelay": 0,
+    "zoneTime": 0,
+    "zoneFunc": {
+      "zoneFuncType": "event",
+      "moveDelay": 0,
+      "moveTime": 0,
+      "tickFrequency": 1,
+      "tickOffset": 0,
+      "protocol": "cbr:0.3.8",
+      "jsonTag": {
+        "description": "Create event for other mod to subscribe",
+        "boolTrue": true,
+        "boolFalse": false,
+        "float": 0.333,
+        "double": 0.88888888,
+        "long": 4294967294,
+        "int": 666666,
+        "short": 25565,
+        "randomUUID": "9ef05fa3-fefa-48d6-948d-2a9ebe0794c2"
+      }
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "0.000000,0.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "0.000000,0.000000,0.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "0.000000,0.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "0.000000,0.000000,0.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 16,
+    "zoneName": "Initial elytra equipment",
+    "zoneColor": "#FFAA00AA",
+    "zoneDelay": 80,
+    "zoneTime": 20,
+    "zoneFunc": {
+      "zoneFuncType": "inventory",
+      "moveDelay": 0,
+      "moveTime": 0,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "skipNonEmptySlot": false,
+      "dropBeforeReplace": false,
+      "firstSlotIndex": 36,
+      "lastSlotIndex": 39,
+      "lootEntry": {
+        "lootType": "multi",
+        "entries": [
+          {
+            "lootType": "empty",
+            "type": "item"
+          },
+          {
+            "lootType": "empty",
+            "type": "item"
+          },
+          {
+            "lootType": "item",
+            "item": "minecraft:elytra",
+            "count": 1,
+            "nbt": "{components:{\"minecraft:damage\":332}}"
+          },
+          {
+            "lootType": "item",
+            "item": "minecraft:iron_helmet",
+            "count": 1,
+            "nbt": ""
+          }
+        ]
+      },
+      "lootSpawnerLootId": -1
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "0.000000,255.000000,0.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "scale": 1.01,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 17,
+    "zoneName": "Client special render",
+    "zoneColor": "#FFFFFF22",
+    "preZoneDelayId": 0,
+    "zoneDelay": 80,
+    "zoneTime": 12000,
+    "zoneFunc": {
+      "zoneFuncType": "noFunc",
+      "moveDelay": 0,
+      "moveTime": 0
+    },
+    "zoneShape": {
+      "zoneShapeType": "circle",
+      "start": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "0.000000,-60.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "10.000000,1.000000,10.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "0.000000,-60.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "10.000000,1.000000,10.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    },
+    "zoneSpecial": {
+      "zoneSpecialType": "render",
+      "protocol": "cbr:direct",
+      "jsonTag": {
+        "hideInSpectate": true,
+        "heightOffset": 0.25,
+        "side": 0.5,
+        "3dDistance": false,
+        "distDim": "x",
+        "distMul": 1.0,
+        "distAdd": 0,
+        "innerColor": "#00FF0011"
+      }
+    }
+  },
+  {
+    "zoneId": 18,
+    "zoneName": "Red cross regeneration",
+    "zoneColor": "#FF000099",
+    "zoneDelay": 900,
+    "zoneTime": 700,
+    "zoneFunc": {
+      "zoneFuncType": "effect",
+      "moveDelay": 0,
+      "moveTime": 0,
+      "tickFrequency": 20,
+      "tickOffset": -1,
+      "effects": [
+        {
+          "type": "minecraft:regeneration",
+          "duration": 20,
+          "serverLevel": 1
+        }
+      ]
+    },
+    "zoneShape": {
+      "zoneShapeType": "cross",
+      "start": {
+        "center": {
+          "centerType": "lockPlayer",
+          "playerId": 0,
+          "selectStanding": true,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.2
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "15.000000,1.500000,5.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 18,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 18,
+          "progress": 0.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 19,
+    "zoneName": "Yellow ring glowing",
+    "zoneColor": "#FFD70099",
+    "zoneDelay": 900,
+    "zoneTime": 700,
+    "zoneFunc": {
+      "zoneFuncType": "effect",
+      "moveDelay": 0,
+      "moveTime": 20,
+      "tickFrequency": 20,
+      "tickOffset": -1,
+      "effects": [
+        {
+          "type": "minecraft:glowing",
+          "duration": 20,
+          "serverLevel": 1
+        }
+      ]
+    },
+    "zoneShape": {
+      "zoneShapeType": "ring",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 18,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 18,
+          "progress": 0.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 19,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "21.213203,1.500000,24.213203",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  }
+]

@@ -1,0 +1,162 @@
+[
+  {
+    "zoneId": 2,
+    "zoneName": "Levitation Effect",
+    "zoneColor": "#AAAAAA11",
+    "zoneDelay": 0,
+    "zoneTime": 200,
+    "zoneFunc": {
+      "zoneFuncType": "effect",
+      "moveDelay": 0,
+      "moveTime": 20,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "effects": [
+        {
+          "type": "minecraft:levitation",
+          "duration": 20,
+          "serverLevel": 1
+        },
+        {
+          "type": "minecraft:glowing",
+          "duration": 20,
+          "serverLevel": 1
+        }
+      ]
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 1.01,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 1.01,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 3,
+    "zoneName": "Initial elytra equipment",
+    "zoneColor": "#BBBBBB22",
+    "zoneDelay": 80,
+    "zoneTime": 20,
+    "zoneFunc": {
+      "zoneFuncType": "inventory",
+      "moveDelay": 0,
+      "moveTime": 0,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "skipNonEmptySlot": false,
+      "dropBeforeReplace": false,
+      "firstSlotIndex": 36,
+      "lastSlotIndex": 39,
+      "lootEntry": {
+        "lootType": "multi",
+        "entries": [
+          {
+            "lootType": "empty",
+            "type": "item"
+          },
+          {
+            "lootType": "empty",
+            "type": "item"
+          },
+          {
+            "lootType": "item",
+            "item": "minecraft:elytra",
+            "count": 1,
+            "nbt": "{components:{\"minecraft:damage\":332}}"
+          },
+          {
+            "lootType": "empty",
+            "type": "item"
+          }
+        ]
+      },
+      "lootSpawnerLootId": -1
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 1.01,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 1.01,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  }
+]

@@ -1,0 +1,18 @@
+filename = 'particlerain-4.0.0-beta.11+1.21.1-neoforge.jar'
+name = 'Particle Rain'
+side = 'client'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'beta'
+x-prismlauncher-version-number = 'v4-beta.11+1.21.1-neoforge'
+
+[download]
+hash = 'a99355c57bc8d4e04dc42b2caa5981c0c8bb0408e5dff6789149894ebeb0f0b23c95325b5f4bc62d3f8f57890feb3dc8e888da8f155db0ccc39bdebfd7f63cc2'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/nrikgvxm/versions/k32OBTlL/particlerain-4.0.0-beta.11%2B1.21.1-neoforge.jar'
+
+[update.modrinth]
+mod-id = 'nrikgvxm'
+version = 'k32OBTlL'

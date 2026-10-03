@@ -1,0 +1,25 @@
+filename = 'sable_ragdoll_dummies-1.0.0-neoforge-1.21.1.jar'
+name = 'Sable: Ragdoll Dummies'
+side = 'both'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.0.0'
+
+[download]
+hash = '97a5662dd92360307a7c0f53321122c8c6026a70386c530a8b13a7d85e6f0786d8b41848b445a511b68ea07907e3174a2b4197a391dd56fa810d06363af1225d'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/YSTRBJTu/versions/biCqsCL8/sable_ragdoll_dummies-1.0.0-neoforge-1.21.1.jar'
+
+[update.modrinth]
+mod-id = 'YSTRBJTu'
+version = 'biCqsCL8'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'I3mWDgfy'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'T9PomCSv'
+type = 'REQUIRED'

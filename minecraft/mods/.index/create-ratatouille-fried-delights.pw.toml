@@ -1,0 +1,22 @@
+filename = 'ratatouille_fried_delights-1.0.4.jar'
+name = 'Create: Ratatouille Fried Delights'
+side = 'both'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.0.4'
+
+[download]
+hash = '571e6d6976c7b463326ca313289bce8c771ed676f109e48a67ebf129ddb39121f6ba883e3274c0999116cfb2573e9b2b6fd7dd383787b22b9cc839148772410e'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/xG1YXmVZ/versions/sTm1ZEgP/ratatouille_fried_delights-1.0.4.jar'
+
+[update.modrinth]
+mod-id = 'xG1YXmVZ'
+version = 'sTm1ZEgP'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'XM0ifg8q'
+type = 'REQUIRED'
+version = 'Ovv4xLQg'

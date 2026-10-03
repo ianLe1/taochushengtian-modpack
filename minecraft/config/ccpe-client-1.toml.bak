@@ -1,0 +1,26 @@
+#Monitor 模块边框颜色 - 红 (0-255)。默认: 90
+# Default: 90
+# Range: 0 ~ 255
+monitorOutlineR = 90
+#Monitor 模块边框颜色 - 绿 (0-255)。默认: 143
+# Default: 143
+# Range: 0 ~ 255
+monitorOutlineG = 143
+#Monitor 模块边框颜色 - 蓝 (0-255)。默认: 60
+# Default: 60
+# Range: 0 ~ 255
+monitorOutlineB = 60
+#Monitor 模块边框颜色 - 透明度 (0-255)。默认: 255
+# Default: 255
+# Range: 0 ~ 255
+monitorOutlineA = 255
+#Monitor 棋盘网格线粗细倍率 (0.0-2.0)。默认: 1.0
+# Default: 1.0
+# Range: 0.0 ~ 2.0
+monitorGridLineWidth = 1.0
+#Monitor 模块边框/预览框线条粗细倍率 (0.0-2.0)。默认: 1.0
+# Default: 1.0
+# Range: 0.0 ~ 2.0
+monitorOutlineLineWidth = 1.0
+#坐垫操作模式下显示虚拟摇杆 HUD（默认关闭，避免破坏沉浸感；需要时在客户端配置中开启）。
+joystickOverlayEnabled = false

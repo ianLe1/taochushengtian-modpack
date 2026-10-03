@@ -1,0 +1,87 @@
+[
+  {
+    "id": 0,
+    "name": "Example PUBG Armor Scaling config",
+    "color": "#FFFFFF",
+    "damageScaling": {
+      "damageScaleData": [
+        {
+          "item": "minecraft:netherite_helmet",
+          "scale": 0.45
+        },
+        {
+          "item": "minecraft:diamond_chestplate",
+          "scale": 0.45
+        },
+        {
+          "item": "minecraft:iron_helmet",
+          "scale": 0.6
+        },
+        {
+          "item": "minecraft:iron_chestplate",
+          "scale": 0.6
+        },
+        {
+          "item": "minecraft:leather_helmet",
+          "scale": 0.7
+        },
+        {
+          "item": "minecraft:leather_chestplate",
+          "scale": 0.7
+        },
+        {
+          "item": "minecraft:chainmail_chestplate",
+          "scale": 0.8
+        }
+      ]
+    },
+    "durabilityScaling": {
+      "healthToDurabilityRatio": 5.0,
+      "useAbsorbedDamageOnly": false,
+      "headshotMultiplierScaling": false,
+      "durabilityScaleData": [
+        {
+          "item": "minecraft:netherite_helmet",
+          "damagePercent": 230.0,
+          "replaceItem": {}
+        },
+        {
+          "item": "minecraft:diamond_chestplate",
+          "damagePercent": 250.0,
+          "lootDataId": 0
+        },
+        {
+          "item": "minecraft:iron_helmet",
+          "damagePercent": 150.0,
+          "replaceItem": {}
+        },
+        {
+          "item": "minecraft:iron_chestplate",
+          "damagePercent": 220.0,
+          "lootDataId": 0
+        },
+        {
+          "item": "minecraft:leather_helmet",
+          "damagePercent": 80.0,
+          "replaceItem": {}
+        },
+        {
+          "item": "minecraft:leather_chestplate",
+          "damagePercent": 200.0,
+          "lootDataId": 0
+        }
+      ],
+      "replaceItemLootData": [
+        {
+          "lootDataId": 0,
+          "replaceItem": {
+            "lootType": "item",
+            "item": "minecraft:chainmail_chestplate",
+            "count": 1,
+            "nbt": "{components:{\"minecraft:damage\":239}}"
+          }
+        }
+      ]
+    }
+  }
+]

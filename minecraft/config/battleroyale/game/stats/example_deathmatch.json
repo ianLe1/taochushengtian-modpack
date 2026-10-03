@@ -1,0 +1,57 @@
+[
+  {
+    "id": 0,
+    "name": "DeathMatch scoreboard (Process-oriented)",
+    "color": "#FFFFFFAA",
+    "scoreboard": {
+      "recordScoreboard": true,
+      "resetScoreboardAtStart": false,
+      "mcMaxHealth": 20,
+      "damageMultiplier": 5.0,
+      "ratioBase": 1000.0,
+      "syncGameInfoToObjective": true,
+      "gameInfoObjectiveName": "dm_gameInfo",
+      "gameInfoObjective": {
+        "playerTotal": "Total",
+        "alive": "Alive",
+        "gameTime": "GameTime"
+      },
+      "scoreboardCycleInterval": 60,
+      "cycleObjectiveName": [
+        "dm_hurt",
+        "dm_kill",
+        "dm_kd"
+      ],
+      "mainObjective": {
+        "player_to_player_damage": "dm_hurt",
+        "other_to_player_damage": "dm_otherHurt",
+        "player_damage_by_player": "dm_damage",
+        "player_damage_by_other": "dm_otherDamage",
+        "player_knock_player": "dm_knock",
+        "other_knock_player": "dm_otherKnock",
+        "player_down_by_player": "dm_down",
+        "player_down_by_other": "dm_otherDown",
+        "player_revive": "dm_revive",
+        "player_kill_player": "dm_kill",
+        "other_kill_player": "dm_otherKill",
+        "player_death_by_player": "dm_death",
+        "player_death_by_other": "dm_otherDeath",
+        "player_win": "dm_win",
+        "player_lose": "dm_lose"
+      },
+      "secondObjective": {
+        "player_attack_rate": "dm_attackRate",
+        "player_kd": "dm_kd",
+        "player_game_total": "dm_gameTotal",
+        "player_win_rate": "dm_winRate"
+      },
+      "specialObjective": {
+        "enableJourneyStats": true,
+        "journeyStatsDelay": 100,
+        "player_journey": "dm_journey"
+      },
+      "listObjectiveAfterGame": "dm_kd",
+      "sidebarObjectiveAfterGame": "dm_attackRate"
+    }
+  }
+]

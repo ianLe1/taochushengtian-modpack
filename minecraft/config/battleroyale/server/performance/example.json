@@ -1,0 +1,123 @@
+[
+  {
+    "id": 0,
+    "default": true,
+    "name": "Default performance",
+    "color": "#FFFFFF",
+    "generator": {
+      "common": {
+        "lootAnyBlockEntity": false,
+        "lootVanillaChest": true,
+        "removeLootTable": true,
+        "clearPreviousContent": true,
+        "removeNoGameidEntity": true,
+        "vanillaWhiteList": [],
+        "vanillaBlackList": []
+      },
+      "normal": {
+        "maxNormalTickLootChunk": 2000
+      },
+      "game": {
+        "maxGameTickLootChunk": 2000,
+        "maxLootDistance": 20,
+        "bfsTolerantCenterDistance": 3,
+        "maxCachedCenter": 1500,
+        "maxQueuedChunk": 50000,
+        "bfsFrequency": 100,
+        "instantNextBfs": false,
+        "maxCachedLootChunk": 100000,
+        "cleanCachedChunk": 10000
+      }
+    }
+  },
+  {
+    "id": 1,
+    "name": "Max quality",
+    "color": "#FFFFFF",
+    "generator": {
+      "common": {
+        "lootAnyBlockEntity": false,
+        "lootVanillaChest": true,
+        "removeLootTable": true,
+        "clearPreviousContent": true,
+        "removeNoGameidEntity": true,
+        "vanillaWhiteList": [],
+        "vanillaBlackList": []
+      },
+      "normal": {
+        "maxNormalTickLootChunk": 3000
+      },
+      "game": {
+        "maxGameTickLootChunk": 3000,
+        "maxLootDistance": 32,
+        "bfsTolerantCenterDistance": 3,
+        "maxCachedCenter": 1500,
+        "maxQueuedChunk": 50000,
+        "bfsFrequency": 100,
+        "instantNextBfs": true,
+        "maxCachedLootChunk": 100000,
+        "cleanCachedChunk": 10000
+      }
+    }
+  },
+  {
+    "id": 2,
+    "name": "Better performance",
+    "color": "#FFFFFF",
+    "generator": {
+      "common": {
+        "lootAnyBlockEntity": false,
+        "lootVanillaChest": true,
+        "removeLootTable": true,
+        "clearPreviousContent": true,
+        "removeNoGameidEntity": true,
+        "vanillaWhiteList": [],
+        "vanillaBlackList": []
+      },
+      "normal": {
+        "maxNormalTickLootChunk": 500
+      },
+      "game": {
+        "maxGameTickLootChunk": 500,
+        "maxLootDistance": 16,
+        "bfsTolerantCenterDistance": 3,
+        "maxCachedCenter": 500,
+        "maxQueuedChunk": 3000,
+        "bfsFrequency": 100,
+        "instantNextBfs": false,
+        "maxCachedLootChunk": 50000,
+        "cleanCachedChunk": 10000
+      }
+    }
+  },
+  {
+    "id": 3,
+    "name": "Developer Performance Test",
+    "color": "#FFFFFF",
+    "generator": {
+      "common": {
+        "lootAnyBlockEntity": false,
+        "lootVanillaChest": true,
+        "removeLootTable": true,
+        "clearPreviousContent": true,
+        "removeNoGameidEntity": true,
+        "vanillaWhiteList": [],
+        "vanillaBlackList": []
+      },
+      "normal": {
+        "maxNormalTickLootChunk": 100000
+      },
+      "game": {
+        "maxGameTickLootChunk": 100000,
+        "maxLootDistance": 128,
+        "bfsTolerantCenterDistance": 0,
+        "maxCachedCenter": 50000,
+        "maxQueuedChunk": 200000,
+        "bfsFrequency": 100,
+        "instantNextBfs": true,
+        "maxCachedLootChunk": 300000,
+        "cleanCachedChunk": 10000
+      }
+    }
+  }
+]

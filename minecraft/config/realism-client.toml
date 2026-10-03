@@ -1,0 +1,27 @@
+[general]
+	#Enable debug mode
+	debugMode = false
+
+	[general.Overlay]
+		#Enable Track Placing Overlay
+		"Enable Overlay" = true
+		#Use MPH For The Overlay
+		"Use mph" = false
+
+	[general.ETCS]
+		#Enable ETCS for trains
+		"ETCS Enable" = true
+		#Size of the ETCS display
+		# Default: 0.25
+		# Range: 0.1 ~ 2.0
+		"ETCS Size" = 0.25
+		#Use Mph in ETCS
+		"ETCS MPH" = false
+		#Enable ETCS sounds
+		"ETCS Sounds" = true
+
+	[general.Banking]
+		#Enable banking rendering (roll rotation) on curved tracks
+		"Enable Banking" = true
+		#Rotate player camera with the train(Forge only)
+		"Enable Player Tilt" = true

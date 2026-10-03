@@ -1,0 +1,178 @@
+[
+  {
+    "id": 0,
+    "default": true,
+    "name": "No limit",
+    "color": "#FFFFFFAA",
+    "block": {
+      "itemRenderDistance": 16.0,
+      "renderItemBlockIfEmpty": true,
+      "itemRenderScale": 1.0,
+      "itemRenderHeight": 0.0,
+      "doItemBobbing": true,
+      "doItemSpinning": true,
+      "itemBobPhase": 0.5,
+      "itemBobSpeed": 0.1,
+      "itemBobHeight": 0.2,
+      "itemSpinSpeed": 2.864789,
+      "entityRenderDistance": 16.0,
+      "enableFrustumCulling": true,
+      "enableOcclusionCulling": true,
+      "occlusionCheckInterval": 100
+    },
+    "zone": {
+      "useClientColor": false,
+      "circleSegments": 64,
+      "ellipseSegments": 64,
+      "sphereSegments": 64,
+      "ellispoidSegments": 64
+    },
+    "teamEntry": {
+      "enableTeamZone": true,
+      "useClientColor": false,
+      "renderBeacon": true,
+      "renderBoundingBox": true,
+      "transparency": 0.5
+    },
+    "spectateEntry": {
+      "enableSpectateZone": true,
+      "useClientColor": false,
+      "renderBeacon": true,
+      "renderBoundingBox": true,
+      "transparency": 0.5,
+      "scanFrequency": 60
+    }
+  },
+  {
+    "id": 1,
+    "name": "Client single color",
+    "color": "#FFFFFFAA",
+    "block": {
+      "itemRenderDistance": 8.0,
+      "renderItemBlockIfEmpty": false,
+      "itemRenderScale": 1.0,
+      "itemRenderHeight": 0.0,
+      "doItemBobbing": true,
+      "doItemSpinning": true,
+      "itemBobPhase": 0.5,
+      "itemBobSpeed": 0.1,
+      "itemBobHeight": 0.2,
+      "itemSpinSpeed": 2.864789,
+      "entityRenderDistance": 0.0,
+      "enableFrustumCulling": true,
+      "enableOcclusionCulling": true,
+      "occlusionCheckInterval": 100
+    },
+    "zone": {
+      "useClientColor": true,
+      "fixedColor": "#0000FF",
+      "circleSegments": 64,
+      "ellipseSegments": 64,
+      "sphereSegments": 64,
+      "ellispoidSegments": 64
+    },
+    "teamEntry": {
+      "enableTeamZone": true,
+      "useClientColor": true,
+      "fixedColor": "#00FFFF",
+      "renderBeacon": true,
+      "renderBoundingBox": true,
+      "transparency": 0.5
+    },
+    "spectateEntry": {
+      "enableSpectateZone": true,
+      "useClientColor": true,
+      "fixedColor": "#00FFFF",
+      "renderBeacon": true,
+      "renderBoundingBox": true,
+      "transparency": 0.5,
+      "scanFrequency": 60
+    }
+  },
+  {
+    "id": 2,
+    "name": "Max render",
+    "color": "#FFFFFFAA",
+    "block": {
+      "itemRenderDistance": 8000.0,
+      "renderItemBlockIfEmpty": true,
+      "itemRenderScale": 1.0,
+      "itemRenderHeight": 0.0,
+      "doItemBobbing": true,
+      "doItemSpinning": true,
+      "itemBobPhase": 0.5,
+      "itemBobSpeed": 0.1,
+      "itemBobHeight": 0.2,
+      "itemSpinSpeed": 2.864789,
+      "entityRenderDistance": 8000.0,
+      "enableFrustumCulling": true,
+      "enableOcclusionCulling": true,
+      "occlusionCheckInterval": 50
+    },
+    "zone": {
+      "useClientColor": false,
+      "circleSegments": 1024,
+      "ellipseSegments": 1024,
+      "sphereSegments": 1024,
+      "ellispoidSegments": 1024
+    },
+    "teamEntry": {
+      "enableTeamZone": true,
+      "useClientColor": false,
+      "renderBeacon": true,
+      "renderBoundingBox": true,
+      "transparency": 0.5
+    },
+    "spectateEntry": {
+      "enableSpectateZone": true,
+      "useClientColor": false,
+      "renderBeacon": true,
+      "renderBoundingBox": true,
+      "transparency": 0.5,
+      "scanFrequency": 60
+    }
+  },
+  {
+    "id": 3,
+    "name": "Better Performance",
+    "color": "#FFFFFFAA",
+    "block": {
+      "itemRenderDistance": 4.0,
+      "renderItemBlockIfEmpty": false,
+      "itemRenderScale": 0.5,
+      "itemRenderHeight": 0.0,
+      "doItemBobbing": false,
+      "doItemSpinning": false,
+      "itemBobPhase": 0.5,
+      "itemBobSpeed": 0.1,
+      "itemBobHeight": 0.2,
+      "itemSpinSpeed": 2.864789,
+      "entityRenderDistance": 4.0,
+      "enableFrustumCulling": true,
+      "enableOcclusionCulling": true,
+      "occlusionCheckInterval": 500
+    },
+    "zone": {
+      "useClientColor": false,
+      "circleSegments": 32,
+      "ellipseSegments": 32,
+      "sphereSegments": 32,
+      "ellispoidSegments": 32
+    },
+    "teamEntry": {
+      "enableTeamZone": true,
+      "useClientColor": false,
+      "renderBeacon": false,
+      "renderBoundingBox": true,
+      "transparency": 0.5
+    },
+    "spectateEntry": {
+      "enableSpectateZone": true,
+      "useClientColor": false,
+      "renderBeacon": false,
+      "renderBoundingBox": true,
+      "transparency": 0.5,
+      "scanFrequency": 100
+    }
+  }
+]

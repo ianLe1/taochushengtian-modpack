@@ -1,0 +1,45 @@
+[
+  {
+    "lootId": 0,
+    "default": true,
+    "name": "Horse Spawn with Probability",
+    "color": "#FFFFFFAA",
+    "entry": {
+      "lootType": "random",
+      "chance": 0.2,
+      "entry": {
+        "lootType": "entity",
+        "entity": "minecraft:horse",
+        "count": 1,
+        "range": 1,
+        "attempts": 4
+      }
+    }
+  },
+  {
+    "lootId": 1,
+    "name": "Zombie Spawn with High Probability",
+    "color": "#FFFFFFAA",
+    "entry": {
+      "lootType": "weight",
+      "entries": [
+        {
+          "weight": 0.8,
+          "entry": {
+            "lootType": "entity",
+            "entity": "minecraft:zombie",
+            "count": 5,
+            "range": 20,
+            "attempts": 4
+          }
+        },
+        {
+          "weight": 0.2,
+          "entry": {
+            "lootType": "none"
+          }
+        }
+      ]
+    }
+  }
+]

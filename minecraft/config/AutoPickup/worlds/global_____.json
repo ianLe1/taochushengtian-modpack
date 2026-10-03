@@ -1,0 +1,16 @@
+{
+  "autoPickup": true,
+  "autoPickupBlocks": true,
+  "autoPickupBlockXp": true,
+  "autoPickupMobLoot": false,
+  "autoPickupMobXp": false,
+  "autoPickupSplitMobLoot": false,
+  "autoPickupSplitMobXp": false,
+  "allowMaster": true,
+  "allowBlocks": true,
+  "allowBlockXp": true,
+  "allowMobLoot": true,
+  "allowMobXp": true,
+  "allowSplitMobLoot": true,
+  "allowSplitMobXp": true
+}

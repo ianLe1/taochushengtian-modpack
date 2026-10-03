@@ -1,0 +1,56 @@
+filename = 'pv-addon-soundphysics-1.1.2.jar'
+name = 'pv-addon-soundphysics'
+side = 'client'
+x-prismlauncher-loaders = [ 'neoforge', 'forge', 'fabric' ]
+x-prismlauncher-mc-versions = [
+    '1.16.5',
+    '1.17.1',
+    '1.18.2',
+    '1.19.2',
+    '1.19.3',
+    '1.19.4',
+    '1.20',
+    '1.20.1',
+    '1.20.2',
+    '1.20.3',
+    '1.20.4',
+    '1.20.5',
+    '1.20.6',
+    '1.21',
+    '1.21.1',
+    '1.21.2',
+    '1.21.3',
+    '1.21.4',
+    '1.21.5',
+    '1.21.6',
+    '1.21.7',
+    '1.21.8',
+    '1.21.9',
+    '1.21.10',
+    '1.21.11',
+    '26.1',
+    '26.1.1',
+    '26.1.2',
+    '26.2',
+    '26.3'
+]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.1.2'
+
+[download]
+hash = '67e92417e591af94df022e81e1891af476445cc5283259fe6586e495d4d8cc15841cd5590d926fa55406225524d4d6c5f8746e19deda2456aec4c4c3f202be07'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/K1y8brkJ/versions/kmyhU2jp/pv-addon-soundphysics-1.1.2.jar'
+
+[update.modrinth]
+mod-id = 'K1y8brkJ'
+version = 'kmyhU2jp'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'qyVF9oeo'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = '1bZhdhsH'
+type = 'REQUIRED'

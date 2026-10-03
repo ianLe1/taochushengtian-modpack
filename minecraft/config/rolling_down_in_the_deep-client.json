@@ -1,0 +1,21 @@
+{
+  "enabled": true,
+  "persistentSwimming": true,
+  "swapYawAndRoll": false,
+  "strafeRollStrength": 0.2,
+  "strafeYawStrength": 1.0,
+  "strafeDoStrafe": true,
+  "velocityEnable": true,
+  "velocityMin": 0.4,
+  "velocityMax": 1.0,
+  "velocityScale": 8.65,
+  "smoothing": {
+    "smoothingEnabled": true,
+    "strafeSmoothingEnabled": true,
+    "values": {
+      "pitch": 0.5,
+      "yaw": 0.5,
+      "roll": 0.5
+    }
+  }
+}

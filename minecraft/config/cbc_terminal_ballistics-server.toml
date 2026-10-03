@@ -1,0 +1,85 @@
+[terminal_ballistics]
+	#Enable CBC terminal ballistics penetration override.
+	enabled = true
+	#Global multiplier for accumulated armor integrity thresholds.
+	# Default: 1.0
+	# Range: 0.05 ~ 100.0
+	armorIntegrityMultiplier = 1.0
+	#Global multiplier for AP spall fragment count/damage.
+	# Default: 1.0
+	# Range: 0.0 ~ 100.0
+	globalSpallMultiplier = 1.0
+	#Hard cap on generated spall fragments per impact.
+	# Default: 28
+	# Range: 0 ~ 256
+	maxSpallFragmentsPerImpact = 28
+	#Impact overlay/record lifetime in ticks.
+	# Default: 18000
+	# Range: 20 ~ 72000
+	impactOverlayLifetimeTicks = 18000
+	#Maximum stored impact marks per block.
+	# Default: 5
+	# Range: 1 ~ 16
+	impactOverlayMarksPerBlock = 5
+	#Integrity damage multiplier for autocannon impacts against armor.
+	# Default: 0.16
+	# Range: 0.0 ~ 10.0
+	autocannonArmorDamageMultiplier = 0.16
+	#Scales energy/momentum into saved integrity damage.
+	# Default: 1.0
+	# Range: 0.01 ~ 100.0
+	impactDamageScale = 1.0
+	#Optional extra velocity damping after penetration, proportional to fractional mass loss. 0 keeps CBC-like mass-only slowing.
+	# Default: 0.0
+	# Range: 0.0 ~ 1.0
+	velocityDampingPerMassLoss = 0.0
+	#Maximum armor level for copycat armor layer blocks. Changes require existing blocks to be updated with the Armor Upgrader tool.
+	# Default: 20
+	# Range: 1 ~ 200
+	copycatArmorMaxLevel = 20
+	#Integrity damage multiplier for spall fragments against blocks with toughness <= spallIntegrityDamageToughnessThreshold.
+	# Default: 0.5
+	# Range: 0.0 ~ 10.0
+	spallIntegrityDamageScale = 0.5
+	#Maximum block toughness for spall to apply integrity damage. Blocks above this threshold ignore spall damage entirely.
+	# Default: 16.0
+	# Range: 0.0 ~ 100.0
+	spallIntegrityDamageToughnessThreshold = 16.0
+	#Velocity (m/s) at which spall cone is widest. Higher velocities produce narrower cones.
+	# Default: 200.0
+	# Range: 50.0 ~ 500.0
+	spallConeVelocityBaseline = 200.0
+	#Minimum spall cone half-angle in degrees. Used for high-velocity focused penetrations.
+	# Default: 15.0
+	# Range: 5.0 ~ 45.0
+	spallConeMinAngle = 15.0
+	#Maximum spall cone half-angle in degrees. Used for low-velocity oblique penetrations.
+	# Default: 60.0
+	# Range: 30.0 ~ 90.0
+	spallConeMaxAngle = 60.0
+
+	[terminal_ballistics.ricochet]
+		#Blocks below this toughness cannot ricochet projectiles.
+		# Default: 3.0
+		# Range: 0.0 ~ 100.0
+		minToughness = 3.0
+		#Block toughness at which ricochet probability reaches full strength.
+		# Default: 20.0
+		# Range: 1.0 ~ 100.0
+		toughnessScale = 20.0
+		#Projectile velocity (m/s) at which ricochet chance is reduced by half.
+		# Default: 200.0
+		# Range: 50.0 ~ 1000.0
+		velocityBaseline = 200.0
+		#Minimum fraction of projectile mass lost on ricochet.
+		# Default: 0.15
+		# Range: 0.0 ~ 1.0
+		massLossMin = 0.15
+		#Maximum fraction of projectile mass lost on ricochet.
+		# Default: 0.5
+		# Range: 0.0 ~ 1.0
+		massLossMax = 0.5
+		#Projectile velocity (m/s) used for ricochet mass loss.
+		# Default: 200.0
+		# Range: 50.0 ~ 1000.0
+		massLossVelocityScale = 200.0

@@ -1,0 +1,18 @@
+filename = 'better_fishing-1.0.0-neoforge-1.21.1.jar'
+name = 'Better Fishing'
+side = ''
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.0.0'
+
+[download]
+hash = '22d4bd6dcc84e9110566facf60db6926398cd4cf035460ba8e0165ca36b59acb7c98d5700e37dbc902e023fbcba33d17b5a9fda63fb23736b86b0007ec28db63'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/Xn1YuVMr/versions/PwXKcfxd/better_fishing-1.0.0-neoforge-1.21.1.jar'
+
+[update.modrinth]
+mod-id = 'Xn1YuVMr'
+version = 'PwXKcfxd'

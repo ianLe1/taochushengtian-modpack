@@ -1,0 +1,21 @@
+filename = 'entity_model_features-3.3.9-1.21-neoforge.jar'
+name = 'Entity Model Features'
+side = ''
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21', '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '3.3.9-neoforge-1.21'
+
+[download]
+hash = '566abfd11f6281bb0817e253624e9c7c2aa028f85ac93a24c276a0561fbc5c19a527f8f2ca200477d16cdb362ced9ca6b740b81ad926133188706c6ada0048cc'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/4I1XuqiY/versions/gEOHNhtN/entity_model_features-3.3.9-1.21-neoforge.jar'
+
+[update.modrinth]
+mod-id = '4I1XuqiY'
+version = 'gEOHNhtN'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'BVzZfTc1'
+type = 'REQUIRED'

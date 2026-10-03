@@ -1,0 +1,33 @@
+filename = 'tacz_fpm_compat-1.0.0.jar'
+name = 'TaCZ - First-person Model compatibility'
+side = 'client'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.0.0'
+
+[download]
+hash = 'ed9a6a227b20f96c23e2856ded51ea2d2b01dc4d7af022f39d9c50dbfc4cce041e6d5c2f9c539911c744b85581f51c3c9b27bedb9a01929242d1ed70bff05ad8'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/5Cxz7WGs/versions/96rusvTi/tacz_fpm_compat-1.0.0.jar'
+
+[update.modrinth]
+mod-id = '5Cxz7WGs'
+version = '96rusvTi'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'OypNE65K'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'k2ZPuTBm'
+type = 'OPTIONAL'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'MPCX6s5C'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'H5XMjpHi'
+type = 'REQUIRED'

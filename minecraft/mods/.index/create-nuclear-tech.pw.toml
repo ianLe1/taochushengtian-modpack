@@ -1,0 +1,18 @@
+filename = 'createnucleartech-1.0s.jar'
+name = 'Create Nuclear Tech'
+side = 'both'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1', '1.21.2', '1.21.3', '1.21.4', '1.21.5', '1.21.6', '1.21.7', '1.21.8', '1.21.9', '1.21.10', '1.21.11' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.0s'
+
+[download]
+hash = '22045e3aaa99cd30f8721f639a91c50fc1232c2d99b6042736f35cc39df2f1af78db0035c85aa82deefd04c2f666d2c4e9b1bd1965093839bfd42b88e2563a98'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/biKYEwYW/versions/Re22oGj5/createnucleartech-1.0s.jar'
+
+[update.modrinth]
+mod-id = 'biKYEwYW'
+version = 'Re22oGj5'

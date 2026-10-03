@@ -1,0 +1,18 @@
+filename = 'KeyPreset-1.0.8.jar'
+name = 'KeyPreset'
+side = 'client'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.0.8'
+
+[download]
+hash = 'b07c81f8bafb76b195c3d603705c25194ae06b29499150a9b262f632ca09469662f65bf3585f58a99ee6c18d1e20ae381055fe3d9f03e9ee87d1296f7ba4a4c8'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/dR3NB4to/versions/yvfl18VI/KeyPreset-1.0.8.jar'
+
+[update.modrinth]
+mod-id = 'dR3NB4to'
+version = 'yvfl18VI'

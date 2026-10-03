@@ -1,0 +1,57 @@
+filename = 'Fresh Food.zip'
+name = 'Fresh Food'
+side = 'client'
+x-prismlauncher-loaders = []
+x-prismlauncher-mc-versions = [
+    '1.20.1',
+    '1.21',
+    '1.21.1',
+    '1.21.2',
+    '1.21.4',
+    '1.21.5',
+    '1.21.6',
+    '1.21.7',
+    '1.21.8',
+    '1.21.9',
+    '1.21.10',
+    '1.21.11',
+    '26.1',
+    '26.1.1',
+    '26.1.2'
+]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.3.4'
+
+[download]
+hash = '69a5c9b3dadb218179efaa7c53395d1db78c372149b7fc3d73a93c7816eb9008d927c0034980ed6fce8a48be0781aa9defd6d71e965be7be17c7d9591103428a'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/UoLAbzII/versions/kQYADnq4/Fresh Food.zip'
+
+[update.modrinth]
+mod-id = 'UoLAbzII'
+version = 'kQYADnq4'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'u58R1TMW'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'qjlkcVfy'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = '757R1JEL'
+type = 'OPTIONAL'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'MPCX6s5C'
+type = 'OPTIONAL'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'AP8rDDLS'
+type = 'OPTIONAL'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'TiF5QWZY'
+type = 'REQUIRED'

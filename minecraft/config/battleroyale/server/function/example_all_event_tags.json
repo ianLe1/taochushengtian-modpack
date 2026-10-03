@@ -1,0 +1,454 @@
+[
+  {
+    "id": 0,
+    "name": "Register all event tags",
+    "color": "#FFFFFF",
+    "register": {
+      "details": [
+        {
+          "tag": "battleroyale:on_game_complete",
+          "event": "GAME_COMPLETE_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_game_complete_finish",
+          "event": "GAME_COMPLETE_FINISH_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_game_stop",
+          "event": "GAME_STOP_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_game_stop_finish",
+          "event": "GAME_STOP_FINISH_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_game_player_damage",
+          "event": "GAME_PLAYER_DAMAGE_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_game_player_damage_finish",
+          "event": "GAME_PLAYER_DAMAGE_FINISH_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_game_player_death",
+          "event": "GAME_PLAYER_DEATH_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_game_player_death_finish",
+          "event": "GAME_PLAYER_DEATH_FINISH_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_game_player_down",
+          "event": "GAME_PLAYER_DOWN_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_game_player_down_finish",
+          "event": "GAME_PLAYER_DOWN_FINISH_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_game_player_revive",
+          "event": "GAME_PLAYER_REVIVE_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_game_player_revive_finish",
+          "event": "GAME_PLAYER_REVIVE_FINISH_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_game_spectate",
+          "event": "GAME_SPECTATE_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_game_lobby_teleport",
+          "event": "GAME_LOBBY_TELEPORT_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_game_lobby_teleport_finish",
+          "event": "GAME_LOBBY_TELEPORT_FINISH_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_game_init",
+          "event": "GAME_INIT_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_game_init_finish",
+          "event": "GAME_INIT_FINISH_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_game_load",
+          "event": "GAME_LOAD_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_game_load_finish",
+          "event": "GAME_LOAD_FINISH_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_game_start",
+          "event": "GAME_START_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_game_start_finish",
+          "event": "GAME_START_FINISH_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_invite_player",
+          "event": "INVITE_PLAYER_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_invite_player_complete",
+          "event": "INVITE_PLAYER_COMPLETE_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_request_player",
+          "event": "REQUEST_PLAYER_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_request_player_complete",
+          "event": "REQUEST_PLAYER_COMPLETE_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_game_loot_bfs",
+          "event": "GAME_LOOT_BFS_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_game_loot_bfs_finish",
+          "event": "GAME_LOOT_BFS_FINISH_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_game_loot",
+          "event": "GAME_LOOT_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_game_loot_finish",
+          "event": "GAME_LOOT_FINISH_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_game_tick",
+          "event": "GAME_TICK_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_game_tick_finish",
+          "event": "GAME_TICK_FINISH_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_zone_tick",
+          "event": "ZONE_TICK_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_zone_tick_finish",
+          "event": "ZONE_TICK_FINISH_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_zone_created",
+          "event": "ZONE_CREATED_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_zone_complete",
+          "event": "ZONE_COMPLETE_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_custom_zone",
+          "event": "CUSTOM_ZONE_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_airdrop_zone",
+          "event": "AIRDROP_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_entity_zone",
+          "event": "ENTITY_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_custom_generate",
+          "event": "CUSTOM_GENERATE_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_survival_lobby_teleport",
+          "event": "SURVIVAL_LOBBY_TELEPORT_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true
+        },
+        {
+          "tag": "battleroyale:on_survival_lobby_teleport_finish",
+          "event": "SURVIVAL_LOBBY_TELEPORT_FINISH_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_register_manager",
+          "event": "REGISTER_MANAGER_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_trigger",
+          "event": "TRIGGER_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_server_tick",
+          "event": "SERVER_TICK_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_living_attack",
+          "event": "LIVING_ATTACK_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_living_hurt",
+          "event": "LIVING_HURT_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_living_damage",
+          "event": "LIVING_DAMAGE_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_living_death",
+          "event": "LIVING_DEATH_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_player_logged_in",
+          "event": "PLAYER_LOGGED_IN_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_player_logged_out",
+          "event": "PLAYER_LOGGED_OUT_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_player_respawn",
+          "event": "PLAYER_RESPAWN_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_entity_interact",
+          "event": "ENTITY_INTERACT_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_entity_interact_specific",
+          "event": "ENTITY_INTERACT_SPECIFIC_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_left_click_block",
+          "event": "LEFT_CLICK_BLOCK_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_right_click_block",
+          "event": "RIGHT_CLICK_BLOCK_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_right_click_item",
+          "event": "RIGHT_CLICK_ITEM_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_block_break",
+          "event": "BLOCK_BREAK_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_block_tool_modification",
+          "event": "BLOCK_TOOL_MODIFICATION_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_entity_place_block",
+          "event": "ENTITY_PLACE_BLOCK_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_portal_spawn",
+          "event": "PORTAL_SPAWN_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:on_farmland_trample",
+          "event": "FARMLAND_TRAMPLE_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": false
+        },
+        {
+          "tag": "battleroyale:deathmatch/on_add_player_kill",
+          "event": "CUSTOM_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true,
+          "eventClass": "xiao.battleroyale.api.event.custom.deathmatch.AddKillEvent$AddPlayerKillEvent"
+        },
+        {
+          "tag": "battleroyale:deathmatch/on_add_player_kill_finish",
+          "event": "CUSTOM_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false,
+          "eventClass": "xiao.battleroyale.api.event.custom.deathmatch.AddKillEvent$AddPlayerKillFinishEvent"
+        },
+        {
+          "tag": "battleroyale:deathmatch/on_add_team_kill",
+          "event": "CUSTOM_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true,
+          "eventClass": "xiao.battleroyale.api.event.custom.deathmatch.AddKillEvent$AddTeamKillEvent"
+        },
+        {
+          "tag": "battleroyale:deathmatch/on_add_team_kill_finish",
+          "event": "CUSTOM_EVENT",
+          "priority": "LOWEST",
+          "receiveCanceled": false,
+          "eventClass": "xiao.battleroyale.api.event.custom.deathmatch.AddKillEvent$AddTeamKillFinishEvent"
+        },
+        {
+          "tag": "battleroyale:stats/on_damage_record",
+          "event": "CUSTOM_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true,
+          "eventClass": "xiao.battleroyale.api.event.custom.stats.GamePlayerRecordEvent$DamageRecordEvent"
+        },
+        {
+          "tag": "battleroyale:stats/on_hurt_record",
+          "event": "CUSTOM_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true,
+          "eventClass": "xiao.battleroyale.api.event.custom.stats.GamePlayerRecordEvent$HurtRecordEvent"
+        },
+        {
+          "tag": "battleroyale:stats/on_down_record",
+          "event": "CUSTOM_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true,
+          "eventClass": "xiao.battleroyale.api.event.custom.stats.GamePlayerRecordEvent$DownRecordEvent"
+        },
+        {
+          "tag": "battleroyale:stats/on_knock_record",
+          "event": "CUSTOM_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true,
+          "eventClass": "xiao.battleroyale.api.event.custom.stats.GamePlayerRecordEvent$KnockRecordEvent"
+        },
+        {
+          "tag": "battleroyale:stats/on_revive_record",
+          "event": "CUSTOM_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true,
+          "eventClass": "xiao.battleroyale.api.event.custom.stats.GamePlayerRecordEvent$ReviveRecordEvent"
+        },
+        {
+          "tag": "battleroyale:stats/on_death_record",
+          "event": "CUSTOM_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true,
+          "eventClass": "xiao.battleroyale.api.event.custom.stats.GamePlayerRecordEvent$DeathRecordEvent"
+        },
+        {
+          "tag": "battleroyale:stats/on_kill_record",
+          "event": "CUSTOM_EVENT",
+          "priority": "HIGHEST",
+          "receiveCanceled": true,
+          "eventClass": "xiao.battleroyale.api.event.custom.stats.GamePlayerRecordEvent$KillRecordEvent"
+        }
+      ]
+    }
+  }
+]

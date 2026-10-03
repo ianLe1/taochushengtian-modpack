@@ -1,0 +1,58 @@
+[
+  {
+    "lootId": 0,
+    "default": true,
+    "name": "Treasure trove (Not implemented yet)",
+    "color": "#00FFFF",
+    "entry": {
+      "lootType": "multi",
+      "entries": [
+        {
+          "lootType": "item",
+          "item": "minecraft:iron_ingot",
+          "count": 1
+        },
+        {
+          "lootType": "item",
+          "item": "minecraft:gold_ingot",
+          "count": 1
+        },
+        {
+          "lootType": "item",
+          "item": "minecraft:copper_ingot",
+          "count": 1
+        },
+        {
+          "lootType": "item",
+          "item": "minecraft:lapis_lazuli",
+          "count": 1
+        },
+        {
+          "lootType": "item",
+          "item": "minecraft:redstone",
+          "count": 1
+        },
+        {
+          "lootType": "item",
+          "item": "minecraft:diamond",
+          "count": 1
+        },
+        {
+          "lootType": "item",
+          "item": "minecraft:emerald",
+          "count": 1
+        },
+        {
+          "lootType": "item",
+          "item": "minecraft:amethyst_shard",
+          "count": 1
+        },
+        {
+          "lootType": "item",
+          "item": "minecraft:netherite_ingot",
+          "count": 1
+        }
+      ]
+    }
+  }
+]

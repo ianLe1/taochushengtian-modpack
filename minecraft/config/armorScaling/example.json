@@ -1,0 +1,65 @@
+[
+  {
+    "id": 0,
+    "name": "Example Armor Scaling config",
+    "color": "#FFFFFF",
+    "damageScaling": {
+      "damageScaleData": [
+        {
+          "item": "minecraft:iron_helmet",
+          "scale": 0.6
+        },
+        {
+          "item": "minecraft:diamond_chestplate",
+          "scale": 0.45
+        },
+        {
+          "item": "minecraft:iron_chestplate",
+          "scale": 0.6
+        },
+        {
+          "item": "minecraft:chainmail_chestplate",
+          "scale": 0.8
+        }
+      ]
+    },
+    "durabilityScaling": {
+      "healthToDurabilityRatio": 5.0,
+      "useAbsorbedDamageOnly": true,
+      "headshotMultiplierScaling": true,
+      "durabilityScaleData": [
+        {
+          "item": "minecraft:iron_helmet",
+          "damagePercent": 150.0,
+          "replaceItem": {}
+        },
+        {
+          "item": "minecraft:diamond_chestplate",
+          "damagePercent": 250.0,
+          "replaceItem": {
+            "lootType": "item",
+            "item": "minecraft:chainmail_chestplate",
+            "count": 1,
+            "nbt": "{components:{\"minecraft:damage\":239}}"
+          }
+        },
+        {
+          "item": "minecraft:iron_chestplate",
+          "damagePercent": 220.0,
+          "lootDataId": 0
+        }
+      ],
+      "replaceItemLootData": [
+        {
+          "lootDataId": 0,
+          "replaceItem": {
+            "lootType": "item",
+            "item": "minecraft:chainmail_chestplate",
+            "count": 1,
+            "nbt": "{components:{\"minecraft:damage\":239}}"
+          }
+        }
+      ]
+    }
+  }
+]

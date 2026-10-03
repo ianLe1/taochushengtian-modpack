@@ -1,0 +1,18 @@
+filename = 'simulatedcoasters-backport-0.1.2+sable1.2.1.jar'
+name = 'Create Coasters: Simulated - Backport'
+side = 'both'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '0.1.2+sable1.2.1'
+
+[download]
+hash = 'c23f503d1c43ff7fed30496d82f0d01f6eb7c221c1c59a1461b00de05a17dcd10da0aee402859f4cc5a0f7854840f5327462d932d90414908ab9ee98d52c0cc0'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/B96OWxEn/versions/PPr84IYt/simulatedcoasters-backport-0.1.2%2Bsable1.2.1.jar'
+
+[update.modrinth]
+mod-id = 'B96OWxEn'
+version = 'PPr84IYt'

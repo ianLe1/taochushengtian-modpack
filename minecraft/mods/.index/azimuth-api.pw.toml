@@ -1,0 +1,21 @@
+filename = 'azimuth-1.4.9.jar'
+name = 'Azimuth'
+side = ''
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.4.9'
+
+[download]
+hash = '7186b4b4cafcfc690e76fae44f1ff994d2f02dcddd30b148452c960c8f62d02f4e514523f8ac4cda20b8f774edf87d4a0741b475754c7257e64a40b240b853e4'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/RpH8tmT1/versions/j7UkVY7e/azimuth-1.4.9.jar'
+
+[update.modrinth]
+mod-id = 'RpH8tmT1'
+version = 'j7UkVY7e'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'LNytGWDc'
+type = 'REQUIRED'

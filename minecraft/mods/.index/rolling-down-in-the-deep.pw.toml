@@ -1,0 +1,21 @@
+filename = 'rolling-down-in-the-deep-0.2.1+1.21.1-neoforge.jar'
+name = 'Rolling Down in the Deep'
+side = 'client'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'beta'
+x-prismlauncher-version-number = '0.2.1'
+
+[download]
+hash = '9cef0f98dfafb175096ae34770261ebace8178d92072c7ea40411ffbb6bf5c2ea29a501a4af730c674832497898fdbc0700a19079e96a5750a7bc0acb823a44a'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/zQqsEeqy/versions/EAZy6MA3/rolling-down-in-the-deep-0.2.1%2B1.21.1-neoforge.jar'
+
+[update.modrinth]
+mod-id = 'zQqsEeqy'
+version = 'EAZy6MA3'
+
+[[x-prismlauncher-dependencies]]
+addonId = '6FtRfnLg'
+type = 'REQUIRED'

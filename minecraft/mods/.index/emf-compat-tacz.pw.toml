@@ -1,0 +1,33 @@
+filename = 'emf_compat_tacz_1.21.1_1.0.0.jar'
+name = 'EMF Compat: TACZ'
+side = 'client'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.0.0'
+
+[download]
+hash = '757039f6487a88fb3f365534745a774cdb7461541fae9027095ffe47f11dd932152304f97d309ea8fcb900d3684ff7cccae1641227bd255d6e487bfecf2e2392'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/vPnbqVkb/versions/bxrucOH0/emf_compat_tacz_1.21.1_1.0.0.jar'
+
+[update.modrinth]
+mod-id = 'vPnbqVkb'
+version = 'bxrucOH0'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'OypNE65K'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'BVzZfTc1'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = '4I1XuqiY'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'hbGct5uU'
+type = 'REQUIRED'

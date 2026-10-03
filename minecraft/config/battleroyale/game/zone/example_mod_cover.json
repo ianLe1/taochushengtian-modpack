@@ -1,0 +1,112 @@
+[
+  {
+    "zoneId": 0,
+    "zoneName": "Boarder",
+    "zoneColor": "#0000FFAA",
+    "zoneDelay": 0,
+    "zoneTime": 120000,
+    "zoneFunc": {
+      "zoneFuncType": "noFunc",
+      "moveDelay": 0,
+      "moveTime": 0
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "-270.000000,0.000000,150.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "260.000000,120.000000,260.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 0.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 1,
+    "zoneName": "Circle",
+    "zoneColor": "#00FFFF88",
+    "zoneDelay": 0,
+    "zoneTime": 120000,
+    "zoneFunc": {
+      "zoneFuncType": "noFunc",
+      "moveDelay": 0,
+      "moveTime": 0
+    },
+    "zoneShape": {
+      "zoneShapeType": "circle",
+      "start": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "-298.000000,0.000000,116.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "211.000000,80.000000,211.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 1,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 1,
+          "progress": 0.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  }
+]

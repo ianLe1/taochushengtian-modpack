@@ -1,0 +1,83 @@
+[visual]
+	#伞面方向平滑插值系数（lerp），0 表示完全不跟，1 表示瞬间跟上。推荐 0.5~0.95
+	# Default: 0.85
+	# Range: 0.01 ~ 1.0
+	clientDirSmoothing = 0.85
+	#伞面飘动速度，每 tick 的相位增量。0 则不动，推荐 0.2~1.0
+	# Default: 0.4
+	# Range: 0.0 ~ 5.0
+	wobbleFrequency = 0.4
+	#伞旋转的基准阻尼系数。数值越小伞越粘滞、转向越慢
+	# Default: 0.4
+	# Range: 0.01 ~ 1.0
+	slerpBase = 0.4
+	#动态阻尼的角度阈值（度）。当前朝向与目标夹角小于此值时，slerp 系数从 1.0 线性过渡到 slerpBase，大于此值时使用 slerpBase
+	# Default: 7.5
+	# Range: 0.1 ~ 90.0
+	slerpAngleThreshold = 7.5
+	#Yaw 阻尼角度阈值（度）。伞面(vel)与体空间 Y 轴夹角小于此值时，用 cos 增强 yaw 阻尼：cos(angle/threshold * π/2)
+	# Default: 20.0
+	# Range: 1.0 ~ 90.0
+	yawDampThreshold = 20.0
+	#Yaw 阻尼最大倍率。夹角 0° 时 slerp *= 1 - 此值（0°=强阻尼，阈值=无阻尼）
+	# Default: 0.9
+	# Range: 0.0 ~ 1.0
+	yawDampForce = 0.9
+	#飘动绕 X 轴的最大摆动角度（度）
+	# Default: 0.6
+	# Range: 0.0 ~ 20.0
+	wobbleXAmp = 0.6
+	#飘动绕 Z 轴的最大摆动角度（度）——大伞 & 普通伞
+	# Default: 0.5
+	# Range: 0.0 ~ 20.0
+	wobbleZAmpBig = 0.5
+	#飘动绕 Z 轴的最大摆动角度（度）——小伞类型（伞名不含 big 的伞）
+	# Default: 0.5
+	# Range: 0.0 ~ 20.0
+	wobbleZAmpSmall = 0.5
+	#飘动 X 轴频率倍率，乘以 wobblePhase
+	# Default: 1.1
+	# Range: 0.0 ~ 5.0
+	wobbleXFreqMult = 1.1
+	#飘动 Z 轴频率倍率，乘以 wobblePhase
+	# Default: 1.3
+	# Range: 0.0 ~ 5.0
+	wobbleZFreqMult = 1.3
+	#降落伞实体渲染的最大可见距离（格），设为 0 则使用默认值
+	# Default: 512
+	# Range: 0 ~ 1024
+	viewDistance = 512
+
+[physics]
+	#阻力基础系数。所有拖拽力 = -速度 * dragCoefficient * dragBase * delta
+	# Default: 1.0
+	# Range: 0.01 ~ 100.0
+	dragBase = 1.0
+	#单轴最大线性冲量，防止极端速度下物理体爆炸
+	# Default: 250.0
+	# Range: 1.0 ~ 10000.0
+	maxImpulsePerAxis = 250.0
+	#单轴最大角冲量（扭矩上限）
+	# Default: 10.0
+	# Range: 0.1 ~ 1000.0
+	maxTorquePerAxis = 10.0
+	#开伞后宽限 tick 数，在此期间即使速度低于阈值也不会自动切伞
+	# Default: 10
+	# Range: 0 ~ 200
+	lowSpeedGraceTicks = 10
+	#服务端向客户端同步伞面方向的最小间隔（tick），越小方向越精准但带宽越高
+	# Default: 5
+	# Range: 1 ~ 100
+	syncHeartbeatTicks = 5
+	#方向变化平方和阈值。变化小于此值时跳过同步，减少网络包
+	# Default: 1.0E-4
+	# Range: 1.0E-8 ~ 1.0
+	syncDirEpsilonSq = 1.0E-4
+	#平移阻力系数上限。GUI 中 dragCoefficient 的最大值
+	# Default: 100000.0
+	# Range: 0.1 ~ 1000000.0
+	maxDragCoefficient = 100000.0
+	#旋转阻尼系数上限。GUI 中 rotationalDragCoefficient 的最大值
+	# Default: 100000.0
+	# Range: 0.1 ~ 1000000.0
+	maxRotationalDampCoefficient = 100000.0

@@ -1,0 +1,25 @@
+filename = 'epic-terrain_compatible-1.0.3.jar'
+name = 'Epic Terrain Compatible'
+side = 'both'
+x-prismlauncher-loaders = [ 'neoforge', 'forge', 'quilt', 'fabric' ]
+x-prismlauncher-mc-versions = [ '1.20.5', '1.20.6', '1.21', '1.21.1', '1.21.2', '1.21.3' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.0.3+mod'
+
+[download]
+hash = '12530fad3a4a1910ab10a714e6c3e882e954a26e7d891e8ec57d0703828875d623fdc5ca8a170969d395056e18382054f543005f752778de3c2fa0301b43060d'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/sc69VpnK/versions/6WRQyW1o/epic-terrain_compatible-1.0.3.jar'
+
+[update.modrinth]
+mod-id = 'sc69VpnK'
+version = '6WRQyW1o'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'RlmZv9Dv'
+type = 'OPTIONAL'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'w2O2In9c'
+type = 'REQUIRED'

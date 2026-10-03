@@ -1,0 +1,14 @@
+#Volume for all grind rail sounds.
+# Default: 0.5
+# Range: 0.0 ~ 1.0
+soundVolume = 0.5
+
+[pneumaticTubes]
+	#Global pneumatic tube speed multiplier.
+	#2.0 is twice as fast; 0.5 is twice as slow.
+	# Default: 1.0
+	# Range: 0.1 ~ 10.0
+	speedMultiplier = 1.0
+	#When enabled, pneumatic connectors only work with Create Packagers
+	#and only sealed packages can enter a tube network.
+	packagersOnly = false

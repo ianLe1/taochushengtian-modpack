@@ -1,0 +1,3 @@
+[projectiles]
+	#Projectile class overrides formatted namespace:path=autocannon|small|small_medium|medium|big. These supplement built-in id namespace heuristics.
+	classOverrides = []

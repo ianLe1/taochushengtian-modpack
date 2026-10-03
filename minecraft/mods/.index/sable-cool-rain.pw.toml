@@ -1,0 +1,33 @@
+filename = 'sable-cool-rain-1.0.1+1.21.1+neoforge.jar'
+name = 'Sable: Cool Rain'
+side = 'client'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.0.1+1.21.1+neoforge'
+
+[download]
+hash = 'dccd4b92360caef342fa3226ab7e8d6e2dbf44745cf4ff9e3e861356bf7a6796e26a19512319fd1cd143a0f25b23ad65f542ee7783a7f61f6cdc4907a6f78961'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/nUwwB5kx/versions/3KLMffqk/sable-cool-rain-1.0.1%2B1.21.1%2Bneoforge.jar'
+
+[update.modrinth]
+mod-id = 'nUwwB5kx'
+version = '3KLMffqk'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'LNytGWDc'
+type = 'OPTIONAL'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'IgftU6Mn'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'UT2M39wf'
+type = 'OPTIONAL'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'T9PomCSv'
+type = 'REQUIRED'

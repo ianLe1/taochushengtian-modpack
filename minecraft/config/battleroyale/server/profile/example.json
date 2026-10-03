@@ -1,0 +1,115 @@
+[
+  {
+    "id": 0,
+    "name": "Default profile",
+    "color": "#FFFFFF",
+    "modConfigManager": {
+      "configManager": {
+        "game": {
+          "bot": {
+            "0": {
+              "fileName": "example",
+              "id": 0
+            }
+          },
+          "gamerule": {
+            "0": {
+              "fileName": "example",
+              "id": 0
+            }
+          },
+          "spawn": {
+            "0": {
+              "fileName": "example",
+              "id": 0
+            }
+          },
+          "stats": {
+            "0": {
+              "fileName": "example",
+              "id": 0
+            }
+          },
+          "zone": {
+            "0": {
+              "fileName": "example",
+              "id": 0
+            }
+          }
+        },
+        "server": {
+          "function": {
+            "0": {
+              "fileName": "example",
+              "id": 0
+            }
+          },
+          "performance": {
+            "0": {
+              "fileName": "example",
+              "id": 0
+            }
+          },
+          "profile": {
+            "0": {
+              "fileName": "example",
+              "id": 0
+            }
+          },
+          "utility": {
+            "0": {
+              "fileName": "example",
+              "id": 0
+            }
+          }
+        },
+        "effect": {
+          "particle": {
+            "0": {
+              "fileName": "example",
+              "id": 0
+            }
+          }
+        },
+        "client": {
+          "render": {
+            "0": {
+              "fileName": "example",
+              "id": 0
+            }
+          },
+          "display": {
+            "0": {
+              "fileName": "example",
+              "id": 0
+            }
+          }
+        }
+      },
+      "configSubManager": {
+        "loot": {
+          "0": {
+            "fileName": "example",
+            "id": 0
+          },
+          "1": {
+            "fileName": "example",
+            "id": 0
+          },
+          "2": {
+            "fileName": "example",
+            "id": 0
+          },
+          "3": {
+            "fileName": "example",
+            "id": 0
+          },
+          "4": {
+            "fileName": "example",
+            "id": 0
+          }
+        }
+      }
+    }
+  }
+]

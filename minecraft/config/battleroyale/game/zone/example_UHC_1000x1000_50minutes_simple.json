@@ -1,0 +1,57 @@
+[
+  {
+    "zoneId": 0,
+    "zoneName": "UHC blue border",
+    "zoneColor": "#0000FF77",
+    "zoneDelay": 0,
+    "zoneTime": 144000,
+    "zoneFunc": {
+      "zoneFuncType": "safe",
+      "moveDelay": 0,
+      "moveTime": 60000,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "damage": 1.0
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "0.000000,-64.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "500.000000,384.000000,500.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "0.000000,-64.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "12.500000,384.000000,12.500000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  }
+]

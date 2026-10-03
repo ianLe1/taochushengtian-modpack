@@ -1,0 +1,25 @@
+filename = 'pmweatherflowingfluidscompat-0.3.0a-all.jar'
+name = 'PmWeather Flowing Fluids Compat'
+side = 'server'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'alpha'
+x-prismlauncher-version-number = '0.3.0.1a'
+
+[download]
+hash = '4654702b61442f2f9ecf8110e51e39e9274fb740b2b6655fdf90ebe221a69272772460b7d5629c92315470faef0a8e96a36f45edf4a42b076573b32c0556f3f3'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/T6u52m1X/versions/OxStbnv0/pmweatherflowingfluidscompat-0.3.0a-all.jar'
+
+[update.modrinth]
+mod-id = 'T6u52m1X'
+version = 'OxStbnv0'
+
+[[x-prismlauncher-dependencies]]
+addonId = 's1I3BT95'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'TfCsmTLI'
+type = 'REQUIRED'

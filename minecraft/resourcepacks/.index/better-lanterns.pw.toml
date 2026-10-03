@@ -1,0 +1,18 @@
+filename = 'Better Lanterns v1.3.2 - 26.2.zip'
+name = 'Better Lanterns'
+side = 'client'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = []
+x-prismlauncher-mc-versions = [ '26.2' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.3.2-mc26.2'
+
+[download]
+hash = 'e3def6c90933f67632cb1e75dc65dcc6125cf6a310adabca6e8efceb32409c586dbdd0b3add4bb39723a4c7353fc56ff034f5b23489ea946ecc7303f8b0bb208'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/PGGrfcvL/versions/7jOhk8jT/Better Lanterns v1.3.2 - 26.2.zip'
+
+[update.modrinth]
+mod-id = 'PGGrfcvL'
+version = '7jOhk8jT'

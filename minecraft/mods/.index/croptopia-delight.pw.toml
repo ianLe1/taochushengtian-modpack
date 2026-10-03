@@ -1,0 +1,21 @@
+filename = 'croptopiadelight-1.0.1.jar'
+name = 'Croptopia Delight'
+side = 'both'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'beta'
+x-prismlauncher-version-number = '1.0.1'
+
+[download]
+hash = '96f2b8a3b12cb0dc40441df44a04fd5a95f7cdc7ec021ac37b411be0cb6ec41fe11001741054bd8200e2dd18a6da54c2183fbd4bf4301660000cdd6ec0798fb7'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/z2Ihxkgp/versions/hJg4PBcW/croptopiadelight-1.0.1.jar'
+
+[update.modrinth]
+mod-id = 'z2Ihxkgp'
+version = 'hJg4PBcW'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'R2OftAxM'
+type = 'REQUIRED'

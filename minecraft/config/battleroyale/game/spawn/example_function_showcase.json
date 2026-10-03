@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Fixed ground spawn",
+    "color": "#FFFFFFAA",
+    "entry": {
+      "spawnType": "teleport",
+      "spawnShapeType": "square",
+      "center": "0.000000,-60.000000,0.000000",
+      "dimension": "128.000000,0.000000,128.000000",
+      "detailType": "fixed",
+      "teamTogether": true,
+      "findGround": true,
+      "randomRange": 0.0,
+      "hangTime": 300,
+      "fixedPos": [
+        "2032.000000,53.000000,-9060.000000",
+        "1954.000000,53.000000,-9038.000000"
+      ],
+      "needShuffle": false
+    }
+  }
+]

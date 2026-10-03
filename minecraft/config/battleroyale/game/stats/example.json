@@ -1,0 +1,73 @@
+[
+  {
+    "id": 0,
+    "name": "Disable scoreboard",
+    "color": "#FFFFFFAA",
+    "scoreboard": {
+      "recordScoreboard": false,
+      "resetScoreboardAtStart": false,
+      "mcMaxHealth": 20,
+      "damageMultiplier": 5.0,
+      "ratioBase": 1000.0,
+      "syncGameInfoToObjective": false,
+      "gameInfoObjectiveName": "",
+      "scoreboardCycleInterval": 60,
+      "cycleObjectiveName": [],
+      "listObjectiveAfterGame": "",
+      "sidebarObjectiveAfterGame": ""
+    }
+  },
+  {
+    "id": 1,
+    "name": "Enable scoreboard",
+    "color": "#FFFFFFAA",
+    "scoreboard": {
+      "recordScoreboard": true,
+      "resetScoreboardAtStart": false,
+      "mcMaxHealth": 20,
+      "damageMultiplier": 5.0,
+      "ratioBase": 1000.0,
+      "syncGameInfoToObjective": true,
+      "gameInfoObjectiveName": "cbr_gameInfo",
+      "gameInfoObjective": {
+        "playerTotal": "Total",
+        "alive": "Alive",
+        "gameTime": "GameTime"
+      },
+      "scoreboardCycleInterval": 60,
+      "cycleObjectiveName": [
+        "cbr_gameInfo"
+      ],
+      "mainObjective": {
+        "player_to_player_damage": "cbr_hurt",
+        "other_to_player_damage": "cbr_otherHurt",
+        "player_damage_by_player": "cbr_damage",
+        "player_damage_by_other": "cbr_otherDamage",
+        "player_knock_player": "cbr_knock",
+        "other_knock_player": "cbr_otherKnock",
+        "player_down_by_player": "cbr_down",
+        "player_down_by_other": "cbr_otherDown",
+        "player_revive": "cbr_revive",
+        "player_kill_player": "cbr_kill",
+        "other_kill_player": "cbr_otherKill",
+        "player_death_by_player": "cbr_death",
+        "player_death_by_other": "cbr_otherDeath",
+        "player_win": "cbr_win",
+        "player_lose": "cbr_lose"
+      },
+      "secondObjective": {
+        "player_attack_rate": "cbr_attackRate",
+        "player_kd": "cbr_kd",
+        "player_game_total": "cbr_gameTotal",
+        "player_win_rate": "cbr_winRate"
+      },
+      "specialObjective": {
+        "enableJourneyStats": true,
+        "journeyStatsDelay": 100,
+        "player_journey": "cbr_journey"
+      },
+      "listObjectiveAfterGame": "cbr_kd",
+      "sidebarObjectiveAfterGame": "cbr_kd"
+    }
+  }
+]

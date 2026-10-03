@@ -1,0 +1,62 @@
+#.
+#Base Item Drawer capacity settings.
+[storageCapacity]
+	#.
+	#Base storage capacity (in stacks) of a Single slotted Item Drawer.
+	# Default: 32
+	# Range: 1 ~ 1024
+	storageCapacitySingle = 32
+	#.
+	#Base storage capacity (in stacks) of a Double slotted Item Drawer.
+	# Default: 16
+	# Range: 1 ~ 1024
+	storageCapacityDouble = 16
+	#.
+	#Base storage capacity (in stacks) of a Quad slotted Item Drawer.
+	# Default: 8
+	# Range: 1 ~ 1024
+	storageCapacityQuad = 8
+
+#.
+#Upgrade multiplier settings
+[upgradeMultiplier]
+	#.
+	#Capacity multiplier for the Tier I upgrade.
+	# Default: 2
+	# Range: 1 ~ 1024
+	upgradeT1 = 2
+	#.
+	#Capacity multiplier for the Tier II upgrade.
+	# Default: 4
+	# Range: 1 ~ 1024
+	upgradeT2 = 4
+	#.
+	#Capacity multiplier for the Tier III upgrade.
+	# Default: 8
+	# Range: 1 ~ 1024
+	upgradeT3 = 8
+	#.
+	#Capacity multiplier for the Tier IV upgrade.
+	# Default: 16
+	# Range: 1 ~ 1024
+	upgradeT4 = 16
+	#.
+	#Capacity multiplier for the Tier V upgrade.
+	# Default: 32
+	# Range: 1 ~ 1024
+	upgradeT5 = 32
+
+#.
+#Miscellaneous settings
+[misc]
+	#.
+	#Apply slowness when a certain amount of filled drawers are in the players inventory.
+	slowness = true
+	#.
+	#Slowness effect increases by one tier for every X filled drawers in the inventory.
+	# Default: 2
+	# Range: 1 ~ 36
+	slownessAmount = 2
+	#.
+	#If the slowness effect should apply to players in creative mode.
+	slownessCreative = false

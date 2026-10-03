@@ -1,0 +1,23 @@
+[
+  {
+    "id": 0,
+    "default": true,
+    "name": "Overworld Survival",
+    "color": "#FFFFFF",
+    "survival": {
+      "survivalLobby": {
+        "levelKey": "minecraft:overworld",
+        "allowGamePlayerTeleport": false,
+        "lobbyCenter": "0.000000,70.000000,0.000000",
+        "lobbyDimension": "8.000000,160.000000,8.000000",
+        "lobbyMuteki": false,
+        "lobbyHeal": false,
+        "lobbyChangeGamemode": true,
+        "dropInventory": true,
+        "dropGameItemOnly": true,
+        "clearInventory": true,
+        "clearGameItemOnly": true
+      }
+    }
+  }
+]

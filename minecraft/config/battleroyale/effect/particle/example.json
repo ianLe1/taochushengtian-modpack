@@ -1,0 +1,62 @@
+[
+  {
+    "id": 0,
+    "default": true,
+    "name": "Default particle for winner",
+    "color": "#FFFFFF",
+    "detail": {
+      "particleType": "minecraft:explosion_emitter",
+      "count": 3,
+      "initDelay": 1,
+      "interval": 8,
+      "repeat": 3,
+      "offset": "0.000000,0.000000,0.000000",
+      "offsetRange": "8.000000,1.000000,8.000000",
+      "exactOffset": true,
+      "parameter": {
+        "speed": 0.1,
+        "color": "#FFD700",
+        "scale": 1.0,
+        "note": 0,
+        "nbt": "{}"
+      }
+    }
+  },
+  {
+    "id": 1,
+    "name": "Simple particle",
+    "color": "#FFFFFF",
+    "detail": {
+      "particleType": "minecraft:explosion",
+      "count": 1,
+      "initDelay": 20,
+      "interval": 20,
+      "repeat": 10,
+      "offset": "0.000000,0.000000,0.000000",
+      "offsetRange": "0.000000,0.000000,0.000000",
+      "exactOffset": false
+    }
+  },
+  {
+    "id": 2,
+    "name": "Particle with parameter",
+    "color": "#FFFFFF",
+    "detail": {
+      "particleType": "minecraft:dust",
+      "count": 10,
+      "initDelay": 20,
+      "interval": 20,
+      "repeat": 10,
+      "offset": "1.000000,0.000000,1.000000",
+      "offsetRange": "2.000000,1.000000,2.000000",
+      "exactOffset": false,
+      "parameter": {
+        "speed": 0.1,
+        "color": "#0000FF",
+        "scale": 1.0,
+        "note": 0,
+        "nbt": "{}"
+      }
+    }
+  }
+]

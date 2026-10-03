@@ -1,0 +1,22 @@
+filename = 'chemica-1.21.1-0.7.0.jar'
+name = 'Chemica'
+side = ''
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'beta'
+x-prismlauncher-version-number = '0.7.0'
+
+[download]
+hash = 'a95e459bbe20db9ce547b7de731fa69fcc3ec10c132ca13215cfe8949e892ae53f71a90935191e21dadc1c5a4c65df3611d3c4265eb3b005fa378fad3396ed0a'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/E6GusVzz/versions/vVp5FCYf/chemica-1.21.1-0.7.0.jar'
+
+[update.modrinth]
+mod-id = 'E6GusVzz'
+version = 'vVp5FCYf'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'hC1xYvnS'
+type = 'REQUIRED'
+version = 'Kw93Pv7B'

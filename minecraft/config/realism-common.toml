@@ -1,0 +1,17 @@
+	[general."Custom train acceleration"]
+		#Enable custom train acceleration(Custom and Standard)
+		"Enable Custom Train Acceleration" = true
+		#Multiplier for custom train acceleration(Higher = slower acceleration per Carriage)(For trains set on Standard)
+		# Default: 1.0
+		# Range: 0.1 ~ 5.0
+		"Custom Train Acceleration Multiplayer" = 1.0
+		#Allow players to set custom acceleration values larger than default(For trains set on Custom)
+		"Allow Large Acceleration" = true
+
+	[general.Banking]
+		#Global enable of ALL train banking
+		"Global Banking Enable" = true
+
+	[general.ETCS]
+		#Enable ETCS for all trains
+		"Global ETCS Enable" = true

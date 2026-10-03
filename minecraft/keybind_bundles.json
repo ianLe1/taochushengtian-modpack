@@ -1,0 +1,54 @@
+[
+  {
+    "id": "96e98823-0366-49ee-a6a9-c2807ae99c1e",
+    "name": "界面与设置",
+    "entries": [
+      {
+        "key": "key.mcpskins.open_armory",
+        "title": "皮肤军械库"
+      },
+      {
+        "key": "key.wildfire_gender.gender_menu",
+        "title": "性别菜单"
+      },
+      {
+        "key": "key.kubejs.kubedex",
+        "title": "KubeJS 图鉴"
+      },
+      {
+        "key": "key.keybindatlas.open_keyboard",
+        "title": "按键图鉴"
+      },
+      {
+        "key": "key.aeroengineering.monitor_helmet_hud",
+        "title": "工程头盔 HUD"
+      },
+      {
+        "key": "key.ponderer.open_function_page",
+        "title": "思索·功能页面"
+      }
+    ]
+  },
+  {
+    "id": "a7c41f52-0b8e-4d63-9f21-4e7b6d0a8c35",
+    "name": "光影",
+    "entries": [
+      {
+        "key": "iris.keybind.toggleShaders",
+        "title": "开关光影"
+      },
+      {
+        "key": "iris.keybind.shaderPackSelection",
+        "title": "选择光影包"
+      },
+      {
+        "key": "iris.keybind.reload",
+        "title": "重载光影"
+      },
+      {
+        "key": "iris.keybind.wireframe",
+        "title": "线框模式"
+      }
+    ]
+  }
+]

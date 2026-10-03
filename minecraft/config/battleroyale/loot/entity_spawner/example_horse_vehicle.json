@@ -1,0 +1,60 @@
+[
+  {
+    "lootId": 0,
+    "name": "Horse Vehicle",
+    "color": "#FFFFFFAA",
+    "entry": {
+      "lootType": "random",
+      "chance": 0.8,
+      "entry": {
+        "lootType": "weight",
+        "entries": [
+          {
+            "weight": 35.0,
+            "entry": {
+              "lootType": "entity",
+              "entity": "minecraft:camel",
+              "count": 1,
+              "nbt": "{Tame:1b,SaddleItem:{id:\"minecraft:saddle\",Count:1b}}",
+              "range": 5,
+              "attempts": 4
+            }
+          },
+          {
+            "weight": 15.0,
+            "entry": {
+              "lootType": "entity",
+              "entity": "minecraft:horse",
+              "count": 1,
+              "nbt": "{Tame:1b,SaddleItem:{id:\"minecraft:saddle\",count:1},body_armor_item:{components:{\"minecraft:enchantments\":{levels:{\"minecraft:protection\":10}}},count:1,id:\"minecraft:diamond_horse_armor\"},attributes:[{id:\"minecraft:generic.movement_speed\",base:0.39540696d},{id:\"minecraft:generic.max_health\",base:20.0d},{id:\"minecraft:generic.jump_strength\",base:1.0d}]}",
+              "range": 5,
+              "attempts": 4
+            }
+          },
+          {
+            "weight": 30.0,
+            "entry": {
+              "lootType": "entity",
+              "entity": "minecraft:donkey",
+              "count": 1,
+              "nbt": "{Tame:1b,Items:[],ChestedHorse:1b,SaddleItem:{id:\"minecraft:saddle\",Count:1},attributes:[{id:\"minecraft:generic.movement_speed\",base:0.19770348d},{id:\"minecraft:generic.max_health\",base:50.0d},{id:\"minecraft:generic.jump_strength\",base:0.8d}]}",
+              "range": 5,
+              "attempts": 4
+            }
+          },
+          {
+            "weight": 20.0,
+            "entry": {
+              "lootType": "entity",
+              "entity": "minecraft:mule",
+              "count": 1,
+              "nbt": "{Tame:1b,Items:[],ChestedHorse:1b,SaddleItem:{id:\"minecraft:saddle\",Count:1},attributes:[{id:\"minecraft:generic.movement_speed\",base:0.26360464d},{id:\"minecraft:generic.max_health\",base:40.0d},{id:\"minecraft:generic.jump_strength\",base:0.7d}]}",
+              "range": 5,
+              "attempts": 4
+            }
+          }
+        ]
+      }
+    }
+  }
+]

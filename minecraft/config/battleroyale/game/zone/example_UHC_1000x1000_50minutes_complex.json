@@ -1,0 +1,749 @@
+[
+  {
+    "zoneId": 0,
+    "zoneName": "UHC border",
+    "zoneColor": "#FFFFFF00",
+    "zoneDelay": 0,
+    "zoneTime": 72000,
+    "zoneFunc": {
+      "zoneFuncType": "safe",
+      "moveDelay": 0,
+      "moveTime": 0,
+      "tickFrequency": 200,
+      "tickOffset": 0,
+      "damage": 666.0
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "0.000000,-64.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "500.000000,384.000000,500.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "fixed",
+          "fixed": "0.000000,-64.000000,0.000000",
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "fixed",
+          "fixed": "500.000000,384.000000,500.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 10,
+    "zoneName": "Phase 1 border",
+    "zoneColor": "#0000FF19",
+    "preZoneDelayId": 0,
+    "zoneDelay": 0,
+    "zoneTime": 6000,
+    "zoneFunc": {
+      "zoneFuncType": "safe",
+      "moveDelay": 0,
+      "moveTime": 6000,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "damage": 0.5
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 0,
+          "progress": 1.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 10,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 10,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": "-50.000000,0.000000,-50.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 20,
+    "zoneName": "Phase 2 border",
+    "zoneColor": "#0000FF33",
+    "preZoneDelayId": 10,
+    "zoneDelay": 6000,
+    "zoneTime": 6000,
+    "zoneFunc": {
+      "zoneFuncType": "safe",
+      "moveDelay": 0,
+      "moveTime": 6000,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "damage": 1.0
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 10,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 10,
+          "progress": 1.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 20,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 20,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": "-50.000000,0.000000,-50.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 30,
+    "zoneName": "Phase 3 border",
+    "zoneColor": "#0000FF4C",
+    "preZoneDelayId": 20,
+    "zoneDelay": 6000,
+    "zoneTime": 6000,
+    "zoneFunc": {
+      "zoneFuncType": "safe",
+      "moveDelay": 0,
+      "moveTime": 6000,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "damage": 1.5
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 20,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 20,
+          "progress": 1.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 30,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 30,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": "-50.000000,0.000000,-50.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 40,
+    "zoneName": "Phase 4 border",
+    "zoneColor": "#0000FF66",
+    "preZoneDelayId": 30,
+    "zoneDelay": 6000,
+    "zoneTime": 6000,
+    "zoneFunc": {
+      "zoneFuncType": "safe",
+      "moveDelay": 0,
+      "moveTime": 6000,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "damage": 2.0
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 30,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 30,
+          "progress": 1.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 40,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 40,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": "-50.000000,0.000000,-50.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 50,
+    "zoneName": "Phase 5 border",
+    "zoneColor": "#0000FF7F",
+    "preZoneDelayId": 40,
+    "zoneDelay": 6000,
+    "zoneTime": 6000,
+    "zoneFunc": {
+      "zoneFuncType": "safe",
+      "moveDelay": 0,
+      "moveTime": 6000,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "damage": 2.5
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 40,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 40,
+          "progress": 1.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 50,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 50,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": "-50.000000,0.000000,-50.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 60,
+    "zoneName": "Phase 6 border",
+    "zoneColor": "#0000FF99",
+    "preZoneDelayId": 50,
+    "zoneDelay": 6000,
+    "zoneTime": 6000,
+    "zoneFunc": {
+      "zoneFuncType": "safe",
+      "moveDelay": 0,
+      "moveTime": 6000,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "damage": 3.0
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 50,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 50,
+          "progress": 1.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 60,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 60,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": "-50.000000,0.000000,-50.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 70,
+    "zoneName": "Phase 7 border",
+    "zoneColor": "#0000FFB2",
+    "preZoneDelayId": 60,
+    "zoneDelay": 6000,
+    "zoneTime": 6000,
+    "zoneFunc": {
+      "zoneFuncType": "safe",
+      "moveDelay": 0,
+      "moveTime": 6000,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "damage": 3.5
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 60,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 60,
+          "progress": 1.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 70,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 70,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": "-50.000000,0.000000,-50.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 80,
+    "zoneName": "Phase 8 border",
+    "zoneColor": "#0000FFCC",
+    "preZoneDelayId": 70,
+    "zoneDelay": 6000,
+    "zoneTime": 6000,
+    "zoneFunc": {
+      "zoneFuncType": "safe",
+      "moveDelay": 0,
+      "moveTime": 6000,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "damage": 4.0
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 70,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 70,
+          "progress": 1.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 80,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 80,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": "-50.000000,0.000000,-50.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 90,
+    "zoneName": "Phase 9 border",
+    "zoneColor": "#0000FFE5",
+    "preZoneDelayId": 80,
+    "zoneDelay": 6000,
+    "zoneTime": 6000,
+    "zoneFunc": {
+      "zoneFuncType": "safe",
+      "moveDelay": 0,
+      "moveTime": 6000,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "damage": 4.5
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 80,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 80,
+          "progress": 1.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 90,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 90,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": "-50.000000,0.000000,-50.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 100,
+    "zoneName": "Phase 10 border",
+    "zoneColor": "#0000FFFF",
+    "preZoneDelayId": 90,
+    "zoneDelay": 6000,
+    "zoneTime": 6000,
+    "zoneFunc": {
+      "zoneFuncType": "safe",
+      "moveDelay": 0,
+      "moveTime": 6000,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "damage": 5.0
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 90,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 90,
+          "progress": 1.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 100,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "relative",
+          "previousZoneId": 100,
+          "progress": 0.0,
+          "scale": 1.0,
+          "relative": "-50.000000,0.000000,-50.000000",
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  },
+  {
+    "zoneId": 110,
+    "zoneName": "Phase 11 border",
+    "zoneColor": "#0000FF118",
+    "preZoneDelayId": 100,
+    "zoneDelay": 6000,
+    "zoneTime": 72000,
+    "zoneFunc": {
+      "zoneFuncType": "safe",
+      "moveDelay": 0,
+      "moveTime": 0,
+      "tickFrequency": 20,
+      "tickOffset": 0,
+      "damage": 5.5
+    },
+    "zoneShape": {
+      "zoneShapeType": "square",
+      "start": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 100,
+          "progress": 1.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 100,
+          "progress": 1.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "end": {
+        "center": {
+          "centerType": "previous",
+          "previousZoneId": 110,
+          "progress": 0.0,
+          "randomRange": 0.0,
+          "playerCenterLerp": 0.0
+        },
+        "dimension": {
+          "dimensionType": "previous",
+          "previousZoneId": 110,
+          "progress": 0.0,
+          "scale": 1.0,
+          "randomRange": 0.0
+        },
+        "rotation": {
+          "rotationType": "fixed",
+          "fixed": 0.0,
+          "randomRange": 0.0
+        }
+      },
+      "allowBadShape": false
+    }
+  }
+]

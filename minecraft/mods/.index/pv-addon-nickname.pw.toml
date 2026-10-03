@@ -1,0 +1,43 @@
+filename = 'pv-addon-nickname-2.1.3.jar'
+name = 'pv-addon-nickname'
+side = 'server'
+x-prismlauncher-loaders = [ 'neoforge', 'forge', 'fabric' ]
+x-prismlauncher-mc-versions = [
+    '1.20.1',
+    '1.20.2',
+    '1.20.3',
+    '1.20.4',
+    '1.20.5',
+    '1.20.6',
+    '1.21',
+    '1.21.1',
+    '1.21.2',
+    '1.21.3',
+    '1.21.4',
+    '1.21.5',
+    '1.21.6',
+    '1.21.7',
+    '1.21.8',
+    '1.21.9',
+    '1.21.10',
+    '1.21.11',
+    '26.1',
+    '26.1.1',
+    '26.1.2'
+]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '2.1.3'
+
+[download]
+hash = 'e53389ff0978e801f18f30fcb90d5acbc6bb541ed87d72319108162c20146fdad722ad1d25018cb3b2020715e5c20a62da01ddc38ff855fcf68427330b0d2647'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/kcWnKtP9/versions/x81LbqJB/pv-addon-nickname-2.1.3.jar'
+
+[update.modrinth]
+mod-id = 'kcWnKtP9'
+version = 'x81LbqJB'
+
+[[x-prismlauncher-dependencies]]
+addonId = '1bZhdhsH'
+type = 'REQUIRED'

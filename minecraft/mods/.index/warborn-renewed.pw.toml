@@ -1,0 +1,25 @@
+filename = 'WRB-Armor-NeoForge-1.21.1-0.6.1.jar'
+name = 'WarBorn Renewed'
+side = 'server'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = 'WRB-Armor-NeoForge-1.21.1-0.6.1.jar'
+
+[download]
+hash = '967ba8e7aac09783b9dc53bd7bac2f72ebc31e59'
+hash-format = 'sha1'
+mode = 'metadata:curseforge'
+url = ''
+
+[update.curseforge]
+file-id = 7711226
+project-id = 1363074
+
+[[x-prismlauncher-dependencies]]
+addonId = '309927'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = '388172'
+type = 'REQUIRED'

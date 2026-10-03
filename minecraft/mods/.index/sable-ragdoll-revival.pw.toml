@@ -1,0 +1,25 @@
+filename = 'sable_ragdoll_revival-1.2.2.jar'
+name = 'Sable: Ragdoll Revival'
+side = 'both'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.2.2'
+
+[download]
+hash = '14d57db090178c863561528c8a5fbbbf31390f1b00172e6399ad978b3340a3952b8bc7a019a1898e3f23600affab5906af8ffd95bc454f721bb6441df859fec1'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/1koTp7kY/versions/NHMoKedW/sable_ragdoll_revival-1.2.2.jar'
+
+[update.modrinth]
+mod-id = '1koTp7kY'
+version = 'NHMoKedW'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'I3mWDgfy'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'T9PomCSv'
+type = 'REQUIRED'

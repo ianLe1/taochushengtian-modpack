@@ -1,0 +1,27 @@
+#.
+#Ratatouille Fried Delights' Kinetic components and their properties
+[kinetics]
+
+		#.
+		#.
+		#Fine tune the kinetic stats of individual components
+		[kinetics.stressValues.ratatouille]
+
+			#.
+			#.
+			#[in Stress Units]
+			#Configure the individual stress impact of mechanical blocks. Note that this cost is doubled for every speed increase it receives.
+			[kinetics.stressValues.ratatouille.impact]
+				continuous_fryer = 4.0
+				drum_processor = 4.0
+
+#.
+#Ratatouille Fried Delights' liquid manipulation tools
+[fluids]
+	#.
+	#.
+	#[in Buckets]
+	#The amount of liquid a fryer can hold per block.
+	# Default: 1
+	# Range: > 1
+	fryerTankCapacity = 1

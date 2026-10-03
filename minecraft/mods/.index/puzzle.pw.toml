@@ -1,0 +1,21 @@
+filename = 'puzzle-neoforge-2.3.0+1.21.1.jar'
+name = 'Puzzle'
+side = 'client'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21', '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '2.3.0+1.21.1-neoforge'
+
+[download]
+hash = 'b2c90cc1a3d6157934ce5d50e47ace4a1bc5d47c2afebec16db6a34d5b453fb7a15f6595ab775bac612023e7ea0c67a6232491d2d4c0842f4c78bfd68e236282'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/3IuO68q1/versions/bZNDTLHq/puzzle-neoforge-2.3.0%2B1.21.1.jar'
+
+[update.modrinth]
+mod-id = '3IuO68q1'
+version = 'bZNDTLHq'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'codAaoxh'
+type = 'REQUIRED'

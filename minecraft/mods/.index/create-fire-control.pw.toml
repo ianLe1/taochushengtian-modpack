@@ -1,0 +1,37 @@
+filename = 'create-fire-control-0.7.9.jar'
+name = 'Create: Fire Control'
+side = 'server'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = 'create-fire-control-0.7.9.jar'
+
+[download]
+hash = '428b0bfc1d1a2c0ebc9df9cfd6988890893cbcd3'
+hash-format = 'sha1'
+mode = 'metadata:curseforge'
+url = ''
+
+[update.curseforge]
+file-id = 8946647
+project-id = 1647191
+
+[[x-prismlauncher-dependencies]]
+addonId = '1552960'
+type = 'OPTIONAL'
+
+[[x-prismlauncher-dependencies]]
+addonId = '388172'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = '1619723'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = '328085'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = '1312371'
+type = 'REQUIRED'

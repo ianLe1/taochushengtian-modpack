@@ -1,0 +1,58 @@
+[
+  {
+    "id": 0,
+    "name": "All display",
+    "color": "#FFFFFFAA",
+    "team": {
+      "display": true,
+      "xRatio": -0.9,
+      "yRatio": -0.9,
+      "offlineTime": 160
+    },
+    "game": {
+      "display": true,
+      "xRatio": 0.85,
+      "yRatio": 0.9,
+      "aliveColor": "#FFFFFFFF",
+      "aliveCountColor": "#00FFFFFF"
+    },
+    "map": {
+      "enableJourneyMap": true,
+      "lineThickness": 4.0
+    }
+  },
+  {
+    "id": 1,
+    "name": "Display nothing",
+    "color": "#FFFFFFAA",
+    "team": {
+      "display": false
+    },
+    "game": {
+      "display": false
+    },
+    "map": {
+      "enableJourneyMap": false,
+      "lineThickness": 4.0
+    }
+  },
+  {
+    "id": 2,
+    "name": "Hide team",
+    "color": "#FFFFFFAA",
+    "team": {
+      "display": false
+    },
+    "game": {
+      "display": true,
+      "xRatio": 0.85,
+      "yRatio": 0.9,
+      "aliveColor": "#FFFFFFFF",
+      "aliveCountColor": "#00FFFFFF"
+    },
+    "map": {
+      "enableJourneyMap": true,
+      "lineThickness": 4.0
+    }
+  }
+]

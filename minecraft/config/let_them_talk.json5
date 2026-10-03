@@ -1,0 +1,16 @@
+{
+  "voiceThresholdDb": -40.0,
+  "voiceSourceGateDb": -40.0,
+  "releaseDelaySeconds": 1.0,
+  "duckTargets": [
+    {
+      "process": "spotify"
+    },
+    {
+      "process": "chrome"
+    }
+  ],
+  "modEnabled": true,
+  "useFade": true,
+  "fadeDurationSeconds": 0.5
+}

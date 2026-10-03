@@ -1,0 +1,21 @@
+filename = 'sablefloaters-1.0.1.jar'
+name = 'Sable: Floaters'
+side = ''
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.0.1'
+
+[download]
+hash = 'e50954360759db69c346375759316326e60bd796b8819ec1743060c8dec2525e9f988df453409826866b732cc5f7ddf0479ff62a6c29a9b7d52ceab6bc17d3a6'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/kjqs1O8F/versions/PjmCUp0h/sablefloaters-1.0.1.jar'
+
+[update.modrinth]
+mod-id = 'kjqs1O8F'
+version = 'PjmCUp0h'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'T9PomCSv'
+type = 'REQUIRED'

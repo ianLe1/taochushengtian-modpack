@@ -1,0 +1,21 @@
+filename = 'extra-mod-integrations-all-neoforge-1.0.3+1.21.1.jar'
+name = 'EMI Addon: Extra Mod Integrations'
+side = 'client'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.0.3+1.21.1.neoforge'
+
+[download]
+hash = '9267359eefc56bdb1eca2992cba12363f54f974f27ca2031ecb0677ba4c3bcd1d563db94dd569bbdf085a8b890cd7aa681ae6f485859051565b6a2cf50adc4c8'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/bpRHnWUb/versions/bxgGyUjY/extra-mod-integrations-all-neoforge-1.0.3%2B1.21.1.jar'
+
+[update.modrinth]
+mod-id = 'bpRHnWUb'
+version = 'bxgGyUjY'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'fRiHVvU7'
+type = 'REQUIRED'

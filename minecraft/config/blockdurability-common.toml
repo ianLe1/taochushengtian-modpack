@@ -1,0 +1,57 @@
+[hp_calculation]
+	#Minimum HP for any breakable block (prevents zero-HP blocks)
+	# Default: 1.0
+	# Range: 0.5 ~ 1.7976931348623157E308
+	minBlockHP = 1.0
+	#Per-block HP overrides. Takes priority over the hardness formula.
+	#Format: "modid:block_id=hp", supports wildcards.
+	#Examples:
+	#  "minecraft:obsidian=20"  - reduce obsidian to 20 HP
+	#  "minecraft:*glass*=1"    - force all glass to 1 HP
+	blockHPOverrides = []
+	#Block HP = max(minBlockHP, blockHardness * hardnessMultiplier).
+	#Block hardness correlates strongly with explosion resistance.
+	#Examples with multiplier=1.5:
+	#  Glass (hardness 0.3) → HP = max(1, 0.3*1.5) = 1
+	#  Oak Planks (2.0) → HP = max(1, 2.0*1.5) = 3
+	#  Oak Door (3.0)   → HP = max(1, 3.0*1.5) = 4.5
+	#  Stone (1.5)      → HP = max(1, 1.5*1.5) = 2.25
+	#  Obsidian (50.0)  → HP = max(1, 50*1.5) = 75
+	# Default: 1.5
+	# Range: 0.1 ~ 100.0
+	hardnessMultiplier = 1.5
+
+[general]
+	#Damage dealt to a block per bullet hit (used when useBulletDamage is false)
+	# Default: 1.0
+	# Range: 0.1 ~ 100.0
+	damagePerHit = 1.0
+	#If true, use the bullet's entity damage * bulletDamageMultiplier as block damage
+	useBulletDamage = false
+	#Enable the block durability system
+	enabled = true
+	#Multiplier when useBulletDamage is true
+	# Default: 1.0
+	# Range: 0.0 ~ 100.0
+	bulletDamageMultiplier = 1.0
+	#Fix TaCZ bullet_ignore tag so fences and fence gates can be hit by bullets
+	fixBulletIgnore = true
+
+[effects]
+	#Spawn block break particles when damaged
+	spawnBreakParticles = true
+	#Play block hit sound when damaged
+	playBreakSound = true
+	#Whether broken blocks drop items
+	dropItems = false
+
+[whitelist]
+	#Whitelist: only blocks matching these patterns can be damaged by bullets.
+	#Two formats supported:
+	#  "tag:namespace:path"  → Block tag matching (auto-compatible with all mods!)
+	#  "modid:block_id"     → Exact name match
+	#  "modid:*pattern*"    → Wildcard name match
+	#Blocks NOT in this list will ignore bullet damage entirely.
+	#
+	#Default covers: glass, wood planks, logs, wooden doors/trapdoors/fences, leaves
+	blockWhitelist = ["tag:c:glass_blocks", "tag:c:glass_panes", "tag:minecraft:planks", "tag:minecraft:logs", "tag:minecraft:wooden_doors", "tag:minecraft:wooden_trapdoors", "tag:minecraft:fences", "tag:minecraft:fence_gates", "tag:minecraft:wooden_stairs", "tag:minecraft:wooden_slabs", "tag:minecraft:wooden_buttons", "tag:minecraft:wooden_pressure_plates", "tag:minecraft:standing_signs", "tag:minecraft:wall_signs", "tag:minecraft:ceiling_hanging_signs", "tag:minecraft:wall_hanging_signs"]

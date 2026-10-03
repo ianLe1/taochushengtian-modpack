@@ -1,0 +1,43 @@
+[HUD]
+	#Allowed Values: Light, Hide
+	stamina_hud_type = "Light"
+	#horizontal alignment
+	#Allowed Values: Left, Right
+	hud_align_h_s = "Right"
+	#vertical alignment
+	#Allowed Values: Top, Bottom
+	hud_align_v_s = "Bottom"
+	show_always = false
+	hide_automatically = true
+	# Default: 0
+	# Range: -100 ~ 100
+	hud_offset_h = 0
+	# Default: 0
+	# Range: -100 ~ 100
+	hud_offset_v = 0
+
+[GrapplingHook]
+	#how much speed widens the view. 0 disables
+	# Default: 0.6
+	# Range: 0.0 ~ 1.0
+	fov_intensity = 0.6
+	#how far the camera leans towards the rope. 0 disables
+	# Default: 0.6
+	# Range: 0.0 ~ 1.0
+	camera_roll_intensity = 0.6
+	#how much a loose rope sags. 0 for straight
+	# Default: 1.0
+	# Range: 0.0 ~ 2.0
+	rope_sag = 1.0
+	#show a marker where the hook would land
+	show_target_indicator = true
+	#size of that marker in pixels
+	# Default: 11
+	# Range: 3 ~ 64
+	target_indicator_size = 11
+	#log it when the rope ends up inside a block
+	debug_rope = false
+
+[Other]
+	enable_sounds = true
+	parcool_is_active = true

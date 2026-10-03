@@ -1,0 +1,18 @@
+filename = 'sable_weighted_create_deco-1.21.1-1.0.1-d.jar'
+name = 'Create Deco Sable Compatibility'
+side = ''
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.0.1-d'
+
+[download]
+hash = 'ceab580049b2fb7d95a7c43b26e9342fcb4ffb3887a366c66259e6688507b51fbef37e11585bfed33352e73748ceed2661d5878450ce98d0dc7c94c10a254520'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/kHIRKdOE/versions/dplYym5G/sable_weighted_create_deco-1.21.1-1.0.1-d.jar'
+
+[update.modrinth]
+mod-id = 'kHIRKdOE'
+version = 'dplYym5G'

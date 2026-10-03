@@ -1,0 +1,25 @@
+filename = 'createimp-1.4.2.jar'
+name = 'Create Improve'
+side = ''
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.4.2'
+
+[download]
+hash = '472b5ccb5ca10454f7c3a786792ba32e8b898d665c449a1646b71aa066366566bd24e90ad7a4b84dd8effbd9af7e6e4c04967ded86bf55acbff3ef6e0e78883d'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/3xu2jXe8/versions/nt4kkAaE/createimp-1.4.2.jar'
+
+[update.modrinth]
+mod-id = '3xu2jXe8'
+version = 'nt4kkAaE'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'LNytGWDc'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = '9s6osm5g'
+type = 'REQUIRED'

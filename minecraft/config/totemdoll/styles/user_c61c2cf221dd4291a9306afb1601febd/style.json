@@ -1,0 +1,25 @@
+{
+  "format": 3,
+  "id": "totemdoll:user_c61c2cf221dd4291a9306afb1601febd",
+  "name": "0iLee",
+  "template": "totemdoll:alex",
+  "user_created": true,
+  "origin": "local",
+  "model": {
+    "type": "mesh",
+    "geometry": "models/geometry.json"
+  },
+  "textures": {
+    "base": "textures/skin.png"
+  },
+  "skin": {
+    "supported": true,
+    "format": "minecraft_64x64",
+    "target": "base",
+    "mapping": "minecraft_player"
+  },
+  "features": {
+    "animations": false,
+    "dynamic_textures": false
+  }
+}

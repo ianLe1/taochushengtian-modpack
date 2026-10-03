@@ -1,0 +1,18 @@
+filename = 'sable-photomancy-1.0.1.jar'
+name = 'Sable Photomancy'
+side = 'both'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.0.1'
+
+[download]
+hash = '3a02e10c10d96a8fde75a5e625207f5452991d48ec4b4762dff3ea870952fdb922b93ad3d0b84c66bdb7875bcf96f3c6f61076c595a13652ddf86fd9a6dc9730'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/hNGBYvQN/versions/hwxjOCxE/sable-photomancy-1.0.1.jar'
+
+[update.modrinth]
+mod-id = 'hNGBYvQN'
+version = 'hwxjOCxE'

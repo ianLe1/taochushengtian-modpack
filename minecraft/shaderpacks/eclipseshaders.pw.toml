@@ -1,0 +1,40 @@
+filename = 'EclipseShaders.zip'
+name = 'Eclipse'
+side = 'client'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = []
+x-prismlauncher-mc-versions = [
+    '1.19',
+    '1.19.1',
+    '1.19.2',
+    '1.19.3',
+    '1.19.4',
+    '1.20',
+    '1.20.1',
+    '1.20.2',
+    '1.20.3',
+    '1.20.4',
+    '1.20.5',
+    '1.20.6',
+    '1.21',
+    '1.21.1',
+    '1.21.2',
+    '1.21.3',
+    '1.21.4',
+    '1.21.5',
+    '1.21.6',
+    '1.21.7',
+    '1.21.8'
+]
+x-prismlauncher-release-type = 'beta'
+x-prismlauncher-version-number = '1.0'
+
+[download]
+hash = '95c8ebc977d8877b9f3d991f060b25117a57ee9016414959bdd00aa2643bf1eb21246b7fc8ef8bd3a68e83a9839220f1b1bf26ba665ef106df8ba15707de81b1'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/s8ZCVd1a/versions/3lt2DwGh/EclipseShaders.zip'
+
+[update.modrinth]
+mod-id = 's8ZCVd1a'
+version = '3lt2DwGh'

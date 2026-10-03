@@ -1,0 +1,21 @@
+{
+  "basicSettings": {
+    "screenWhitelist": [],
+    "enableScreenRecovering": false,
+    "recoveredScreens": [],
+    "englishStateImpl": "DISABLE_IM",
+    "primaryEnglishState": "CJK"
+  },
+  "advanceSettings": {
+    "charSimulationScreens": [],
+    "commandPrefixRegex": "^/"
+  },
+  "linuxCompatibilitySettings": {
+    "enableKeyboardPatch": true,
+    "ibusOnArgName": "libpinyin",
+    "ibusOffArgName": "xkb:us::eng",
+    "fcitx5OnArgName": "-o",
+    "fcitx5OffArgName": "-c",
+    "fcitx5OnStateName": "2"
+  }
+}

@@ -1,0 +1,38 @@
+#How far away chunkloaders can be linked to their train stations
+#(in chebyshev distance, in blocks)
+#note: Chunkloaders can have issues linking to stations that are outside of the view distance
+# Default: 96
+# Range: > 0
+trainStationMaxDistance = 96
+#How many train station chunkloader blocks can be connected to a single train station
+#(does not give a warning when placing down chunkloaders above the count, you have to check after placing it)
+# Default: 500
+# Range: > 0
+chunkloaderMaxCount = 500
+#Cooldown (in ticks) that a compiler needs before it can produce another manifest
+# Default: 80
+# Range: 1 ~ 1000
+compilerCooldown = 80
+#Maximum number of bytes (of item data) that can be encoded in a single manifest
+#(Lower bytes = more difficult to exceed the byte limit for a chunk, and sending a full inventory will require using more readers on the other end)
+#Recommended value - 80,000 bytes or less (roughly equivalent to 1 full minecraft book), or slightly more
+#to be able to list books inside of manifests.
+# Default: 1600000
+# Range: 256 ~ 10000000
+manifestMaxBytes = 1600000
+#How much the compiler cooldown is increased when a connected extension module is used (per module)
+#(This modifier is not incurred if the extension module prints a blank manifest, only if it prints a manifest with items)
+# Default: 0.0
+# Range: 0.0 ~ 1000.0
+expansionModuleCooldownModifier = 0.0
+#How far away expansion module blocks can be linked to their compilers
+#(in chebyshev distance, in blocks)
+#note: can have issues linking outside of the view distance (see above)
+# Default: 30
+# Range: 0 ~ 1000
+expansionModuleMaxDistance = 30
+#How many expansion module blocks can be connected to a single compiler block
+#(does not give a warning when placing down module blocks above the count, you have to check after placing it)
+# Default: 500
+# Range: 0 ~ 100000
+expansionModuleMaxCount = 500

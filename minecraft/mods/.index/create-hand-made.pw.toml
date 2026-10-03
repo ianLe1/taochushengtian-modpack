@@ -1,0 +1,29 @@
+filename = 'create_hand_made-0.2.0-beta.jar'
+name = 'Create: Hand Made'
+side = 'server'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'beta'
+x-prismlauncher-version-number = 'create_hand_made-neo1.21.1-0.2.0-beta'
+
+[download]
+hash = 'cac611f8bee097468ec3c2bd63fc4109d4883412'
+hash-format = 'sha1'
+mode = 'metadata:curseforge'
+url = ''
+
+[update.curseforge]
+file-id = 9028236
+project-id = 1712724
+
+[[x-prismlauncher-dependencies]]
+addonId = '238086'
+type = 'OPTIONAL'
+
+[[x-prismlauncher-dependencies]]
+addonId = '328085'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = '238222'
+type = 'OPTIONAL'

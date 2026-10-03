@@ -1,0 +1,33 @@
+filename = 'createmetalogistics-1.21.1-0.4.7.jar'
+name = 'Create: Meta Logistics'
+side = 'both'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1', '1.21.2', '1.21.3', '1.21.4', '1.21.5', '1.21.6', '1.21.7', '1.21.8', '1.21.9', '1.21.10', '1.21.11' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '0.4.7'
+
+[download]
+hash = '72092ce883445d558df0465c855a4fe3a51bf47297b8bfb44400b3c2ef37d7ba9c1bb651b780e3976bf7b18fc284641fbaaa19d4a82bac1edd7987783fef7bec'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/2ACRRn3U/versions/vT5WCxeH/createmetalogistics-1.21.1-0.4.7.jar'
+
+[update.modrinth]
+mod-id = '2ACRRn3U'
+version = 'vT5WCxeH'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'ordsPcFz'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'LNytGWDc'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'u6dRKJwZ'
+type = 'OPTIONAL'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'fRiHVvU7'
+type = 'OPTIONAL'

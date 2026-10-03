@@ -1,0 +1,36 @@
+#The max amount of water that can be added to water during rain (This is the biggest factor when it comes to how fast flooding happens
+# Default: 6
+# Range: 1 ~ 100
+maxwateramount = 6
+#Should rain be in areas that are raining? If enabled it will make flooding very difficult plus lag may occur so it is recommended to leave this off
+waterdrainsrain = false
+#If enabled the amount of rain will dynamically adjust to try and stop overloading the users system (do note the highest this will go is still limited by the user set value
+isadaptive = true
+#If adaptive is enabled each tick will aim to be this many milliseconds long
+# Default: 30
+# Range: 1 ~ 50
+targettps = 30
+#If rain places blocks above water (This must be turned on for flooding to properly occur)
+rainfillsblocks = true
+#How far away from the player puddles can form
+# Default: 120
+# Range: 0 ~ 200
+maxpuddleradius = 120
+#What is the minimum rain level puddles can form at
+# Default: 0.1
+# Range: 0.0 ~ 1.0
+minlevelpuddle = 0.1
+#When realistic downfall is enabled what should the peak mm/h be
+# Default: 200
+# Range: 0 ~ 400
+maxraindownfall = 200
+#Enable storm surge system (Experimental as of now, recommended to restart your world if you toggle this
+stormsurgeactive = false
+#Enable if you wish to make storm surge chunks require certain biome types (recommended to enable with mods that consistently place beach biomes beside oceans eg. Lithosphere)
+stormsurgebiomecheck = false
+#How deep water needs to be for a storm surge to occur
+# Default: 3
+# Range: 1 ~ 10
+mindepthsurge = 3
+#If enabled this attempts to make rain downfall 'realistic' by calculating amounts based off how long the minecraft day is (Overrides max water amount, adaptive settings and min rain level). Also this is highly laggy!
+realisticdownfall = false

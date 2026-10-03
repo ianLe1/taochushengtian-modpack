@@ -1,0 +1,8 @@
+# AutoPickup Client Configuration
+master = true
+blocks = true
+blockXp = true
+mobLoot = false
+mobXp = false
+splitMobLoot = false
+splitMobXp = false

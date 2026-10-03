@@ -1,0 +1,11 @@
+[
+  {
+    "id": 0,
+    "default": true,
+    "name": "Disable function",
+    "color": "#FFFFFF",
+    "register": {
+      "details": []
+    }
+  }
+]

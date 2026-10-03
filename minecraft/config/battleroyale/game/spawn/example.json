@@ -1,0 +1,123 @@
+[
+  {
+    "id": 0,
+    "default": true,
+    "name": "Random ground spawn",
+    "color": "#FFFFFFAA",
+    "entry": {
+      "spawnType": "teleport",
+      "spawnShapeType": "square",
+      "center": "0.000000,-60.000000,0.000000",
+      "dimension": "128.000000,0.000000,128.000000",
+      "detailType": "random",
+      "teamTogether": false,
+      "findGround": true,
+      "randomRange": 0.0,
+      "hangTime": 300
+    }
+  },
+  {
+    "id": 1,
+    "name": "Fixed ground spawn",
+    "color": "#FFFFFFAA",
+    "entry": {
+      "spawnType": "teleport",
+      "spawnShapeType": "square",
+      "center": "0.000000,-60.000000,0.000000",
+      "dimension": "128.000000,0.000000,128.000000",
+      "detailType": "fixed",
+      "teamTogether": true,
+      "findGround": true,
+      "randomRange": 0.0,
+      "hangTime": 300,
+      "fixedPos": [
+        "0.000000,-60.000000,0.000000",
+        "-50.000000,-60.000000,-50.000000",
+        "-50.000000,-60.000000,50.000000",
+        "50.000000,-60.000000,-50.000000",
+        "50.000000,-60.000000,50.000000"
+      ],
+      "needShuffle": false
+    }
+  },
+  {
+    "id": 2,
+    "name": "Grid distributed teleport",
+    "color": "#FFFFFFAA",
+    "entry": {
+      "spawnType": "teleport",
+      "spawnShapeType": "rectangle",
+      "center": "0.000000,-60.000000,0.000000",
+      "dimension": "128.000000,0.000000,128.000000",
+      "detailType": "distributed",
+      "teamTogether": true,
+      "findGround": false,
+      "randomRange": 10.0,
+      "hangTime": 300,
+      "fixedSimulationCount": 15,
+      "playerFactorContribution": 0.0,
+      "allowOnBorder": true,
+      "globalShrinkRatio": 0.8,
+      "needShuffle": false
+    }
+  },
+  {
+    "id": 3,
+    "name": "Double center grid distribution teleport",
+    "color": "#FFFFFFAA",
+    "entry": {
+      "spawnType": "teleport",
+      "spawnShapeType": "circle",
+      "center": "0.000000,195.000000,0.000000",
+      "dimension": "128.000000,0.000000,128.000000",
+      "detailType": "distributed",
+      "teamTogether": true,
+      "findGround": false,
+      "randomRange": 0.0,
+      "hangTime": 300,
+      "useGoldenSpiral": false,
+      "fixedSimulationCount": 15,
+      "playerFactorContribution": 0.0,
+      "allowOnBorder": true,
+      "globalShrinkRatio": 0.8,
+      "needShuffle": true
+    }
+  },
+  {
+    "id": 4,
+    "name": "Golden Spiral Distribution teleport",
+    "color": "#FFFFFFAA",
+    "entry": {
+      "spawnType": "teleport",
+      "spawnShapeType": "circle",
+      "center": "0.000000,195.000000,0.000000",
+      "dimension": "128.000000,0.000000,128.000000",
+      "detailType": "distributed",
+      "teamTogether": true,
+      "findGround": false,
+      "randomRange": 0.0,
+      "hangTime": 300,
+      "useGoldenSpiral": true,
+      "fixedSimulationCount": 15,
+      "playerFactorContribution": 0.0,
+      "allowOnBorder": true,
+      "globalShrinkRatio": 0.8,
+      "needShuffle": false
+    }
+  },
+  {
+    "id": 2,
+    "name": "Plane spawn (Not implemented)",
+    "color": "#FFFFFF",
+    "entry": {
+      "spawnType": "plane",
+      "spawnShapeType": "square",
+      "center": "0.000000,65.000000,0.000000",
+      "dimension": "128.000000,0.000000,128.000000",
+      "detailType": "random",
+      "planeHeight": 255.0,
+      "planeSpeed": 2.5,
+      "fixedFlightTime": true
+    }
+  }
+]

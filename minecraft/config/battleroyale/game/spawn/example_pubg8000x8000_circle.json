@@ -1,0 +1,70 @@
+[
+  {
+    "id": 0,
+    "name": "8000x8000 Circle radius 4000 * 90%",
+    "color": "#FFFFFFAA",
+    "preZoneCenterOffset": 0,
+    "entry": {
+      "spawnType": "teleport",
+      "spawnShapeType": "circle",
+      "center": "0.000000,-60.000000,0.000000",
+      "dimension": "3600.000000,0.000000,3600.000000",
+      "detailType": "random",
+      "teamTogether": true,
+      "findGround": true,
+      "randomRange": 8.0,
+      "hangTime": 300
+    }
+  },
+  {
+    "id": 1,
+    "name": "8000x8000 Square side 4000 * 90%",
+    "color": "#FFFFFFAA",
+    "preZoneCenterOffset": 0,
+    "entry": {
+      "spawnType": "teleport",
+      "spawnShapeType": "square",
+      "center": "0.000000,-60.000000,0.000000",
+      "dimension": "3600.000000,0.000000,3600.000000",
+      "detailType": "random",
+      "teamTogether": true,
+      "findGround": true,
+      "randomRange": 8.0,
+      "hangTime": 300
+    }
+  },
+  {
+    "id": 2,
+    "name": "5340x5340 Circle radius 2670 * 90%",
+    "color": "#FFFFFFAA",
+    "preZoneCenterOffset": 0,
+    "entry": {
+      "spawnType": "teleport",
+      "spawnShapeType": "circle",
+      "center": "0.000000,-60.000000,0.000000",
+      "dimension": "2403.000000,0.000000,2403.000000",
+      "detailType": "random",
+      "teamTogether": true,
+      "findGround": true,
+      "randomRange": 8.0,
+      "hangTime": 300
+    }
+  },
+  {
+    "id": 3,
+    "name": "881x881 Circle radius 440 * 90%",
+    "color": "#FFFFFFAA",
+    "preZoneCenterOffset": 0,
+    "entry": {
+      "spawnType": "teleport",
+      "spawnShapeType": "circle",
+      "center": "0.000000,-60.000000,0.000000",
+      "dimension": "396.000000,0.000000,396.000000",
+      "detailType": "random",
+      "teamTogether": true,
+      "findGround": true,
+      "randomRange": 8.0,
+      "hangTime": 300
+    }
+  }
+]

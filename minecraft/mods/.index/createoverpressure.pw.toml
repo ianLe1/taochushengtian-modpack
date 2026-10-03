@@ -1,0 +1,18 @@
+filename = 'overpressure-0.1.7.4.jar'
+name = 'Create: Overpressure'
+side = ''
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '0.1.7.4'
+
+[download]
+hash = '56ce3a1d284f63dfab441ab06a365923958d2313c5fdf5d338d787e7e0a90453e4bc68f76eb1830586a53df312f98c27914bb10c6c56346e5ed619e573266ca3'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/FZ4dlc9b/versions/s0DcXhza/overpressure-0.1.7.4.jar'
+
+[update.modrinth]
+mod-id = 'FZ4dlc9b'
+version = 's0DcXhza'

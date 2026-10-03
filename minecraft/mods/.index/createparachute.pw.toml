@@ -1,0 +1,18 @@
+filename = 'create_parachute-1.1.3b.jar'
+name = 'Create:Parachute'
+side = ''
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'beta'
+x-prismlauncher-version-number = '1.1.3b'
+
+[download]
+hash = '132e548c88eafab48d1004dded51ee7a16cd06f7f1051536d053e3398c74834a550c25d7cf05da9130f10b380577990f2e72802a1f4bb25e949ef657c4e85974'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/vnyV74Zs/versions/zTsjbZUO/create_parachute-1.1.3b.jar'
+
+[update.modrinth]
+mod-id = 'vnyV74Zs'
+version = 'zTsjbZUO'

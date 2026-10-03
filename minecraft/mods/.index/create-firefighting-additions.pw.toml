@@ -1,0 +1,31 @@
+filename = 'createfirefightingadd-0.2.5-beta-fix2.jar'
+name = 'CreateFireFightingAdd'
+side = ''
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'beta'
+x-prismlauncher-version-number = '0.2.5-beta-fix2'
+
+[download]
+hash = 'f0d4cb80163efd03f17c2791c235600cbadfca294f7d33d2b05256044239a449a3342e9dc0c6d9daa93a0a8a5dfeba8db86a091d5b08ad2bfb09106ee6692dcc'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/tlmPPRct/versions/nRSRtbX2/createfirefightingadd-0.2.5-beta-fix2.jar'
+
+[update.modrinth]
+mod-id = 'tlmPPRct'
+version = 'nRSRtbX2'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'LNytGWDc'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'aJewFWOb'
+type = 'OPTIONAL'
+version = 'Th1GDsiT'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'T9PomCSv'
+type = 'OPTIONAL'
+version = 'NGuyFOeE'

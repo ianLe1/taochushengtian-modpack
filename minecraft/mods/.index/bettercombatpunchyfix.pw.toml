@@ -1,0 +1,25 @@
+filename = 'bettercombat-punchy-fix-1.0.1.jar'
+name = 'Better Combat Punchy Fix'
+side = 'client'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1', '1.21.2', '1.21.3', '1.21.4', '1.21.5', '1.21.6', '1.21.7', '1.21.8', '1.21.9', '1.21.10', '1.21.11' ]
+x-prismlauncher-release-type = 'beta'
+x-prismlauncher-version-number = '1.0.1'
+
+[download]
+hash = '1e8f82434ae8d9b1a183aa2b5b92f29bd8ba3f1075b5335975f8cbf4c55fa2fb8afdd2f980b83b02f4f36ce1a0643e67baa9071d69cb3c63e162f30b2bad160a'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/lMVNnVJw/versions/EYLy5ekm/bettercombat-punchy-fix-1.0.1.jar'
+
+[update.modrinth]
+mod-id = 'lMVNnVJw'
+version = 'EYLy5ekm'
+
+[[x-prismlauncher-dependencies]]
+addonId = '8aoMKplv'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = '5sy6g3kz'
+type = 'REQUIRED'

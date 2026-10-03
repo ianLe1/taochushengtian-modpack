@@ -1,0 +1,25 @@
+filename = 'takesapillage-neoforge-1.0.13+mc1.21.1.jar'
+name = 'It Takes a Pillage Continuation'
+side = ''
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21', '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = 'neoforge-1.0.13+mc1.21.1'
+
+[download]
+hash = 'cc0d566d80f6da915795382561f0c57d611f0c1a28f82520b6606850cb282dc7168becfdea485076a0d45631bfbaaa7287ebc27a2824a94b50ab619a51aefeab'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/QOJOg1gE/versions/m8qvxZIS/takesapillage-neoforge-1.0.13%2Bmc1.21.1.jar'
+
+[update.modrinth]
+mod-id = 'QOJOg1gE'
+version = 'm8qvxZIS'
+
+[[x-prismlauncher-dependencies]]
+addonId = '1eAoo2KR'
+type = 'OPTIONAL'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'G1hIVOrD'
+type = 'REQUIRED'

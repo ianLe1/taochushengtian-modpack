@@ -1,0 +1,18 @@
+filename = 'punchy-2.8d-neoforge-1.21.1.jar'
+name = 'Punchy'
+side = ''
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '2.8d'
+
+[download]
+hash = '44871b7d63009e447614dff0d43acc76c9744979099f3a43d175733e86dd4d15a44d70712b8ed09f8ccf65605de532fa60cd4f21e5dce6b303657fe32c46e406'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/8aoMKplv/versions/NFoiGe81/punchy-2.8d-neoforge-1.21.1.jar'
+
+[update.modrinth]
+mod-id = '8aoMKplv'
+version = 'NFoiGe81'

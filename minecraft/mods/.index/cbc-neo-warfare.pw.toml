@@ -1,0 +1,21 @@
+filename = 'cbcmodernwarfare-0.0.6v+mc.1.21.1-neoforge.jar'
+name = 'CBC Neo Warfare'
+side = 'server'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = 'cbcmodernwarfare-0.0.6v+mc.1.21.1-neoforge.jar'
+
+[download]
+hash = 'c8cd9d1fd4a3913f7f453b397fcc5ef36aec4749'
+hash-format = 'sha1'
+mode = 'metadata:curseforge'
+url = ''
+
+[update.curseforge]
+file-id = 8232556
+project-id = 1552960
+
+[[x-prismlauncher-dependencies]]
+addonId = '646668'
+type = 'REQUIRED'

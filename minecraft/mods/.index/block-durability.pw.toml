@@ -1,0 +1,21 @@
+filename = 'blockdurability-1.1.0-neoforge.jar'
+name = '[BD] 方块耐久 Block-Durability'
+side = 'both'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.1.0-neoforge-1.21.1'
+
+[download]
+hash = '64817c6056e495f661ef58b16348a7a286422b65679b9ae014fb452a0e4123f05e5baeb264e09ab16a847d125ec7ec2ac47605f2a2386072b1e0fe8dcb9e82b8'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/TwN8uQRZ/versions/SLXHqHNJ/blockdurability-1.1.0-neoforge.jar'
+
+[update.modrinth]
+mod-id = 'TwN8uQRZ'
+version = 'SLXHqHNJ'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'OypNE65K'
+type = 'REQUIRED'

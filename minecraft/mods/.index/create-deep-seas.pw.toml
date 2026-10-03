@@ -1,0 +1,41 @@
+filename = 'create_submarine-3.3.0.jar'
+name = 'Create Deep Seas'
+side = ''
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '3.3.0'
+
+[download]
+hash = 'df2cf8242deaf7954f146fd8571000b654f0660e78e52bd1888bdd13aef4ed658dfabd89741e914313d746b0b5b7f78acfd02642f8718b51593bb6ec38b308de'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/mva5q4qZ/versions/8CV1LRTl/create_submarine-3.3.0.jar'
+
+[update.modrinth]
+mod-id = 'mva5q4qZ'
+version = '8CV1LRTl'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'LNytGWDc'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'T9PomCSv'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'ndHYMY2K'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'p19vrgc2'
+type = 'EMBEDDED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'oWaK0Q19'
+type = 'REQUIRED'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'XaDC71GB'
+type = 'EMBEDDED'

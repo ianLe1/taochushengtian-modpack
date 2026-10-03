@@ -1,0 +1,18 @@
+filename = 'flowing_fluids-1.0.6-1.21-neoforge.jar'
+name = 'Flowing Fluids'
+side = 'both'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21', '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.0.6-neoforge-1.21'
+
+[download]
+hash = 'c903f5a9d67e860ef641869e54fe6d6a6ee0ae5285e754ac465160e63b15512453d374ead3d288fa9bb67c9050a6d6b8f2db7c1b7bc06e398a9a3969e9409c29'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/s1I3BT95/versions/k37oVEnG/flowing_fluids-1.0.6-1.21-neoforge.jar'
+
+[update.modrinth]
+mod-id = 's1I3BT95'
+version = 'k37oVEnG'

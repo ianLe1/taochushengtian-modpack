@@ -1,0 +1,18 @@
+filename = 'reterraforged-neoforge-1.21.1.jar'
+name = 'ReTerraforged Unofficial'
+side = ''
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = 'ReTerraForged 0.0.6003 (NeoForge 1.21.1)'
+
+[download]
+hash = 'e37e28cbcd4e8e728f4c23cbdf5be5491283d42c'
+hash-format = 'sha1'
+mode = 'metadata:curseforge'
+url = ''
+
+[update.curseforge]
+file-id = 8435102
+project-id = 1607000

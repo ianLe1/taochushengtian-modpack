@@ -1,0 +1,57 @@
+{
+  "player": {
+    "normalMode": "interest_point",
+    "autoRotateInteracting": true,
+    "doNotRotateWhenEating": true,
+    "raycastOrigin": "camera"
+  },
+  "sound": {
+    "centerCameraEntitySounds": false
+  },
+  "hud": {
+    "crosshair": "always",
+    "hideCrosshairWhenFallFlyingAndNotAiming": true
+  },
+  "schemaVersion": 2,
+  "camera": {
+    "normal": {
+      "centeredOffsetY": -0.254,
+      "fovMultiplier": 1.0,
+      "centered": false,
+      "distance": 1.1,
+      "offsetX": -0.2,
+      "offsetY": -0.25
+    },
+    "aiming": {
+      "centeredOffsetY": -0.43,
+      "fovMultiplier": 0.9,
+      "centered": false,
+      "distance": 0.448,
+      "offsetX": -0.3,
+      "offsetY": -0.41
+    },
+    "smoothing": {
+      "adjustingDistanceHalfLife": 0.05,
+      "normal": {
+        "offsetHalfLife": 0.04,
+        "distanceHalfLife": 0.08,
+        "fovHalfLife": 0.08,
+        "horizontalPivotHalfLife": 0.064,
+        "verticalPivotHalfLife": 0.08
+      },
+      "aiming": {
+        "offsetHalfLife": 0.025,
+        "distanceHalfLife": 0.025,
+        "fovHalfLife": 0.036,
+        "horizontalPivotHalfLife": 0.02,
+        "verticalPivotHalfLife": 0.025
+      },
+      "rotationHalfLife": 0.0,
+      "flyingPivotHalfLife": 0.07,
+      "adjustingOffsetHalfLife": 0.05
+    }
+  },
+  "aiming": {
+    "smartAiming": true
+  }
+}

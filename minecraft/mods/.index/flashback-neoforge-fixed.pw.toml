@@ -1,0 +1,18 @@
+filename = 'flashback_neoforge_fixed-1.0.13.jar'
+name = 'Flashback Neoforge Fixed'
+side = 'client'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '1.0.13'
+
+[download]
+hash = 'bb2ab99422b78bf7b5f444e5a7da174e5a7d21928f1c9a60d37caa8a40f3ca4b01b197112f6e5a30c0941d75677807d287ba3a5ecad1861ee68a8a9e3094f06a'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/QaOcZcLU/versions/UnmUYYwv/flashback_neoforge_fixed-1.0.13.jar'
+
+[update.modrinth]
+mod-id = 'QaOcZcLU'
+version = 'UnmUYYwv'

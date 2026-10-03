@@ -1,0 +1,22 @@
+filename = 'aeroengine_fuel_compat-0.0.2.jar'
+name = 'AeroEngine fuel compat'
+side = 'server'
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '0.0.2'
+
+[download]
+hash = 'fdc1c9cc893d7494eab6506f4c160b3b67973b95fbb390ba07c1cfdad18d96cdf8038baf8f07918ae9606e415c19047354078327758a4c63c4266ca7471bc699'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/RNUSzf19/versions/iQWqNLQY/aeroengine_fuel_compat-0.0.2.jar'
+
+[update.modrinth]
+mod-id = 'RNUSzf19'
+version = 'iQWqNLQY'
+
+[[x-prismlauncher-dependencies]]
+addonId = 'CRh10iJF'
+type = 'REQUIRED'
+version = '8OfV7zZ0'

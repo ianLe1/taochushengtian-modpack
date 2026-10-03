@@ -1,0 +1,93 @@
+[
+  {
+    "id": 0,
+    "name": "8000x8000 Double center grid distribution 4000 * 90%",
+    "color": "#FFFFFFAA",
+    "preZoneCenterOffset": 0,
+    "entry": {
+      "spawnType": "teleport",
+      "spawnShapeType": "circle",
+      "center": "0.000000,384.000000,0.000000",
+      "dimension": "4000.000000,0.000000,4000.000000",
+      "detailType": "distributed",
+      "teamTogether": true,
+      "findGround": false,
+      "randomRange": 8.0,
+      "hangTime": 300,
+      "useGoldenSpiral": false,
+      "fixedSimulationCount": 64,
+      "playerFactorContribution": 0.0,
+      "allowOnBorder": true,
+      "globalShrinkRatio": 0.9,
+      "needShuffle": true
+    }
+  },
+  {
+    "id": 1,
+    "name": "8000x8000 Grid distribution 4000 * 90%",
+    "color": "#FFFFFFAA",
+    "preZoneCenterOffset": 0,
+    "entry": {
+      "spawnType": "teleport",
+      "spawnShapeType": "square",
+      "center": "0.000000,384.000000,0.000000",
+      "dimension": "4000.000000,0.000000,4000.000000",
+      "detailType": "distributed",
+      "teamTogether": true,
+      "findGround": false,
+      "randomRange": 8.0,
+      "hangTime": 300,
+      "fixedSimulationCount": 100,
+      "playerFactorContribution": 0.0,
+      "allowOnBorder": true,
+      "globalShrinkRatio": 0.9,
+      "needShuffle": true
+    }
+  },
+  {
+    "id": 2,
+    "name": "5340x5340 Double center grid distribution 2670 * 90%",
+    "color": "#FFFFFFAA",
+    "preZoneCenterOffset": 0,
+    "entry": {
+      "spawnType": "teleport",
+      "spawnShapeType": "circle",
+      "center": "0.000000,319.000000,0.000000",
+      "dimension": "2670.000000,0.000000,2670.000000",
+      "detailType": "distributed",
+      "teamTogether": true,
+      "findGround": false,
+      "randomRange": 8.0,
+      "hangTime": 300,
+      "useGoldenSpiral": false,
+      "fixedSimulationCount": 32,
+      "playerFactorContribution": 0.0,
+      "allowOnBorder": true,
+      "globalShrinkRatio": 0.9,
+      "needShuffle": true
+    }
+  },
+  {
+    "id": 3,
+    "name": "881x881 Double center grid distribution 440 * 90%",
+    "color": "#FFFFFFAA",
+    "preZoneCenterOffset": 0,
+    "entry": {
+      "spawnType": "teleport",
+      "spawnShapeType": "circle",
+      "center": "0.000000,192.000000,0.000000",
+      "dimension": "440.000000,0.000000,440.000000",
+      "detailType": "distributed",
+      "teamTogether": true,
+      "findGround": false,
+      "randomRange": 8.0,
+      "hangTime": 300,
+      "useGoldenSpiral": false,
+      "fixedSimulationCount": 16,
+      "playerFactorContribution": 0.0,
+      "allowOnBorder": true,
+      "globalShrinkRatio": 0.9,
+      "needShuffle": true
+    }
+  }
+]

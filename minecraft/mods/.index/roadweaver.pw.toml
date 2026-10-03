@@ -1,0 +1,18 @@
+filename = 'roadweaver-neoforge-2.3.1-1.21.1-hotfix.jar'
+name = 'RoadWeaver'
+side = 'both'
+x-prismlauncher-dependencies = []
+x-prismlauncher-loaders = [ 'neoforge' ]
+x-prismlauncher-mc-versions = [ '1.21.1' ]
+x-prismlauncher-release-type = 'release'
+x-prismlauncher-version-number = '2.3.1-1.21.1-hotfix'
+
+[download]
+hash = 'c8af9dbec209b652997872ed15c272e701c9c3b93817d89301512865ca2107d10a8e69d6b600ffb07cdf859d8fd109c6a7f59a31ef9ac81417d3eee4af6ac729'
+hash-format = 'sha512'
+mode = 'url'
+url = 'https://cdn.modrinth.com/data/6jk8Pote/versions/4k6l0sVO/roadweaver-neoforge-2.3.1-1.21.1-hotfix.jar'
+
+[update.modrinth]
+mod-id = '6jk8Pote'
+version = '4k6l0sVO'

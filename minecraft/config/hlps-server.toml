@@ -1,0 +1,16 @@
+#Max Screen Size
+# Default: 32
+# Range: 1 ~ 64
+maxScreenSize = 32
+#Maximum VRAM size in monitor peripherals
+# Default: 2147483647
+# Range: > 16384
+maxVRAMSize = 2147483647
+#Minimum brightness (nits) a monitor can be set to; 100 = normal/default
+# Default: 10
+# Range: 1 ~ 100
+minBrightnessNits = 10
+#Maximum brightness (nits) a monitor can be set to; 100 = normal/default
+# Default: 400
+# Range: 100 ~ 10000
+maxBrightnessNits = 400
