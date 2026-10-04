@@ -234,6 +234,17 @@ function warRun(cmd) {
 // 1. 数据层（L1 权威存储）：server.persistentData['war']
 // ============================================================================
 
+// 有序迁移链：WAR_DATA_MIGRATIONS[n] = function(st) 把 schema n 升到 n+1。
+// **当前为空**（lead 明确：不许顺手给现有域加迁移函数）；缺哪一级就拒绝接管，绝不猜形状。
+var WAR_DATA_MIGRATIONS = [];
+
+// schema 版本状态（只读对外；唯一代码侧版本常量是 WAR_CONFIG.dataVersion）
+var WAR_SCHEMA = {
+  code: 1, stored: 1, refused: false, reason: '', lastMigrate: '', lastRefuseAt: 0
+};
+WAR_SCHEMA.code = warToInt(WAR_CONFIG.dataVersion, 1);
+WAR_SCHEMA.stored = WAR_SCHEMA.code;
+
 var WAR_DATA = {
   server: null,
   state: null,          // 内存镜像（唯一可写副本），落盘时才序列化
@@ -243,6 +254,9 @@ var WAR_DATA = {
   lastSaveAt: 0,
   javaOk: false,
   CT: null,
+  readOnly: false,          // schema 拒绝接管时置真：不落盘、不写入
+  schema: WAR_SCHEMA,
+  migrations: WAR_DATA_MIGRATIONS,
 
   newTag: function () {
     if (!WAR_DATA.javaOk) {
@@ -259,7 +273,8 @@ var WAR_DATA = {
   defaultState: function () {
     return {
       version: WAR_CONFIG.version,
-      dataVersion: WAR_CONFIG.dataVersion,
+      schemaVersion: WAR_CONFIG.dataVersion,   // 权威：数据形状版本
+      dataVersion: WAR_CONFIG.dataVersion,     // 遗留镜像（兼容老读取方，不参与判定）
       createdAt: warNow(),
       bootCount: 0,
       savedAt: 0,
@@ -292,7 +307,8 @@ var WAR_DATA = {
   normalize: function (st) {
     if (st == null || typeof st !== 'object') st = WAR_DATA.defaultState();
     if (typeof st.version !== 'string') st.version = WAR_CONFIG.version;
-    if (typeof st.dataVersion !== 'number') st.dataVersion = WAR_CONFIG.dataVersion;
+    if (typeof st.schemaVersion !== 'number') st.schemaVersion = (typeof st.dataVersion === 'number') ? st.dataVersion : WAR_CONFIG.dataVersion;
+    if (typeof st.dataVersion !== 'number') st.dataVersion = st.schemaVersion;
     if (typeof st.createdAt !== 'number' || st.createdAt <= 0) st.createdAt = warNow();
     if (typeof st.bootCount !== 'number') st.bootCount = 0;
     if (typeof st.savedAt !== 'number') st.savedAt = 0;
@@ -312,6 +328,46 @@ var WAR_DATA = {
     return st;
   },
 
+  // schema 判定：更旧 → 走迁移链；更新 → **拒绝接管**（只读；盘上数据一字不动）
+  checkSchema: function (st) {
+    var code = warToInt(WAR_CONFIG.dataVersion, 1);
+    var stored = warToInt(st.schemaVersion, code);
+    st.schemaVersion = stored;
+    st.dataVersion = stored;                     // 镜像同步（只写不判）
+    WAR_SCHEMA.code = code; WAR_SCHEMA.stored = stored;
+    if (stored > code) {
+      WAR_DATA.readOnly = true;
+      WAR_SCHEMA.refused = true;
+      WAR_SCHEMA.reason = '数据 schema v' + stored + ' 比代码 v' + code + ' 新';
+      WAR_SCHEMA.lastRefuseAt = warNow();
+      return { ok: false, refused: true, from: stored, to: code, ran: [] };
+    }
+    WAR_DATA.readOnly = false; WAR_SCHEMA.refused = false; WAR_SCHEMA.reason = '';
+    if (stored < code) return WAR_DATA.migrate(st, code);
+    return { ok: true, refused: false, migrated: false, from: stored, to: code, ran: [] };
+  },
+
+  // 逐级迁移：每步成功后推进版本 ⇒ 幂等（第二次 from===to 直接返回、不重复执行）
+  // 缺函数 / 抛异常 → 返回失败且**不推进版本**（调用方据此拒绝接管，绝不猜形状）
+  migrate: function (st, _to) {
+    if (st == null) return { ok: false, error: '数据根为空' };
+    var to = warToInt(_to, warToInt(WAR_CONFIG.dataVersion, 1));
+    var from = warToInt(st.schemaVersion, to);
+    if (from === to) return { ok: true, refused: false, migrated: false, from: from, to: to, ran: [] };
+    if (from > to) return { ok: false, error: '数据 schema v' + from + ' 比目标 v' + to + ' 新（不降级）', from: from, to: to, ran: [] };
+    var ran = [];
+    for (var v = from; v < to; v++) {
+      var fn = WAR_DATA_MIGRATIONS[v];
+      if (typeof fn !== 'function') return { ok: false, error: '缺少 v' + v + ' → v' + (v + 1) + ' 的迁移函数', from: from, to: to, ran: ran };
+      try { fn(st); } catch (e) { return { ok: false, error: 'v' + v + ' → v' + (v + 1) + ' 迁移抛异常：' + e, from: from, to: to, ran: ran }; }
+      st.schemaVersion = v + 1;
+      st.dataVersion = st.schemaVersion;
+      ran.push(v + '→' + (v + 1));
+    }
+    WAR_SCHEMA.lastMigrate = 'v' + from + '→v' + to;
+    return { ok: true, refused: false, migrated: true, from: from, to: to, ran: ran };
+  },
+
   load: function (server) {
     if (server != null) WAR_DATA.bind(server);
     var st = WAR_DATA.defaultState();
@@ -320,7 +376,9 @@ var WAR_DATA = {
     if (root != null) {
       try {
         if (root.contains('version')) st.version = String(root.getString('version'));
+        if (root.contains('schemaVersion')) st.schemaVersion = warToInt(root.getInt('schemaVersion'), WAR_CONFIG.dataVersion);
         if (root.contains('dataVersion')) st.dataVersion = warToInt(root.getInt('dataVersion'), WAR_CONFIG.dataVersion);
+        if (!root.contains('schemaVersion') && root.contains('dataVersion')) st.schemaVersion = st.dataVersion;   // 旧档只写过 dataVersion
         if (root.contains('createdAt')) st.createdAt = Number(root.getLong('createdAt'));
         if (root.contains('bootCount')) st.bootCount = warToInt(root.getInt('bootCount'), 0);
         if (root.contains('savedAt')) st.savedAt = Number(root.getLong('savedAt'));
@@ -338,9 +396,26 @@ var WAR_DATA = {
         console.error('[war] 数据根读取异常，已回退默认值：' + err);
       }
     }
+    var chk = WAR_DATA.checkSchema(st);
+    if (chk.refused === true) {
+      // 拒绝接管：不 normalize（保持读到的原样）、不改盘；只把拒绝记进**内存**审计面
+      WAR_DATA.state = st;
+      WAR_DATA.dirty = false;
+      WAR_DATA.lastLoadAt = warNow();
+      WAR_AUDIT.append('system', 'data.refuse', 'schema', 'refuse',
+                       'stored=v' + chk.from + ' code=v' + chk.to + (chk.error ? ' ' + chk.error : ''));
+      warWarnOnce('schema-readonly', '数据来自更新版本（' + (WAR_SCHEMA.reason || chk.error || '') + '）：本次只读，不接管、不落盘；请升级脚本');
+      warLog('数据根载入被拒绝：stored=v' + chk.from + ' > code=v' + chk.to + '（只读，磁盘数据原样保留）');
+      return st;
+    }
     st = WAR_DATA.normalize(st);
     WAR_DATA.state = st;
     WAR_DATA.dirty = false;
+    if (chk.migrated === true) {
+      WAR_AUDIT.append('system', 'data.migrate', 'schema', 'ok',
+                       'from=v' + chk.from + ' to=v' + chk.to + ' 步骤=' + chk.ran.join(','));
+      warLog('数据根已迁移：v' + chk.from + ' → v' + chk.to + '（步骤 ' + chk.ran.join(',') + '）');
+    }
     WAR_DATA.lastLoadAt = warNow();
     warLog('数据根载入：' + (firstBoot ? '首次启动（将创建键 ' + WAR_NS + '）' : '已存在')
            + '｜schema v' + st.dataVersion + '｜bootCount=' + st.bootCount
@@ -350,13 +425,18 @@ var WAR_DATA = {
 
   save: function (reason) {
     if (WAR_DATA.state == null) return false;
+    if (WAR_DATA.readOnly === true) {        // schema 拒绝接管：绝不按旧形状写盘
+      warWarnOnce('schema-save-blocked', '数据来自更新版本（只读）：拒绝落盘，避免按旧形状写坏存档');
+      return false;
+    }
     if (WAR_DATA.server == null) { warWarnOnce('no-server', '尚未绑定服务器，落盘跳过'); return false; }
     var tag = WAR_DATA.newTag();
     if (tag == null) { warWarnOnce('no-tag', '无法创建 CompoundTag，落盘跳过（内存数据仍在）'); return false; }
     try {
       var st = WAR_DATA.state;
       tag.putString('version', String(st.version));
-      tag.putInt('dataVersion', warToInt(st.dataVersion, WAR_CONFIG.dataVersion));
+      tag.putInt('schemaVersion', warToInt(st.schemaVersion, WAR_CONFIG.dataVersion));   // 权威（数据形状版本）
+      tag.putInt('dataVersion', warToInt(st.dataVersion, WAR_CONFIG.dataVersion));       // 遗留镜像
       tag.putLong('createdAt', Number(st.createdAt));
       tag.putInt('bootCount', warToInt(st.bootCount, 0));
       tag.putLong('savedAt', warNow());
@@ -387,6 +467,7 @@ var WAR_DATA = {
   // 一次改动包成事务样子：出错不落盘、不标记脏
   mutate: function (label, fn) {
     if (WAR_DATA.state == null) return { ok: false, error: '数据根未载入' };
+    if (WAR_DATA.readOnly === true) return { ok: false, error: '数据来自更新版本（只读）：拒绝写入' };
     try {
       var ret = fn(WAR_DATA.state);
       WAR_DATA.dirty = true;
@@ -654,6 +735,12 @@ function warBoot(server) {
     if (server == null) return false;
     WAR_DATA.bind(server);
     WAR_DATA.load(server);
+    if (WAR_DATA.readOnly === true) {
+      // schema 拒绝接管：不跑 boot 钩子、不落盘、ready=否 —— 宁可不工作，也不按错误形状写坏存档
+      WAR.ready = false;
+      warLog('拒绝接管：' + (WAR_SCHEMA.reason || 'schema 不兼容') + '（只读；磁盘数据原样保留）');
+      return false;
+    }
     WAR_DATA.state.bootCount = warToInt(WAR_DATA.state.bootCount, 0) + 1;
     WAR.ready = true;
     WAR.bootAt = warNow();
@@ -698,6 +785,7 @@ global.WAR = {
 
   // 核心三件套
   data: WAR_DATA,
+  schema: WAR_SCHEMA,
   audit: WAR_AUDIT,
 
   // 域（未实现的仍是 stub，见 §3）

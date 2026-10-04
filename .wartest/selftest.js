@@ -1158,6 +1158,111 @@ entryIron19.buy = ironBuy019; entryIron19.sell = ironSell019;   // 还原货架�
 assert(WAR.shop.priceOf('minecraft:iron_ingot', 'buy') === 12 && WAR.shop.priceOf('minecraft:iron_ingot', 'sell') === 6, '货架价格已还原（买12/卖6）');
 assert(WAR.econ.invariant().ok === true, 'T19 后账目恒等式仍成立');
 
+// ================================================================ T20 数据 schema 版本化 + 迁移框架
+console.log('\n--- T20 schema 版本化与迁移框架 ---');
+// ① 当前版本：加载行为完全不变
+assert(WAR.schema != null && WAR.schema.code === 1 && WAR.schema.stored === 1 && WAR.schema.refused === false,
+       '当前版本：code=1 / stored=1 / 未拒绝');
+assert(WAR.data.readOnly === false && WAR.ready === true, '当前版本：非只读、ready 仍为是（加载行为未变）');
+assert(WAR.data.state.schemaVersion === 1 && WAR.data.state.dataVersion === 1,
+       'state：schemaVersion=1（权威）+ dataVersion=1（遗留镜像）');
+assert(WAR.data.migrations === WAR_DATA_MIGRATIONS && WAR.data.migrations.length === 0,
+       '迁移注册表当前为空（不顺手给现有域加迁移函数）');
+// ② 迁移：能升 + 幂等 + 缺函数则拒绝推进
+var st20 = WAR.data.defaultState();
+st20.schemaVersion = 0; st20.dataVersion = 0; st20.kv.marker = 'v0';
+var calls20 = 0;
+WAR.data.migrations[0] = function (s) { calls20++; s.kv.marker = 'v1'; s.kv.addedByMigration = true; };
+var mig20 = WAR.data.migrate(st20);
+assert(mig20.ok === true && mig20.from === 0 && mig20.to === 1 && mig20.ran.join(',') === '0→1',
+       'v0→v1 迁移成功且记录步骤 0→1');
+assert(calls20 === 1 && st20.schemaVersion === 1 && st20.dataVersion === 1 && st20.kv.marker === 'v1',
+       '迁移函数执行一次、版本推进到 1、数据被改写成 v1');
+var snap20 = JSON.stringify(st20);
+var mig20b = WAR.data.migrate(st20);
+assert(mig20b.ok === true && mig20b.ran.length === 0 && JSON.stringify(st20) === snap20 && calls20 === 1,
+       '迁移幂等：第二次重入不执行、状态逐字节不变（函数仍只被调用一次）');
+delete WAR.data.migrations[0];
+var st20miss = WAR.data.defaultState(); st20miss.schemaVersion = 0; st20miss.dataVersion = 0;
+var mig20miss = WAR.data.migrate(st20miss);
+assert(mig20miss.ok === false && mig20miss.error.indexOf('缺少') >= 0 && st20miss.schemaVersion === 0,
+       '缺迁移函数：不推进版本、返回失败（绝不猜形状）');
+assert(WAR.data.migrate(null).ok === false, '数据根为空：迁移拒绝');
+// ③ 真实 load 路径：v0 盘上数据 → 迁移 → 写审计 → 落盘后磁盘变成 v1
+WAR.data.migrations[0] = function (s) { s.kv.marker = 'v1'; s.kv.addedByMigration = true; };
+var srv20 = new FakeServer();
+var root20 = new FakeTag();
+root20.putString('version', 'v0.1.0-m0');
+root20.putInt('schemaVersion', 0);
+root20.putInt('dataVersion', 0);
+root20.putInt('bootCount', 3);
+root20.putString('kv', JSON.stringify({ marker: 'v0' }));
+srv20.persistentData.put('war', root20);
+srv20.players = [];
+var audBefore20 = WAR.audit.count();
+WAR.data.load(srv20);
+assert(WAR.data.readOnly === false && WAR.data.state.schemaVersion === 1 && WAR.data.state.kv.marker === 'v1',
+       'v0 盘上数据经 load 升到 v1（迁移函数生效）');
+var migAudit20 = [];
+var items20 = WAR.data.state.audit.items;
+for (var i20 = 0; i20 < items20.length; i20++) if (items20[i20].action === 'data.migrate') migAudit20.push(items20[i20]);
+assert(migAudit20.length === 1 && migAudit20[0].result === 'ok' && migAudit20[0].detail.indexOf('from=v0 to=v1') >= 0,
+       '迁移写审计 data.migrate（from=v0 to=v1）');
+REG.loaded[0]({ server: srv20 });
+// 注意：save() 会新建一个 tag 并 put 回 persistentData ⇒ 断言必须读**当前**根，不能读旧引用
+var root20live = srv20.persistentData.getCompound('war');
+assert(root20live.getInt('schemaVersion') === 1 && root20live.getInt('dataVersion') === 1,
+       '迁移后落盘：磁盘 schemaVersion 由 0 变成 1、镜像 dataVersion 同步（迁移真正持久化）');
+assert(root20live.getAllKeys().indexOf('schemaVersion') >= 0, '根 NBT 出现 schemaVersion 标量键');
+assert(JSON.parse(root20live.getString('kv')).marker === 'v1', '迁移后的 kv 载荷已落盘（读当前根）');
+delete WAR.data.migrations[0];
+// ④ 数据比代码新（v2 vs code v1）：拒绝接管 + 盘上数据逐字节不变 + 审计 + warnOnce 一次
+var srv21 = new FakeServer();
+var root21 = new FakeTag();
+root21.putString('version', 'v0.9.0-future');
+root21.putInt('schemaVersion', 2);
+root21.putInt('dataVersion', 2);
+root21.putInt('bootCount', 9);
+root21.putString('futureField', '不许被改写');
+root21.putString('kv', JSON.stringify({ marker: 'future' }));
+srv21.persistentData.put('war', root21);
+srv21.players = [];
+function diskSnap(root) {
+  var keys = Array.from(root.m.keys()).sort();
+  var out = [];
+  for (var i = 0; i < keys.length; i++) out.push(keys[i] + '=' + String(root.m.get(keys[i])));
+  return out.join('|');
+}
+var snap21a = diskSnap(root21);
+var errN21 = 0, origErr21 = console.error;
+console.error = function () { errN21++; };
+WAR.data.load(srv21);
+console.error = origErr21;
+assert(WAR.data.readOnly === true && WAR_SCHEMA.refused === true && WAR_SCHEMA.stored === 2 && WAR_SCHEMA.code === 1,
+       'v2 数据：标成只读 + 记录 stored=2 / code=1（拒绝接管）');
+assert(diskSnap(root21) === snap21a, '被拒后磁盘数据逐字节未变（前后快照全等）');
+assert(root21.getString('futureField') === '不许被改写' && root21.getInt('schemaVersion') === 2, '未来字段与版本号原样保留');
+var refuseAudit20 = WAR.data.state.audit.items.filter(function (x) { return x.action === 'data.refuse'; });
+assert(refuseAudit20.length === 1 && refuseAudit20[0].result === 'refuse', '拒绝写审计 data.refuse（会话内可见）');
+assert(errN21 === 1 && WAR.data.warned['schema-readonly'] === true, 'warnOnce 只报一次（console.error 计数=1）');
+assert(WAR.data.save('t20') === false, '只读状态：save() 拒绝落盘');
+assert(WAR.data.mutate('t20', function (s) { s.kv.hacked = 1; }).ok === false, '只读状态：mutate() 拒绝写入');
+var errN21b = 0, origErr21b = console.error;
+console.error = function () { errN21b++; };
+WAR.data.mutate('t20b', function () { });
+WAR.data.save('t20b');
+console.error = origErr21b;
+assert(errN21b === 0, '只读状态重复写：不再产生新的告警（warnOnce 生效；本轮新增告警=' + errN21b + '）');
+REG.loaded[0]({ server: srv21 });
+assert(WAR.ready === false, '被拒数据上 boot：不就绪（宁可不工作，也不按错误形状写）');
+assert(diskSnap(root21) === snap21a, '被拒数据上 boot 之后：磁盘数据仍逐字节未变（没被 bootCount++/落盘污染）');
+// ⑤ 恢复：换回正常数据后系统重新可用（拒绝不是永久枷锁）
+var srv22 = new FakeServer();
+srv22.players = [];
+REG.loaded[0]({ server: srv22 });
+assert(WAR.ready === true && WAR.data.readOnly === false && WAR_SCHEMA.refused === false,
+       '换回正常（无数据）后：ready=是、非只读、拒绝标记清除');
+
 console.log('\n--- 汇总 ---');
 console.log('PASS=' + passN + ' FAIL=' + failN + ' SKIP=' + skipN);
 console.log(ok ? 'ALL_PASS' : 'SOME_FAILED');
