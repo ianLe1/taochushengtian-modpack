@@ -1,5 +1,6 @@
 # 仅客户端模组（必须从专用服剔除）：jar / modid / 依据强度 / 依据
 # 生成：server-pack/tools/scan_mods.py --offline
+# 基准变更（2026-10-04 17:26）：本表 = 15:22 全量扫描快照(333/328) + 2026-10-04 17:13 增量（+baguettelib / +smoothscrolling）；此后 mods 有任何增删都需重跑扫描并更新本行。
 AdvancementPlaques-1.21.1-neoforge-1.6.8.jar	advancementplaques	A	Modrinth 项目 advancement-plaques server_side=unsupported (client_side=required)
 AmbientSounds_NEOFORGE_v6.3.9_mc1.21.1.jar	ambientsounds	A	Modrinth 项目 ambientsounds server_side=unsupported (client_side=required)
 BetterF3-11.0.3-NeoForge-1.21.1.jar	betterf3	A	Modrinth 项目 betterf3 server_side=unsupported (client_side=required)
@@ -80,3 +81,4 @@ talking-heads-1.1.4+1.21.1+neoforge.jar	talkingheads	A+B	Modrinth 项目 talking
 totemdoll-neoforge-1.3.0-mc1.21.1.jar	totemdoll	A	Modrinth 项目 totemdoll server_side=unsupported (client_side=required)
 veinminer-client-neoforge-2.11.2+1.21.1.jar	veinminer_client	A	Modrinth 项目 veinminer-client server_side=unsupported (client_side=required)
 waveycapes-neoforge-1.11.2-mc1.21.1.jar	waveycapes,waveycapes	A	Modrinth 项目 wavey-capes server_side=unsupported (client_side=required)
+smoothscrolling-1.21.1-NeoForge-1.1.0.jar	smoothscrolling	B-	新增 2026-10-04 17:26；mixins.json client=10/mixins=0 + 两条必需依赖 side=CLIENT + 自述 GUI 动画 ⇒ 客户端专用（需实机确认一次）

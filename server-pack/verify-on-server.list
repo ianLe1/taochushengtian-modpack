@@ -1,5 +1,6 @@
 # 必须真机开服才能定的模组：jar / modid / server_side / 为什么要实测
 # 生成：server-pack/tools/scan_mods.py --offline
+# 基准变更（2026-10-04 17:26）：本表 = 15:22 全量扫描快照(333/328) + 2026-10-04 17:13 增量（+baguettelib / +smoothscrolling）；此后 mods 有任何增删都需重跑扫描并更新本行。
 CBCmoreshells-1.4.0.jar	cbc_enhanced_shells	no-metadata	server_side=absent≠required ⇒ 是否需要在服务端保留需实测
 Chunky-NeoForge-1.4.23.jar	chunky	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
 Clumps-neoforge-1.21.1-19.0.0.1.jar	clumps	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
@@ -55,3 +56,4 @@ tongdarailway-1.1.5+mc21.1.jar	tongdarailway	no-metadata	server_side=absent≠re
 xaerominimap-neoforge-1.21.1-26.5.0.jar	xaerominimap	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
 xaeroworldmap-neoforge-1.21.1-1.46.0.jar	xaeroworldmap	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
 yet_another_config_lib_v3-3.8.2+1.21.1-neoforge.jar	yet_another_config_lib_v3	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+baguettelib-1.21.1-NeoForge-2.0.7.jar	baguettelib	unknown	新增 2026-10-04 17:26；库模组、无 client-only 证据，但服务端无使用者 ⇒ 留/删皆可

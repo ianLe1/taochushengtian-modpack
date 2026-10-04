@@ -8,7 +8,7 @@
 | 东西 | 内容 | 能不能拿到 jar | 用途 |
 |---|---|---|---|
 | 白名单 git 仓库（`packwiz-pack/`，以及实例根仓库） | `.pw.toml` / `index.toml` / `pack.toml` 等**元数据**，不含 jar（分发条例 U3） | ❌ | 同步「要装什么、什么版本」；`packwiz refresh/install` 靠它 |
-| `dist/server-mods.tsv` | 服务端 253 个 jar 的文件名 + md5 + 直链 + 官方哈希 | ✅ 描述所有 jar 的来源 | 「拿到 jar」的唯一权威清单 |
+| `dist/server-mods.tsv` | 服务端 254 个 jar 的文件名 + md5 + 直链 + 官方哈希 | ✅ 描述所有 jar 的来源 | 「拿到 jar」的唯一权威清单 |
 | `dist/download-mods.sh` | 读上面那份 TSV 并下载 + 逐文件校验 | ✅ 落地 | 一台空服务器从零装满模组 |
 
 **为什么必须两套**：仓库不带 jar 是硬约束（避免把 bin 塞进 git、也避免再分发条款风险），
@@ -21,7 +21,7 @@
 ```bash
 python3 tools/gen-dist-manifest.py                # 清单已随包提供；改了 mods 才需要重跑
 tools/make-server.sh --target /srv/mc --no-mods --with-config
-dist/download-mods.sh --target /srv/mc/mods       # 253 个 jar 逐个下载并校验
+dist/download-mods.sh --target /srv/mc/mods       # 254 个 jar 逐个下载并校验
 cd /srv/mc && ./start.sh --check
 ```
 **路径 B —— 本机/局域网（最快）**：模组直接从本机实例拷，不联网
@@ -37,13 +37,13 @@ cd /srv/mc && ./start.sh --check
 ## 3. 校验口径（怎么知道装对了）
 
 * `download-mods.sh --check --target <mods目录>`：逐文件按清单哈希校验，缺/坏逐条列出，非零退出。
-* 已实测对账：对**本机实例的 minecraft/mods/** 跑 `--check` ⇒ **253/253 全部通过，exit=0**。
+* 已实测对账：对**本机实例的 minecraft/mods/** 跑 `--check` ⇒ **254/254 全部通过，exit=0**。
   也就是说清单里的哈希与磁盘上的 jar 一一对得上，不是抄来的。
 * 抽验下载（联网真下 + 校验）：
   * Modrinth 路径（sha512）：`sableexplosionfix-1.0.0.jar` 4795 B ✓
   * CurseForge 路径（sha1）：`keywheel-neoforge-1.1.7-1.21.1-java21.jar` 60922 B ✓
   * 幂等性：同一文件重复跑 ⇒ 「已存在且校验通过 1，本次下载 0」✓
-* **未做全量下载**（253 个、约 556 MB）：只抽验了上述样本。首次全量建议在网络好的时候跑，
+* **未做全量下载**（254 个、约 556 MB）：只抽验了上述样本。首次全量建议在网络好的时候跑，
   失败项会被记录并重跑补齐（幂等）。
 
 ## 4. 需要人工处理的 1 项 + 3 项特别说明
@@ -85,3 +85,27 @@ https://mediafilez.forgecdn.net/files/<file-id 整除 1000>/<file-id 模 1000>/<
 * 每次改 mods，先改仓库里的 `.pw.toml`（增删都要），再重跑 `../tools/gen-dist-manifest.py` 让清单跟上；
   **手编 TSV 一定会漂移。**
 * 分发前把 `config/` 过一遍：里面有个人设置与本机路径（键位、HUD、性能参数），不是所有人都该原样继承。
+
+## 8. 闸门：清单 vs 磁盘（每次分发前跑）
+
+规则：**扫描集（`server-mods.list` 行数 + `client-only.list` 行数）若 != 磁盘上的 jar 总数，先重跑扫描再分发。** 注意分母不要拿 `dist/server-mods.tsv` 的条数（那是服务端子集 254，天然小于磁盘总数）。 「`--check` 全过」只证明清单内部自洽，**不证明清单与现实一致**。
+
+怎么数：
+
+```bash
+cd <实例>
+KEEP=$(grep -vc '^#' server-pack/server-mods.list)     # 保留（服务端可用）行数
+DROP=$(grep -vc '^#' server-pack/client-only.list)     # 剔除（仅客户端）行数
+echo $((KEEP + DROP))                                  # 扫描集 = keep + drop
+ls -1 minecraft/mods/*.jar | wc -l                     # 磁盘上的 jar 总数
+```
+
+两者不等的处理：
+
+```bash
+python3 server-pack/tools/scan_mods.py          # 重扫（更新 reports/ 与三份 list）
+python3 server-pack/tools/gen-dist-manifest.py  # 重生成 dist/server-mods.tsv
+```
+
+也可以让下载脚本自己报：`dist/download-mods.sh --target <mods> --source-mods <实例>/minecraft/mods`
+（它会打印 `[gate]` 与不一致时的 `[WARN]`，但**不会**因此失败——分发脚本的退出码语义不变。）

@@ -4,21 +4,24 @@
 > 本目录是**新增**的，全程**只读** `minecraft/`：没有移动、删除、改名过任何一个 jar，也没有 git commit。
 > 本目录**不含 jar**（分发条例），只有清单、脚本与文档。
 
+> **基准快照**：本目录的清单基于 **2026-10-04 15:22 全量扫描（333 jar / 328 清单）** 叠加 **2026-10-04 17:13 增量**（+baguettelib / +smoothscrolling）＝ 现磁盘 **335 jar / 329 清单**。此后任何 `minecraft/mods/` 增删，都必须重跑扫描并更新此行。
+> 另：清单文件里 `.pw.toml` 的 `side` 字段是**声明不是运行时事实**（本次两个新模组都写 `side='server'`，而 jar 证据显示 smoothscrolling 是客户端模组）——分类请以 jar 内 `neoforge.mods.toml` + `*.mixins.json` 的 client 段 + 依赖侧声明为准。
+
 ## 1. 结论摘要（快照：2026-10-04 15:22 扫描时点）
 
 | 类别 | 数量 | 体积 | 结论 | 明细文件 |
 |---|---|---|---|---|
-| 实盘 jar 总数 | 333 | 923.4 MB | 全部逐个解析了 `neoforge.mods.toml`/`mods.toml`/`fabric.mod.json` | `reports/mods-scan.json` |
-| **服务端可用（keep）** | **253** | 556.4 MB | 可放进专用服 `mods/` | `server-mods.list` |
-| **仅客户端（drop）** | **80** | 367.0 MB | **必须从专用服剔除** | `client-only.list` |
-| 待真机验证（keep 的子集） | 55 | — | 判据不足，只有真开服才能定 | `verify-on-server.list` |
-| 对账 | — | — | 剔除 80 + 保留 253 = 333 ✓ | `reports/reconcile.txt` |
-| 分发来源 | 253 | — | 可用直链拿到 252（其中 1 项需人工） | `dist/server-mods.tsv` |
+| 实盘 jar 总数 | 335 | 923.4 MB | 全部逐个解析了 `neoforge.mods.toml`/`mods.toml`/`fabric.mod.json` | `reports/mods-scan.json` |
+| **服务端可用（keep）** | **254** | 556.4 MB | 可放进专用服 `mods/` | `server-mods.list` |
+| **仅客户端（drop）** | **81** | 367.0 MB | **必须从专用服剔除** | `client-only.list` |
+| 待真机验证（keep 的子集） | 56 | — | 判据不足，只有真开服才能定 | `verify-on-server.list` |
+| 对账 | — | — | 剔除 81 + 保留 254 = 335 ✓（含 17:13 增量） | `reports/reconcile.txt` |
+| 分发来源 | 254 | — | 可用直链拿到 253（其中 1 项需人工） | `dist/server-mods.tsv` |
 
 清单对账的硬证据：`dist/download-mods.sh --check --target minecraft/mods` ⇒
-**253/253 哈希通过，exit=0**（清单里的哈希与磁盘上的 jar 一致，不是抄来的）。
+**254/254 哈希通过，exit=0**（清单里的哈希与磁盘上的 jar 一致，不是抄来的）。
 
-## 2. 剔除依据的口径（为什么这 80 个被判仅客户端）
+## 2. 剔除依据的口径（为什么这 81 个被判仅客户端）
 
 只有**拿到证据**才剔，证据分四级；**证据不足一律 keep**（宁可多留也不误剔）：
 
@@ -29,7 +32,7 @@
 | **A+B** | 8 | 上面两条**独立**证据同时成立 | `Flashback`、`entity_texture_features`、`sable-cool-rain`、`sounds`、`pv-addon-flashback`、`emixx`、`let-them-talk`、`talking-heads` |
 | **C-upstream** | 1 | 上游项目 `server_side=unsupported` + jar 内容特征（该 jar 清单未写 side，故非清单级硬证据） | `neo-voxy.jar` |
 
-保留侧的分布（用于说明「为什么这 55 个要实测」）：
+保留侧的分布（用于说明「为什么这 56 个要实测」）：
 `packwiz side` = both 143 / server 43 / 空 66 / **client 1**（`create-jadeaddon-tfmg-compat-1.0.0.jar`，
 Modrinth 无该项目，依赖标 CLIENT ⇒ 归入待验，不剔）。
 另有 6 个 jar 没有 packwiz 元数据，逐个人工核对（`tools/scan_mods.py` 的 MANUAL 段），
@@ -43,13 +46,13 @@ Modrinth 无该项目，依赖标 CLIENT ⇒ 归入待验，不剔）。
 | `server.properties.template` | 逐项带「为什么」的服务端配置模板 | `make-server.sh` 会自动拷；也可手抄 |
 | `start.sh` | 启动脚本（含自检 `--check`、`--dry-run`） | 拷进服务端根目录后执行 |
 | `user_jvm_args.txt` | 堆与 GC 参数（Aikar G1，10G 档） | 与 `start.sh` 一起用 |
-| `server-mods.list` | 253 个服务端模组（jar / modid / server_side / 备注） | 人工核对 |
-| `client-only.list` | 80 个被剔除模组 + **逐个的依据** | 复核剔除是否合理 |
-| `verify-on-server.list` | 55 个必须实测的模组 + 为什么要实测 | 首次开服时重点盯 |
-| `tools/scan_mods.py` | 扫描器：解析 333 个 jar 的清单 + 查 Modrinth 缓存 + 依赖闭合 | 改了 mods 之后重跑（注意联网与缓存） |
+| `server-mods.list` | 254 个服务端模组（jar / modid / server_side / 备注） | 人工核对 |
+| `client-only.list` | 81 个被剔除模组 + **逐个的依据** | 复核剔除是否合理 |
+| `verify-on-server.list` | 56 个必须实测的模组 + 为什么要实测 | 首次开服时重点盯 |
+| `tools/scan_mods.py` | 扫描器：解析 335 个 jar 的清单 + 查 Modrinth 缓存 + 依赖闭合 | 改了 mods 之后重跑（注意联网与缓存） |
 | `tools/make-server.sh` | 组装服务端根目录（模组 + 配置 + 脚本） | 开服第一步 |
 | `tools/gen-dist-manifest.py` | 生成分发清单 `dist/server-mods.tsv` | 改了 mods 之后重跑 |
-| `dist/server-mods.tsv` | 253 个 jar 的文件名 + md5 + 直链 + 官方哈希 | 分发/下载的唯一权威清单 |
+| `dist/server-mods.tsv` | 254 个 jar 的文件名 + md5 + 直链 + 官方哈希 | 分发/下载的唯一权威清单 |
 | `dist/download-mods.sh` | 按清单下载 + 逐文件校验（幂等、可 `--check`） | 空服务器装满模组 |
 | `dist/DISTRIBUTE.md` | 分发说明：仓库/清单/脚本三者关系、CF 直链口径、IPv6 陷阱 | 要把包给别人时 |
 | `ops/backup-world.sh` | 世界定时备份（tar + sha256 + 保留策略 + 可解包自检） | 开服后加进 cron |
@@ -62,7 +65,7 @@ Modrinth 无该项目，依赖标 CLIENT ⇒ 归入待验，不剔）。
 
 ```bash
 cd <实例>
-python3 server-pack/tools/scan_mods.py            # 重扫 333 个 jar（会读/更新 Modrinth 缓存，需联网）
+python3 server-pack/tools/scan_mods.py            # 重扫 335 个 jar（会读/更新 Modrinth 缓存，需联网）
 python3 server-pack/tools/gen-dist-manifest.py    # 重生成分发清单
 server-pack/tools/make-server.sh --target /srv/mc --no-mods --with-config
 server-pack/dist/download-mods.sh --target /srv/mc/mods
@@ -87,13 +90,13 @@ cd /srv/mc && ./start.sh --check
 
 ## 6. 已经验证过的部分（证据）
 
-* **清单对账**：253/253 哈希通过，exit=0（对 `minecraft/mods/` 实盘校验）。
+* **清单对账**：254/254 哈希通过，exit=0（对 `minecraft/mods/` 实盘校验）。
 * **真实下载抽验**：Modrinth 路径（sha512）`sableexplosionfix-1.0.0.jar` 4795 B ✓；
   CurseForge 路径（sha1）`keywheel-neoforge-1.1.7-1.21.1-java21.jar` 60922 B ✓；重复跑 ⇒ 幂等 ✓。
 * **备份/回滚**：合成世界上 3 次备份 + `--keep 2` 触发保留策略；`restore-world.sh drill` 全程
   `[PASS]`（sha256 → 归档可读 → `level.dat` gzip 魔数 1f8b → 文件数对账 → 清理），exit=0。
 * **make-server.sh**：合成实例上 dry-run / 实跑 / 缺件告警 / 非空目录拒绝覆盖 全部符合预期；
-  对真实实例 dry-run 得到 253 条记录且**零缺失**。
+  对真实实例 dry-run 得到 254 条记录且**零缺失**。
 * **start.sh --check**：在未装服务端的目录里按设计 `[FAIL]` 并提示先跑安装器（不是缺陷，是自检生效）。
 * **版本事实**：Java `21.0.7`（Microsoft `java-runtime-delta`）、NeoForge 安装器 `21.1.251`
   本地副本 md5 `71719bf6615fb4ef01c1d27463085b16`。
@@ -101,7 +104,7 @@ cd /srv/mc && ./start.sh --check
 ## 7. 已知缺口（不要当成已解决）
 
 * **未真机开服**：M0 的最终验收在真机上；本文所有「可上专用服」都是**静态证据**结论。
-* **未全量下载 253 个 jar**（约 556 MB）：只抽验了 2 条分发路径 + 幂等性。
+* **未全量下载 254 个 jar**（约 556 MB）：只抽验了 2 条分发路径 + 幂等性。
 * `reports/mods-scan.json` 是 2026-10-04 15:22 的磁盘快照；之后任何 mods 改动都会让它过期。
 * 服务端**尚未安装**（无 `libraries/`），`eula.txt` 需服主本人确认 —— 脚本刻意不代签。
 
@@ -160,6 +163,6 @@ __pycache__/
 3. **`__pycache__/` 已从交付里删掉**（`py_compile` 的副产物），片段里再挡一道，
    防止以后跑 `python3 -m py_compile` 又带进来。
 
-**入库后仍要注意**：`dist/server-mods.tsv`（92 KB 文本）含 253 个 jar 的下载直链 ——
+**入库后仍要注意**：`dist/server-mods.tsv`（92 KB 文本）含 254 个 jar 的下载直链 ——
 它是**清单**不是二进制，符合「仓库不带 jar」的纪律；但正因如此，**改了 `minecraft/mods/` 就必须重跑
 `tools/gen-dist-manifest.py`**，否则清单与磁盘脱节（与 `PREFLIGHT-CLEANUP.md` §3 的纪律同源）。

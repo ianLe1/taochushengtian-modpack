@@ -10,6 +10,7 @@
 #   ./download-mods.sh --target /srv/mc/mods --only 'keywheel*'
 #   ./download-mods.sh --list                         打印清单来源统计
 #   ./download-mods.sh --target ./mods --no-ipv4      允许 IPv6（默认强制 IPv4，见 DISTRIBUTE.md）
+#   ./download-mods.sh --target ./mods --source-mods <实例>/minecraft/mods   顺带做「清单 vs 磁盘」计数闸门
 #
 # 特性：幂等（重跑只补缺失/损坏项）；每个文件按清单里的 hash-format（sha512/sha1）或 md5 校验；
 #       校验失败的文件会被删除并重下；下载失败不静默 —— 结束时非零退出并列出失败项。
@@ -21,6 +22,7 @@ TARGET=./mods
 CHECK=0
 ONLY=
 DO_LIST=0
+SOURCE_MODS=
 # 默认强制 IPv4：本机 IPv6 到 cdn.modrinth.com（fastly）会 TLS 断连（curl 35 unexpected eof），
 # 加 -4 后 200。纯 IPv6 主机可用 --no-ipv4 关掉。
 IPV4=1
@@ -29,6 +31,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --target) TARGET=$2; shift 2 ;;
     --manifest) MANIFEST=$2; shift 2 ;;
+    --source-mods) SOURCE_MODS=$2; shift 2 ;;
     --check) CHECK=1; shift ;;
     --only) ONLY=$2; shift 2 ;;
     --list) DO_LIST=1; shift ;;
@@ -42,6 +45,21 @@ if [ ! -f "$MANIFEST" ]; then
   echo "[FAIL] 找不到清单：$MANIFEST"
   echo "       先生成： python3 ../tools/gen-dist-manifest.py"
   exit 1
+fi
+
+if [ -n "$SOURCE_MODS" ]; then
+  LISTS_DIR=$(cd "$(dirname "$MANIFEST")/.." && pwd)
+  N_KEEP=$(grep -vc '^#' "$LISTS_DIR/server-mods.list" 2>/dev/null || echo 0)
+  N_DROP=$(grep -vc '^#' "$LISTS_DIR/client-only.list" 2>/dev/null || echo 0)
+  N_SCAN=$((N_KEEP + N_DROP))
+  N_DISK=$(ls -1 "$SOURCE_MODS"/*.jar 2>/dev/null | wc -l)
+  echo "[gate] 扫描集(keep $N_KEEP + 剔除 $N_DROP = $N_SCAN) / 磁盘 $N_DISK 个 jar"
+  if [ "$N_SCAN" != "$N_DISK" ]; then
+    echo "[WARN] 扫描快照与磁盘不一致（$N_SCAN vs $N_DISK）⇒ 先重跑扫描再分发："
+    echo "       python3 ../tools/scan_mods.py && python3 ../tools/gen-dist-manifest.py"
+  else
+    echo "[gate] 一致 [OK]"
+  fi
 fi
 
 CURL_FLAGS=--ipv4

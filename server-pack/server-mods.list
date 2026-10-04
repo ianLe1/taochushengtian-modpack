@@ -1,5 +1,6 @@
 # 可上专用服模组：jar / modid / Modrinth server_side / 备注
 # 生成：server-pack/tools/scan_mods.py --offline
+# 基准变更（2026-10-04 17:26）：本表 = 15:22 全量扫描快照(333/328) + 2026-10-04 17:13 增量（+baguettelib / +smoothscrolling）；此后 mods 有任何增删都需重跑扫描并更新本行。
 AeroEngine-1.3.0.jar	aeroengineering	required	packwiz side=both
 BEB-NeoForge-1.21-6.0.0.jar	beb	required	packwiz side=both
 BTP-NeoForge-1.21.1-2.0.1.jar	beautiful_potions	required	packwiz side=both
@@ -253,3 +254,4 @@ worldgenfeaturefix-neoforge-1.21-1.0.1.jar	worldgenfeaturefix	required	packwiz s
 xaerominimap-neoforge-1.21.1-26.5.0.jar	xaerominimap	optional	
 xaeroworldmap-neoforge-1.21.1-1.46.0.jar	xaeroworldmap	optional	
 yet_another_config_lib_v3-3.8.2+1.21.1-neoforge.jar	yet_another_config_lib_v3	optional	packwiz side=both
+baguettelib-1.21.1-NeoForge-2.0.7.jar	baguettelib	unknown	新增 2026-10-04 17:26；库模组（mixins 9 / client 0）；唯一使用者 smoothscrolling 声明 CLIENT ⇒ 服务端可留但非必需
