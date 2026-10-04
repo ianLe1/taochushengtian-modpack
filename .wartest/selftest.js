@@ -1437,6 +1437,29 @@ runPath(registeredRoot, ['base', 'scan'], sScanLow, {});
 assert(sScanLow.messages.length === 0, 'level1 时 /war base scan 不可达（OP 门生效）');
 assert(WAR.econ.invariant().ok === true, 'T22 后账目恒等式仍成立');
 
+// ================================================================ T23 出生点覆盖度门槛配置真源（WAR_CONFIG.spawn.coverMin）
+console.log('\n--- T23 WAR_CONFIG.spawn.coverMin（覆盖度门槛配置真源）---');
+assert('coverMin' in WAR.config.spawn && WAR.config.spawn.coverMin === 7, 'WAR.config.spawn.coverMin 存在且为 7');
+var coreSrc23 = fs.readFileSync(WAR_DIR + '/00_core.js', 'utf8');
+assert(/spawn:\s*\{[^}]*coverMin:\s*7/.test(coreSrc23), 'core 的 spawn CONFIG 里写着 coverMin: 7（文件里的事实，不是运行时补的）');
+assert(coreSrc23.indexOf('覆盖度门槛') >= 0 && coreSrc23.indexOf('唯一真源') >= 0 && coreSrc23.indexOf('dcalib') >= 0 && coreSrc23.indexOf('假放行') >= 0,
+       'core 注释写明：覆盖度门槛 + 暂定待标定 + 标定方法(dcalib) + 唯一真源 + 假放行风险');
+var spawnSrc23 = fs.readFileSync(WAR_DIR + '/20_spawn.js', 'utf8');
+assert(/SP_COVER_MIN_FALLBACK\s*=\s*7/.test(spawnSrc23), '20_spawn.js 侧有 SP_COVER_MIN_FALLBACK = 7（缺键保底常量）');
+assert(spawnSrc23.indexOf('core.coverMin != null') >= 0 && spawnSrc23.indexOf("spawn-cfg-covermin") >= 0,
+       '20_spawn.js 只在 core 缺键时回落，并 warnOnce 点名 spawn-cfg-covermin');
+var bad23 = [];
+var lines23 = spawnSrc23.split('\n');
+for (var i23 = 0; i23 < lines23.length; i23++) {
+  var ln23 = lines23[i23];
+  if (ln23.indexOf('coverMin') < 0) continue;
+  if (/^\s*\/\//.test(ln23)) continue;                        // 注释里出现不算真源
+  if (/SP_COVER_MIN_FALLBACK\s*=\s*7/.test(ln23)) continue;    // 保底常量本身
+  if (/\bcoverMin\b\s*[:=]\s*\d/.test(ln23)) { bad23.push((i23 + 1) + ': ' + ln23.trim()); continue; }   // 第二份字面量
+}
+assert(bad23.length === 0, '20_spawn.js 里没有第二份 coverMin 阈值字面量赋值（命中 ' + bad23.length + ' 行' + (bad23.length ? '：' + bad23.join(' | ') : '') + '）');
+assert(spawnSrc23.indexOf('minScored') >= 0, '（背景断言）20_spawn.js 里 minScored 与 coverMin 是两个不同的 knob —— 本批只加 core 的 coverMin，不动它那两个数字');
+
 console.log('\n--- 汇总 ---');
 console.log('PASS=' + passN + ' FAIL=' + failN + ' SKIP=' + skipN);
 console.log(ok ? 'ALL_PASS' : 'SOME_FAILED');

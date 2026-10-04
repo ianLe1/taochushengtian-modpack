@@ -79,7 +79,11 @@ var WAR_CONFIG = {
   //   ① **暂定值、待实机标定** —— 标定方法：/cm scan 之后用 /war spawn admin dcalib 看 d 的真实分位数，
   //      **自然底噪的 p75 决定阈值下限**（当前这个数只是猜，不是结论）。
   //   ② **唯一真源** —— 20_spawn.js 侧的 SP_D_MAX_FALLBACK=0.05 只在 core 缺键时保底，并 warWarnOnce('spawn-cfg-dmax') 点名。
-  spawn: { mode: 'cm-score', candidateRadius: 5000, tries: 64, dMax: 0.05 },
+  // 另：coverMin = 出生点**覆盖度门槛**（3×3 窗口里 fresh 记录数下限，取值 1..9）：
+  //   ① **暂定值、待实机标定** —— 标定方法：/cm scan 之后用 /war spawn admin dcalib，看「fresh ≥ coverMin 的窗口占比」；
+  //      覆盖不足时 a/d 不可信 ⇒ 会出现「只有几块扫过、恰好都是 a=0」的**假放行**（用户规格里最坏的失效模式）。
+  //   ② **唯一真源** —— 20_spawn.js 侧的 SP_COVER_MIN_FALLBACK=7 只在 core 缺键时保底，并 warWarnOnce('spawn-cfg-covermin') 点名。
+  spawn: { mode: 'cm-score', candidateRadius: 5000, tries: 64, dMax: 0.05, coverMin: 7 },
   claim: { enabled: false, defaultRadius: 32 },            // 暂定默认值；40_base.js
   // 暂定默认值；据点域实现在 40_base.js（**隐性人工程度**模型）。**单位口径**（CM 口径一页纸）：
   //   a/d ∈ [0,1] 小数、有饱和、不是计数；聚合口径 = 区域内**新鲜区块**（status=ok 且 stale=false）的 a 求和。
