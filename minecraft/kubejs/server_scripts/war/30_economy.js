@@ -505,7 +505,7 @@ WAR.commands.add(function (Commands, Arguments, event) {
         return replyResult(ctx, res, '已取出 ' + intOf(ctx, 'amount') + ' 件，账本余额 ' + res.balance);
       })))
     .then(Commands.literal('admin')
-      .requires(function (src) { return WAR.hasPermission(src, WAR.config.admin.commandPermissionLevel); })
+      .requires(warOpPredicate())
       .executes(function (ctx) { return WAR.reply(ctx.source, '用法：/war money admin give|take <玩家> <数量> | status'); })
       .then(Commands.literal('status').executes(function (ctx) {
         return WAR.reply(ctx.source, JSON.stringify(WAR_ECON.status()));

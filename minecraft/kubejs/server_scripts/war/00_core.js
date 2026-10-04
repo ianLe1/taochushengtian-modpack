@@ -148,6 +148,13 @@ function warHasPermission(source, level) {
   try { return source.hasPermission(warToInt(level, 2)) === true; } catch (e) { return false; }
 }
 
+// OP 谓词工厂（三域统一入口）：给 admin 子命令挂权限；level 缺省 = WAR_CONFIG.admin.commandPermissionLevel。
+// 抽取理由：00_core / 20_spawn / 30_economy 原本各写一份内联谓词，写法还不一致（warHasPermission vs WAR.hasPermission）。
+function warOpPredicate(level) {
+  var lv = warToInt(level, WAR_CONFIG.admin.commandPermissionLevel);
+  return function (src) { return warHasPermission(src, lv); };
+}
+
 // 命令回显：控制台与玩家都可用。Text.string 已核实（TextWrapper.string(String)）。
 function warReply(source, msg) {
   warLog(msg);
@@ -534,7 +541,7 @@ ServerEvents.commandRegistry(function (event) {
       }));
 
     var admin = Commands.literal('admin')
-      .requires(function (src) { return warHasPermission(src, WAR_CONFIG.admin.commandPermissionLevel); })
+      .requires(warOpPredicate())
       .executes(function (ctx) { return warReply(ctx.source, '用法：/war admin status | audit [n] | save'); })
       .then(Commands.literal('status').executes(function (ctx) {
         return warReply(ctx.source, warAdminStatusText());
@@ -678,6 +685,7 @@ global.WAR = {
   uuidOf: warUuid,
   nameOf: warName,
   hasPermission: warHasPermission,
+  opPredicate: warOpPredicate,
   fmtTime: warFmtTime,
   stubStatus: function () {
     return {

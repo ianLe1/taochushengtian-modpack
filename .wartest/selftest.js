@@ -668,6 +668,23 @@ WAR.config.econ.firstJoinGrant = 0;
 assert(WAR.config.econ.firstJoinGrant === 0, '恢复暂定默认值 0');
 assert(WAR.econ.invariant().ok === true, '首见发放后不变量仍成立');
 
+// ================================================================ T11 OP 谓词统一（抽取步骤 1）
+console.log('\n--- T11 OP 谓词统一 ---');
+assert(typeof WAR.opPredicate === 'function', 'WAR.opPredicate 已暴露给各域');
+var opDef = WAR.opPredicate();
+assert(opDef(new FakeSource(1, null)) === false && opDef(new FakeSource(2, null)) === true,
+       '缺省 level = WAR_CONFIG.admin.commandPermissionLevel（1 拒 / 2 过）');
+var op4 = WAR.opPredicate(4);
+assert(op4(new FakeSource(2, null)) === false && op4(new FakeSource(4, null)) === true, '显式 level 生效（2 拒 / 4 过）');
+assert(opDef(new FakeSource(3, null)) === true && opDef(new FakeSource(2, null)) === true, '同一谓词重复调用结果稳定');
+var adminNode2 = findChild(registeredRoot, 'admin');
+assert(adminNode2.requires_(new FakeSource(1, null)) === false && adminNode2.requires_(new FakeSource(2, null)) === true,
+       '/war admin 权限行为与重构前一致');
+var moneyAdminNode = findChild(findChild(registeredRoot, 'money'), 'admin');
+assert(moneyAdminNode != null && typeof moneyAdminNode.requires_ === 'function', '/war money admin 挂了 requires 谓词');
+assert(moneyAdminNode.requires_(new FakeSource(1, null)) === false && moneyAdminNode.requires_(new FakeSource(2, null)) === true,
+       '/war money admin 权限行为一致（此前没有断言，这次补上）');
+
 console.log('\n--- 汇总 ---');
 console.log('PASS=' + passN + ' FAIL=' + failN + ' SKIP=' + skipN);
 console.log(ok ? 'ALL_PASS' : 'SOME_FAILED');
