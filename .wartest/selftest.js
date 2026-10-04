@@ -723,6 +723,68 @@ assert(sZ.messages.join(' ').indexOf('必须为正整数') >= 0, '非整数金�
 assert(WAR.econ.balanceOf('uuid-zero') === balZ0, '被拒后余额不变');
 assert(WAR.econ.invariant().ok === true, '步骤 2 后端到端不变量仍成立');
 
+// ================================================================ T13 warPlayerArg（抽取步骤 3）
+console.log('\n--- T13 warPlayerArg ---');
+assert(typeof WAR.playerArg === 'function', 'WAR.playerArg 已暴露');
+var fakePA = { getResult: function (ctx, n) { return (ctx.args && ctx.args[n] !== undefined) ? ctx.args[n] : null; } };
+var tgtP = new FakePlayer('tgt', 'uuid-tgt');
+assert(WAR.playerArg(fakePA, { args: { player: tgtP } }, 'player') === tgtP, '有效玩家：返回同一对象（与替换前 getResult 结果一致）');
+assert(WAR.playerArg(fakePA, { args: {} }, 'player') === null, '缺参数：返回 null');
+assert(WAR.playerArg(fakePA, { args: { player: null } }, 'player') === null, '参数为 null：返回 null');
+assert(WAR.playerArg({ getResult: function () { throw new Error('boom'); } }, { args: {} }, 'player') === null, 'getResult 抛异常：返回 null（原来 10_team 裸调会外泄）');
+var teamSrc3 = fs.readFileSync(WAR_DIR + '/10_team.js', 'utf8');
+assert(teamSrc3.indexOf('WAR_TEAM.invite(a, Arguments.PLAYER.getResult') < 0 &&
+       teamSrc3.indexOf('WAR_TEAM.kick(a, Arguments.PLAYER.getResult') < 0,
+       '10_team 两处调用点已无裸调 getResult（只看调用点，不算头注释）');
+assert(teamSrc3.split('warPlayerArg(Arguments.PLAYER, ctx').length - 1 === 2, '10_team 两处取参都换成 warPlayerArg(Arguments.PLAYER, ctx, ...)');
+var econSrc3 = fs.readFileSync(WAR_DIR + '/30_economy.js', 'utf8');
+assert(econSrc3.split('warPlayerArg(Arguments.PLAYER, ctx, name)').length - 1 === 1, '30_economy 的 playerOf 已改为一行绑定');
+assert(econSrc3.indexOf('warIntArg(I, ctx') < 0, '30_economy 已不再把 create(event) 的结果当包装对象传（回归防线）');
+assert(WAR.intArg({ type: 'integer' }, { args: { n: 3 } }, 'n', 9) === 9, '传错对象（create 的结果，无 getResult）时回落 dft，不静默出错值');
+assert(WAR.data.warned['argwrap-int'] === true, '传错对象会告警一次（不再静默）');
+assert(WAR.playerArg({ type: 'player' }, { args: {} }, 'player') === null, 'warPlayerArg 同守卫：返回 null');
+// 自足前置：T9 的 boot 会用落盘数据覆盖内存 teams（T7 的 wt2 不保证还在），所以 T13 自己建队
+var capT13 = new FakePlayer('cap13', 'uuid-cap13');
+srvE.players.push(capT13);
+var sCap = new FakeSource(0, capT13);
+runPath(registeredRoot, ['team', 'create', 'name'], sCap, { name: '取参队' });
+assert(WAR.team.of(capT13) != null, 'T13 前置：自建队伍成功');
+var srcNoT = new FakeSource(0, capT13);
+runPath(registeredRoot, ['team', 'invite', 'player'], srcNoT, {});
+assert(srcNoT.messages.join('') === '找不到目标玩家（当前仅支持在线玩家）', 'invite 出错分支：文案逐字未变');
+var srcNoK = new FakeSource(0, capT13);
+runPath(registeredRoot, ['team', 'kick', 'player'], srcNoK, {});
+assert(srcNoK.messages.join('') === '找不到目标玩家', 'kick 出错分支：文案逐字未变');
+var guest3 = new FakePlayer('guest', 'uuid-guest');
+srvE.players.push(guest3);
+var srcInv3 = new FakeSource(0, capT13);
+runPath(registeredRoot, ['team', 'invite', 'player'], srcInv3, { player: guest3 });
+assert(srcInv3.messages.join('') === '已邀请 guest（300 秒内有效）', 'invite 成功路径：文案逐字未变');
+var t13team = WAR.team.of(capT13);
+assert(t13team != null && t13team.invites.filter(function (iv) { return iv.uuid === 'uuid-guest'; }).length === 1,
+       'invite 成功：邀请确实落到 L1（统一取参链路打通）');
+
+// ================================================================ T14 经济命令路径（有效金额）
+console.log('\n--- T14 经济命令路径（有效金额；专为抓 intOf 传参回归）---');
+var pCmd = new FakePlayer('cmduser', 'uuid-cmduser');
+srvE.players.push(pCmd);
+WAR.econ.mint('console', 'uuid-cmduser', 100, null);
+var balCmd0 = WAR.econ.balanceOf('uuid-cmduser');
+var sW = new FakeSource(0, pCmd);
+runPath(registeredRoot, ['money', 'withdraw', 'amount'], sW, { amount: 25 });
+assert(WAR.econ.balanceOf('uuid-cmduser') === balCmd0 - 25, '命令路径 /war money withdraw 25 真扣 25（回归断言）');
+assert(fakeCreditCount(pCmd) === 25, '命令路径 withdraw：真的拿到 25 件');
+var sD = new FakeSource(0, pCmd);
+runPath(registeredRoot, ['money', 'deposit', 'amount'], sD, { amount: 10 });
+assert(WAR.econ.balanceOf('uuid-cmduser') === balCmd0 - 15, '命令路径 /war money deposit 10 账本 +10');
+assert(fakeCreditCount(pCmd) === 15, '命令路径 deposit：物品 -10');
+var balTarget0 = WAR.econ.balanceOf('uuid-zero');
+var sP = new FakeSource(0, pCmd);
+runPath(registeredRoot, ['money', 'pay', 'player', 'amount'], sP, { player: pZ, amount: 5 });
+assert(WAR.econ.balanceOf('uuid-cmduser') === balCmd0 - 20, '命令路径 pay：付款方 -5');
+assert(WAR.econ.balanceOf('uuid-zero') === balTarget0 + 5, '命令路径 pay：收款方 +5');
+assert(WAR.econ.invariant().ok === true, 'T14 后不变量仍成立');
+
 console.log('\n--- 汇总 ---');
 console.log('PASS=' + passN + ' FAIL=' + failN + ' SKIP=' + skipN);
 console.log(ok ? 'ALL_PASS' : 'SOME_FAILED');

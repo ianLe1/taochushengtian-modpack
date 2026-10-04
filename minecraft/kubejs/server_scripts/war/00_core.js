@@ -153,7 +153,17 @@ function warHasPermission(source, level) {
 // 签名比最初设想多一个 argType：getResult 是 ArgumentTypeWrapper 的方法，而 core 里没有全局 Arguments
 // （它只在 commandRegistry 事件回调内有效），所以由调用方把已 create 好的类型传进来。
 function warIntArg(argType, ctx, name, dft) {
-  try { return warToInt(argType.getResult(ctx, name), dft); } catch (e) { return dft; }
+  var w = warArgWrapper(argType, 'int');
+  if (w == null) return dft;
+  try { return warToInt(w.getResult(ctx, name), dft); } catch (e) { return dft; }
+}
+
+// 参数包装对象守卫：必须传 event.arguments.<TYPE>（ArgumentTypeWrapper），**不是** create(event) 的返回值
+//（那个是 ArgumentType，没有 getResult）。传错时告警一次并回落，避免像之前那样静默算出错值。
+function warArgWrapper(argType, tag) {
+  if (argType != null && typeof argType.getResult === 'function') return argType;
+  warWarnOnce('argwrap-' + tag, '参数工具收到不合法的参数类型：应传 Arguments.<TYPE> 包装对象，而不是 create(event) 的结果（已按缺省值回落）');
+  return null;
 }
 
 // 整数钳位：语义**照抄 20_spawn.js:142 的 spClampInt**（Number → NaN/±Inf 回落 dft → 夹 [lo,hi] → Math.round），
@@ -165,6 +175,19 @@ function warClampInt(v, lo, hi, dft) {
   if (n < lo) n = lo;
   if (n > hi) n = hi;
   return Math.round(n);
+}
+
+// 读 PLAYER 命令参数：argType = 命令事件里的 event.arguments.PLAYER（ArgumentTypeWrapper）。
+// 失败/未解析一律返回 null，由调用方给出各自的既有文案 —— 本函数不产出任何面向玩家的文本（故对文案零影响）。
+// 签名同 warIntArg 需带 argType；这是唯一被统一掉的差异：原 10_team 裸调会把异常外泄，原 30_economy 的
+// playerOf 已经吞异常返回 null —— 统一后一律取「吞异常」这一侧（更稳，且不改变任何既有文案）。
+function warPlayerArg(argType, ctx, name) {
+  var w = warArgWrapper(argType, 'player');
+  if (w == null) return null;
+  try {
+    var p = w.getResult(ctx, name);
+    return (p == null) ? null : p;
+  } catch (e) { return null; }
 }
 
 // OP 谓词工厂（三域统一入口）：给 admin 子命令挂权限；level 缺省 = WAR_CONFIG.admin.commandPermissionLevel。
@@ -708,6 +731,7 @@ global.WAR = {
   opPredicate: warOpPredicate,
   intArg: warIntArg,
   clampInt: warClampInt,
+  playerArg: warPlayerArg,
   fmtTime: warFmtTime,
   stubStatus: function () {
     return {

@@ -41,7 +41,7 @@ var ECON_CONFIG = WAR.config.econ;
 // 0. 内部工具
 // ============================================================================
 
-function econLog(msg) { WAR.log('[econ] ' + msg); }
+function econLog(msg) { warLog('[econ] ' + msg); }   // 修：原写 WAR.log（核心从未导出 log），错误被 boot 钩子的 try/catch 吞掉、日志从未打印
 
 // 保证 state.econ 结构完整（旧档/坏档也能跑）
 function econNorm() {
@@ -444,8 +444,8 @@ WAR.commands.add(function (Commands, Arguments, event) {
   var I = Arguments.INTEGER.create(event);
   var P = Arguments.PLAYER.create(event);
 
-  function intOf(ctx, name) { return warIntArg(I, ctx, name, -1); }   // 步骤 2：三份整数解析归一（-1 哨兵保留，下游 econCheckAmount 继续拒绝 <=0）
-  function playerOf(ctx, name) { try { return Arguments.PLAYER.getResult(ctx, name); } catch (e) { return null; } }
+  function intOf(ctx, name) { return warIntArg(Arguments.INTEGER, ctx, name, -1); }   // 步骤 2/3：必须传包装对象（I 是 create(event) 的结果，没有 getResult）
+  function playerOf(ctx, name) { return warPlayerArg(Arguments.PLAYER, ctx, name); }   // 步骤 3：同上，传包装对象
   function actorName(ctx) { try { var p = ctx.source.getPlayer(); if (p != null) return WAR.nameOf(p); } catch (e) { } return 'console'; }
   function selfPlayer(ctx) { try { return ctx.source.getPlayer(); } catch (e) { return null; } }
 

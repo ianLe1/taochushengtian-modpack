@@ -471,7 +471,7 @@ WAR.commands.add(function (Commands, Arguments, event) {
       .then(Commands.argument('player', P).executes(function (ctx) {
         var a = actorOf(ctx);
         if (a == null) return WAR.reply(ctx.source, '该命令只能由玩家执行');
-        return WAR._teamResult(WAR_TEAM.invite(a, Arguments.PLAYER.getResult(ctx, 'player')), ctx.source);
+        return WAR._teamResult(WAR_TEAM.invite(a, warPlayerArg(Arguments.PLAYER, ctx, 'player')), ctx.source);
       })))
     .then(Commands.literal('accept')
       .executes(function (ctx) {
@@ -493,7 +493,7 @@ WAR.commands.add(function (Commands, Arguments, event) {
       .then(Commands.argument('player', P).executes(function (ctx) {
         var a = actorOf(ctx);
         if (a == null) return WAR.reply(ctx.source, '该命令只能由玩家执行');
-        return WAR._teamResult(WAR_TEAM.kick(a, Arguments.PLAYER.getResult(ctx, 'player')), ctx.source);
+        return WAR._teamResult(WAR_TEAM.kick(a, warPlayerArg(Arguments.PLAYER, ctx, 'player')), ctx.source);
       })))
     .then(Commands.literal('list').executes(function (ctx) {
       var a = actorOf(ctx);
