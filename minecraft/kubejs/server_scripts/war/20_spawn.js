@@ -62,11 +62,12 @@ var SP_VERSION = 2;   // v2：读数切到 CM.scoreArea 批量接口（旧版 CM
 // CONFIG —— 本域的「待补充参数」（方案 §10）。标「暂定默认值」= 尚未拍板。
 // 运行时可被持久化配置覆盖（/war spawn admin center|radius，或直接改数据根）：
 // 下面的 SP_CONFIG 只是首次初始化时的默认值来源。
+// ⚠ maxRadius / tries **不在这里写死**：唯一真值源是 00_core 的 WAR_CONFIG.spawn
+//   .candidateRadius / .tries（见 spDefaultConfig 的 core 段）。core 缺键时用 SP_FALLBACK
+//   + warWarnOnce 明确警告一次 —— 绝不静默回落（core 改名后继续用 5000/64 跑，这种 bug 最难查）。
 // ============================================================================
 var SP_CONFIG = {
   minRadius: 64,                 // 暂定默认值：环带内边界（方块），避免落在中心附近
-  maxRadius: 5000,               // 暂定默认值；默认取自 00_core 的 WAR_CONFIG.spawn.candidateRadius
-  tries: 64,                     // 暂定默认值；默认取自 00_core 的 WAR_CONFIG.spawn.tries
   maxMillis: 50,                 // 暂定默认值：单次掷点时间预算（ms）——选点低频、绝不进 tick
   minScored: 5,                  // 暂定默认值：候选 3×3 区块中至少几个「非过期」记录才算已扫描
   weights: { d: 0.6, a: 1.0, used: 0.35 },  // 暂定默认值：D̄ / Ā / 已用次数 的权重
@@ -105,6 +106,9 @@ var SP_CONFIG = {
   ]
 };
 
+// 00_core 缺 candidateRadius / tries 时的保底值；使用它一定会 warWarnOnce 点名（不是静默默认值）
+var SP_FALLBACK = { maxRadius: 5000, tries: 64 };
+
 // 接口缺口（task ⑤ 要求列出；扩 CM 属 chunk_metrics.js 改动，须单独授权）
 // 2026-10-04 的 CM 扩展已兑现其中三条（getStatus / scoreArea / rank 的 order+skipStale，
 // 见 chunk_metrics/README.md §4.2），下面是**仍然存在**的缺口。
@@ -126,7 +130,8 @@ var SP_MEM = {
 };
 
 // ============================================================================
-// 0. 小工具（本域私有；war* 前缀的公共工具来自 00_core.js）
+// 0. 小工具（本域私有；war* 前缀的公共工具来自 00_core.js，见那里的工具导出清单：
+//    opPredicate / intArg / clampInt / nameOf / uuidOf / reply / tell / run / every …）
 // ============================================================================
 
 function spNum(v, dft) {
@@ -139,9 +144,10 @@ function spClampNum(v, lo, hi, dft) {
   if (n > hi) n = hi;
   return n;
 }
-function spClampInt(v, lo, hi, dft) {
-  return Math.round(spClampNum(v, lo, hi, dft));
-}
+// 整数钳位统一走 00_core 的 WAR.clampInt（它在 00_core.js 的注释里自证「语义照抄本域旧 spClampInt」：
+// 小数四舍五入、Infinity 回落 dft、越界夹取）。旧 spClampInt **已删**，本域不留副本，
+// 免得两处实现漂移。浮点的 spNum / spClampNum 没有对应共享工具（warToInt 是整数解析、
+// 语义不同），仍留本域。
 function spListHas(list, v) {
   if (list == null || v == null) return false;
   for (var i = 0; i < list.length; i++) { if (list[i] === v) return true; }
@@ -292,8 +298,8 @@ function spDefaultConfig() {
     centerX: null, centerZ: null,
     mode: 'cm-score',
     minRadius: SP_CONFIG.minRadius,
-    maxRadius: SP_CONFIG.maxRadius,
-    tries: SP_CONFIG.tries,
+    maxRadius: SP_FALLBACK.maxRadius,   // 仅 core 缺键时的保底；正常路径由下方 core 段覆盖
+    tries: SP_FALLBACK.tries,           // 同上
     maxMillis: SP_CONFIG.maxMillis,
     minScored: SP_CONFIG.minScored,
     weights: { d: SP_CONFIG.weights.d, a: SP_CONFIG.weights.a, used: SP_CONFIG.weights.used },
@@ -310,14 +316,21 @@ function spDefaultConfig() {
     rankRadiusMax: SP_CONFIG.rankRadiusMax,
     rings: spCopyRings(SP_CONFIG.rings)
   };
-  // 与 00_core 的 CONFIG 对齐（那里是本域的权威默认值来源之一）
+  // maxRadius / tries 的唯一真值源 = 00_core 的 WAR_CONFIG.spawn。
+  // 缺键不是「用默认值继续跑」，而是明确警告一次再退保底（静默回落最难排查）。
   try {
-    var core = global.WAR.config.spawn;
-    if (core != null) {
-      c.maxRadius = spClampInt(core.candidateRadius, 64, 100000, c.maxRadius);
-      c.tries = spClampInt(core.tries, 1, 4096, c.tries);
-      if (core.mode != null) c.mode = String(core.mode);
+    var core = (global.WAR != null) ? global.WAR.config.spawn : null;
+    if (core != null && core.candidateRadius != null) {
+      c.maxRadius = global.WAR.clampInt(core.candidateRadius, 64, 100000, c.maxRadius);
+    } else {
+      warWarnOnce('spawn-cfg-maxradius', '00_core 的 WAR_CONFIG.spawn.candidateRadius 缺失：环带外半径回落到 ' + c.maxRadius + ' 格（请查 00_core.js，勿静默依赖保底值）');
     }
+    if (core != null && core.tries != null) {
+      c.tries = global.WAR.clampInt(core.tries, 1, 4096, c.tries);
+    } else {
+      warWarnOnce('spawn-cfg-tries', '00_core 的 WAR_CONFIG.spawn.tries 缺失：候选上限回落到 ' + c.tries + '（请查 00_core.js，勿静默依赖保底值）');
+    }
+    if (core != null && core.mode != null) c.mode = String(core.mode);
   } catch (e) { }
   return c;
 }
@@ -331,7 +344,7 @@ function spNormConfig(prev) {
   out.mode = (src.mode == null) ? d.mode : String(src.mode);
   for (var i = 0; i < SP_NUM_KEYS.length; i++) {
     var k = SP_NUM_KEYS[i][0];
-    out[k] = spClampInt(src[k], SP_NUM_KEYS[i][1], SP_NUM_KEYS[i][2], d[k]);
+    out[k] = global.WAR.clampInt(src[k], SP_NUM_KEYS[i][1], SP_NUM_KEYS[i][2], d[k]);
   }
   if (out.maxRadius < out.minRadius + 16) out.maxRadius = out.minRadius + 16;
   if (out.weights == null || typeof out.weights !== 'object') out.weights = d.weights;
@@ -951,7 +964,7 @@ function spSetCenter(source, x, z) {
 function spSetRadius(source, r) {
   if (!(r > 0)) return '半径必须是正整数。';
   var mut = spMutate('radius', function (sp) {
-    sp.config.maxRadius = spClampInt(r, 64, 100000, sp.config.maxRadius);
+    sp.config.maxRadius = global.WAR.clampInt(r, 64, 100000, sp.config.maxRadius);
     return sp.config.maxRadius;
   });
   spAudit(warActor(source), 'spawn.admin.radius', String(r), mut.ok ? 'ok' : 'fail');
@@ -959,9 +972,6 @@ function spSetRadius(source, r) {
   return '环带外半径已设为 ' + mut.ret + ' 格。';
 }
 function warActor(source) {
-  try {
-    if (global.WAR != null && typeof global.WAR.hasPermission === 'function') { }
-  } catch (e) { }
   try {
     var p = source.getPlayer();
     if (p != null) return warName(p);
@@ -1017,8 +1027,13 @@ var SP_DOMAIN = {
 // （脚本加载顺序 00_core.js → 20_spawn.js，工厂在事件触发前就已入列）
 function spCommandNode(Commands, Arguments, event) {
   var SI = Arguments.INTEGER.create(event);
+  // 整数参数读取走 00_core 的 WAR.intArg；dft 传 NaN ⇒ 与旧内联实现逐字一致，
+  // 调用点的 isNaN 分支继续负责「必须是整数」的提示（绝不静默用默认值设坐标）。
+  // ⚠ 第一个实参必须是 Arguments.INTEGER（ArgumentTypeWrapper，有 getResult），
+  //   不能传 SI = Arguments.INTEGER.create(event) 的结果（ArgumentType，没有 getResult）
+  //   —— 传错 warArgWrapper 会警告一次并回落 dft，命令就会永远报「必须是整数」。
   function iArg(ctx, name) {
-    try { return parseInt(String(Arguments.INTEGER.getResult(ctx, name)), 10); } catch (e) { return NaN; }
+    return global.WAR.intArg(Arguments.INTEGER, ctx, name, NaN);
   }
   var node = Commands.literal('spawn')
     .executes(function (ctx) { return spCmdRoll(ctx); })
@@ -1036,7 +1051,8 @@ function spCommandNode(Commands, Arguments, event) {
     }));
 
   var admin = Commands.literal('admin')
-    .requires(function (src) { return warHasPermission(src, WAR_CONFIG.admin.commandPermissionLevel); })
+    // OP 谓词走 00_core 的统一入口（level 缺省 = WAR_CONFIG.admin.commandPermissionLevel）
+    .requires(global.WAR.opPredicate())
     .executes(function (ctx) { return warReply(ctx.source, '用法：/war spawn admin center [<x> <z>] | radius <n> | status'); })
     .then(Commands.literal('status').executes(function (ctx) {
       var lines = spStatusLines(ctx.source);

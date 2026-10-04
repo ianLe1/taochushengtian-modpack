@@ -685,6 +685,97 @@ CM._fn = function (bx, bz) { return cmRec(0.1, 0.2, false, false); };
 var r15d = WAR.spawn.roll(new FakePlayer('jack', 'uuid-j2'), { level: lvl, op: true });
 assert(r15d.ok === true, '清掉读取失败注入后恢复成功（三类原因都只是当次判定）');
 
+// ---- T16 与 00_core 共享工具（A 组 1/2/3 + D6）：等价替换 + 真值源单一化 ----
+console.log('\n--- T16 共享工具（opPredicate / intArg / clampInt）+ maxRadius/tries 真值源 ---');
+// (a) WAR.clampInt 语义 = 被删的旧 spClampInt（小数四舍五入 / Infinity 回落 dft / 越界夹取）
+assert(WAR.clampInt(3.6, 0, 10, 1) === 4, 'WAR.clampInt 小数四舍五入（3.6→4，旧 spClampInt 语义）');
+assert(WAR.clampInt(Infinity, 0, 100000, 5000) === 5000, 'WAR.clampInt 对 Infinity 回落 dft（不是夹到上界）');
+assert(WAR.clampInt(10, 64, 100000, 5000) === 64 && WAR.clampInt(999999, 64, 100000, 5000) === 100000, 'WAR.clampInt 越界双向夹取');
+assert(typeof global.spClampInt === 'undefined', '旧 spClampInt 已删除（本域不留副本，单一实现）');
+assert(WAR.clampInt('abc', 64, 100000, 77) === 77, '反向：非数字回落 dft（不是静默算成 0/夹到下限）');
+// (b) 域内钳位确实走共享实现（计数 + 行为不变）
+var clampCalls = 0, clampKeep = WAR.clampInt;
+WAR.clampInt = function (v, lo, hi, dft) { clampCalls++; return clampKeep(v, lo, hi, dft); };
+var src16 = new FakeSource(2, alice);
+var clamp0 = clampCalls;
+var msg16 = WAR.spawn.radius(src16, 10);
+assert(clampCalls > clamp0, 'admin radius 的钳位走 00_core 的 WAR.clampInt（新增调用 ' + (clampCalls - clamp0) + '）');
+// radius 10 → WAR.clampInt 钳到下限 64 → 再被 spNormConfig 的既有不变量
+// 「maxRadius ≥ minRadius + 16」抬到 80。两条都是替换前就有的行为（见 :349）。
+var cfg16r = WAR.spawn.status().config;
+assert(cfg16r.minRadius === 64, '环带内边界 minRadius = 64（下面按它推不变量）');
+assert(cfg16r.maxRadius === cfg16r.minRadius + 16, 'radius 10 钳到 64 再被不变量抬到 80（既有行为，非本次改动引入）');
+assert(String(msg16).indexOf('64') >= 0, '命令回显用的是钳位后的值（64）——与读回的 80 有 16 的差，属既有 quirk，已记录待 lead 定夺');
+WAR.clampInt = clampKeep;
+// (c) admin 谓词来自 WAR.opPredicate()（重注册一次命令树观察；00_core 自身 admin 子树也会调它）
+var opCalls = 0, opKeep = WAR.opPredicate;
+WAR.opPredicate = function (lv) { opCalls++; return opKeep(lv); };
+var rootKeep = registeredRoot;
+REG.commandRegistry[0]({ commands: FakeCommands, arguments: FakeArguments, register: function (n) { registeredRoot = n; } });
+var nodeAdmin16 = findChild(findChild(registeredRoot, 'spawn'), 'admin');
+assert(opCalls >= 1, '/war spawn admin 的谓词由 WAR.opPredicate() 构造（计数 ' + opCalls + '）');
+assert(nodeAdmin16 != null && nodeAdmin16.requires_ != null, '替换后 admin 仍有 requires（OP 门槛没丢）');
+WAR.opPredicate = opKeep;
+registeredRoot = rootKeep;
+// (d) iArg 走 WAR.intArg，且 dft=NaN 保住「必须是整数」的失败语义（绝不静默用默认值）
+var iaCalls = 0, iaKeep = WAR.intArg;
+WAR.intArg = function (t, ctx, n, dft) { iaCalls++; return iaKeep(t, ctx, n, dft); };
+var src16b = new FakeSource(2, alice);
+var c16a = runPath(['spawn', 'admin', 'center'], src16b, { x: 128, z: -256 });
+assert(c16a.ok === true && iaCalls >= 2, 'center 的 x/z 都走 WAR.intArg（计数 ' + iaCalls + '）');
+var cfg16 = WAR.spawn.status().config;
+assert(cfg16.centerX === 128 && cfg16.centerZ === -256, '中心被设为 128 / -256（替换后行为不变）');
+var src16c = new FakeSource(2, alice);
+runPath(['spawn', 'admin', 'center'], src16c, { x: 'abc', z: 34 });
+assert(src16c.messages.join(' ').indexOf('坐标必须是整数') >= 0, '非整数参数仍提示「坐标必须是整数」（dft=NaN 保住语义）');
+assert(WAR.spawn.status().config.centerX === 128, '非整数输入没有静默把中心改到默认点');
+var src16d = new FakeSource(2, alice);
+runPath(['spawn', 'admin', 'radius'], src16d, { n: 'abc' });
+assert(src16d.messages.join(' ').indexOf('半径必须是整数') >= 0, '半径非整数参数同样报错（不静默）');
+WAR.intArg = iaKeep;
+// 反向：传 create(event) 的结果（ArgumentType，没有 getResult）必须告警 + 回落 dft，
+// 绝不静默算错值 —— 这正是 kubejs-crafting 在 /war money 上栽的坑，也是我第一版的错。
+WAR.data.warned['argwrap-int'] = undefined;
+var w16 = [], ce16 = console.error;
+console.error = function (m) { w16.push(String(m)); };
+var badRet = WAR.intArg(FakeArguments.INTEGER.create({}), { args: { x: 5 } }, 'x', 7);
+console.error = ce16;
+assert(badRet === 7 && w16.join(' ').indexOf('不合法的参数类型') >= 0, '反向：传 ArgumentType ⇒ warArgWrapper 告警一次并回落 dft=7（不静默算出 5）');
+// (e) D6：maxRadius / tries 的唯一真值源 = 00_core 的 WAR_CONFIG.spawn（缺键 → 警告 + 保底）
+assert(typeof global.spDefaultConfig === 'function', '可白盒调用 spDefaultConfig（检查默认值来源）');
+var coreSpawn = WAR.config.spawn;
+var keepCR = coreSpawn.candidateRadius, keepT = coreSpawn.tries;
+coreSpawn.candidateRadius = 4444; coreSpawn.tries = 7;
+var dcfg16 = global.spDefaultConfig();
+assert(dcfg16.maxRadius === 4444 && dcfg16.tries === 7, 'core 改值后默认配置跟着走（4444 / 7），不再写死');
+coreSpawn.candidateRadius = undefined;
+WAR.data.warned['spawn-cfg-maxradius'] = undefined;
+var warned16 = [], ceKeep = console.error;
+console.error = function (m) { warned16.push(String(m)); };
+var dcfg16b = global.spDefaultConfig();
+console.error = ceKeep;
+assert(dcfg16b.maxRadius === 5000 && warned16.join(' ').indexOf('candidateRadius 缺失') >= 0, 'core 缺 candidateRadius ⇒ 保底 5000 + 警告一次（不静默回落）');
+WAR.data.warned['spawn-cfg-tries'] = undefined;
+coreSpawn.tries = undefined;
+warned16 = [];
+console.error = function (m) { warned16.push(String(m)); };
+var dcfg16c = global.spDefaultConfig();
+console.error = ceKeep;
+assert(dcfg16c.tries === 64 && warned16.join(' ').indexOf('tries 缺失') >= 0, 'core 缺 tries ⇒ 保底 64 + 警告一次（不静默回落）');
+WAR.data.warned['spawn-cfg-tries'] = true;
+warned16 = [];
+console.error = function (m) { warned16.push(String(m)); };
+global.spDefaultConfig();
+console.error = ceKeep;
+assert(warned16.length === 0, 'warWarnOnce 同 tag 只警告一次（第二次不再刷屏）');
+coreSpawn.candidateRadius = keepCR; coreSpawn.tries = keepT;
+WAR.data.warned['spawn-cfg-maxradius'] = undefined; WAR.data.warned['spawn-cfg-tries'] = undefined;
+var dcfg16d = global.spDefaultConfig();
+assert(dcfg16d.maxRadius === keepCR && dcfg16d.tries === keepT, '恢复 core 值后默认配置回到 ' + keepCR + ' / ' + keepT);
+// (f) A4：删掉 warActor 里那段无效空 try 后，审计主体取名两态不变
+assert(global.warActor(new FakeSource(2, null)) === 'console', 'A4 删死代码后：无玩家 ⇒ 审计主体 console');
+assert(global.warActor(new FakeSource(2, alice)) === 'alice', 'A4 删死代码后：有玩家 ⇒ 审计主体取玩家名');
+
 // ================================================================ 汇总
 console.log('\n=== 汇总：PASS ' + passN + ' / FAIL ' + failN + ' ===');
 if (failN > 0) {
