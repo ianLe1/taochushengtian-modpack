@@ -43,6 +43,14 @@ var CLASSES = {
 };
 global.Java = { loadClass: function (n) { if (!CLASSES[n]) throw new Error('no class ' + n); return CLASSES[n]; } };
 global.NBT = { compoundTag: function () { return new FakeTag(); }, listTag: function () { return []; } };
+// 60_shop.js 读货架要用：java.nio.file.Path.of(String) + JsonIO.readString(Path)（均 javap 实证）
+CLASSES['java.nio.file.Path'] = { of: function (s) { return { _p: String(s), toString: function () { return String(s); } }; } };
+global.JsonIO = {
+  readString: function (p) { return fs.readFileSync(String(p), 'utf8'); },   // 直接读真实货架文件（保真）
+  readJson: function (p) { return JSON.parse(fs.readFileSync(String(p), 'utf8')); },
+  parse: function (s) { return JSON.parse(String(s)); },
+  write: function () { throw new Error('harness: 不允许写文件'); }
+};
 // Text 绑定：TextWrapper.string(String) -> MutableComponent（字节码实证）
 global.Text = {
   string: function (s) { return { text: String(s), toString: function () { return String(s); } }; },
@@ -196,7 +204,7 @@ FakeSource.prototype.sendFailure = function (c) { this.failures.push(String(c));
 // war/ 目录是多名成员共写的（例如 20_spawn.js 属出生点域，依赖 chunk_metrics 的 global.CM）——
 // 全量 glob 会把别人正在写的文件一起拉进来：既让本 harness 与他们的代码耦合，又会污染事件计数。
 // ⇒ 只加载本 harness 负责的文件（显式白名单），其余只报告不加载。
-var WAR_FILES = ['00_core.js', '10_team.js', '30_economy.js', '90_admin.js'];
+var WAR_FILES = ['00_core.js', '10_team.js', '30_economy.js', '60_shop.js', '90_admin.js'];
 var present = fs.readdirSync(WAR_DIR).filter(function (f) { return /[.]js$/.test(f); }).sort();
 var skipped = present.filter(function (f) { return WAR_FILES.indexOf(f) < 0; });
 console.log('=== 加载 war/ 脚本（白名单）：' + WAR_FILES.join(', '));
@@ -250,7 +258,8 @@ assert(WAR != null, 'global.WAR 存在');
 assert(typeof WAR.version === 'string' && WAR.version.length > 0, 'WAR.version = ' + WAR.version);
 var domains = ['data', 'audit', 'team', 'econ', 'spawn', 'claim', 'trade', 'shop'];
 for (var di = 0; di < domains.length; di++) assert(WAR[domains[di]] != null, 'WAR.' + domains[di] + ' 存在');
-assert(WAR.claim.__stub === true && WAR.shop.__stub === true, '未实现域带 __stub 标记（claim/shop）');
+assert(WAR.claim.__stub === true && WAR.trade.__stub === true, '未实现域带 __stub 标记（claim/trade）');
+assert(WAR.shop.__stub === false && WAR.shop.__owner === '60_shop.js', 'shop 已被 60_shop.js 实现（__stub=false）');
 assert(WAR.econ.__stub === false && WAR.econ.__owner === '30_economy.js', 'econ 已被 30_economy.js 实现（__stub=false）');
 assert(WAR.team.__stub === false && WAR.team.__owner === '10_team.js', 'team 已被 10_team.js 实现（__stub=false）');
 assert(typeof WAR.every === 'function' && typeof WAR.boot === 'function' && typeof WAR.tick === 'function', '框架入口 every/boot/tick 存在');
@@ -999,6 +1008,108 @@ var sBare = new FakeSource(2, null);
 runPath(registeredRoot, ['admin'], sBare, {});
 assert(sBare.messages.join('') === '用法：/war admin status | audit [n] | save', '裸 /war admin 的用法串逐字未变（未因新增子命令改写）');
 assert(WAR.econ.invariant().ok === true, 'T17 后不变量仍成立');
+
+// ================================================================ T18 /war shop（60_shop.js，M1 系统商店）
+console.log('\n--- T18 /war shop（60_shop.js）---');
+assert(typeof WAR.shop.status === 'function', 'WAR.shop 已由 60_shop.js 实现（含 status()）');
+var shopSt = WAR.shop.status();
+assert(shopSt.implemented === true && shopSt.owner === '60_shop.js', 'WAR.shop.status(): implemented + owner 正确');
+assert(WAR.config.shop.enabled === true && WAR.config.shop.spread === 0 && WAR.config.shop.maxPerTransaction === 64,
+       'SHOP_CONFIG 暂定默认值：enabled=true / spread=0 / 单次上限 64');
+assert(shopSt.catalogLoaded === true && shopSt.items > 0, '货架已载入（' + shopSt.items + ' 项，source=' + shopSt.catalogSource + '）');
+var shopNode18 = findChild(registeredRoot, 'shop');
+assert(shopNode18 != null && findChild(shopNode18, 'list') != null && findChild(shopNode18, 'buy') != null && findChild(shopNode18, 'sell') != null,
+       '/war shop list|buy|sell 三个子命令存在');
+// —— 账目恒等式工具（本段定义；对应 lead 的验收第 4 条）——
+function t18CreditSum() {
+  var n = 0;
+  for (var i = 0; i < srvE.players.length; i++) {
+    var inv = null;
+    try { inv = srvE.players[i].inventory; } catch (e) { inv = null; }
+    if (inv == null || typeof inv.getSlots !== 'function') continue;
+    try {
+      for (var s = 0; s < inv.getSlots(); s++) {
+        var st = inv.getStackInSlot(s);
+        if (st != null && st.id === 'kubejs:credit') n += st.count;
+      }
+    } catch (e2) { /* 故意坏背包的测试玩家：跳过 */ }
+  }
+  return n;
+}
+function t18Ledger() { return { bal: WAR.econ.total(), net: WAR.data.state.econ.minted - WAR.data.state.econ.burned }; }
+var t18K0 = t18Ledger().bal + t18CreditSum();
+var t18B0 = t18Ledger().net;
+function t18Identity(label) {
+  var inv = WAR.econ.invariant();
+  assert(inv.ok === true && inv.delta === 0,
+         label + '：账目恒等式 Σbalance = minted-burned-withdrawn+deposited（Δ=0，实际 Δ=' + inv.delta + '）');
+  var L = t18Ledger();
+  var dK = (L.bal + t18CreditSum()) - t18K0;
+  var dB = L.net - t18B0;
+  assert(dK - dB === 0, label + '：kubejs:credit 物品侧与账本侧差额为 0（ΔK=' + dK + '，Δ(minted-burned)=' + dB + '）');
+}
+// —— 买入 ——
+var pShop = new FakePlayer('buyer', 'uuid-buyer');
+srvE.players.push(pShop);
+WAR.econ.mint('console', 'uuid-buyer', 100, null);
+var t18Bal0 = WAR.econ.balanceOf('uuid-buyer');
+var buy1 = WAR.shop.buy('buyer', pShop, 'minecraft:bread', 3);
+assert(buy1.ok === true && buy1.unit === 3 && buy1.total === 9, '买入 3×minecraft:bread：单价 3 共 9');
+assert(WAR.econ.balanceOf('uuid-buyer') === t18Bal0 - 9, '买入后账本 -9');
+assert(WAR.shop.count(pShop, 'minecraft:bread') === 3, '买入后背包 +3 面包');
+t18Identity('买入后');
+// —— 拒绝路径 ——
+var poor18 = new FakePlayer('poor18', 'uuid-poor18'); srvE.players.push(poor18);
+assert(WAR.shop.buy('poor18', poor18, 'minecraft:bread', 1).ok === false, '余额不足 → 拒绝');
+assert(WAR.shop.buy('buyer', pShop, 'minecraft:bread', 65).ok === false, '超过单次上限 64 → 拒绝');
+assert(WAR.shop.buy('buyer', pShop, 'minecraft:not_a_real_item', 1).ok === false, '不在货架 → 拒绝');
+assert(WAR.shop.buy('buyer', pShop, 'kubejs:credit', 1).ok === false, '货币本身不上架 → 拒绝');
+assert(WAR.econ.balanceOf('uuid-buyer') === t18Bal0 - 9, '上列拒绝都不改余额');
+t18Identity('拒绝路径后');
+// —— 卖出 ——
+var have18 = WAR.shop.count(pShop, 'minecraft:bread');
+var sell1 = WAR.shop.sell('buyer', pShop, 'minecraft:bread', 2);
+assert(sell1.ok === true && sell1.unit === 1 && sell1.total === 2, '卖出 2×minecraft:bread：回收价 1 共 2');
+assert(WAR.econ.balanceOf('uuid-buyer') === t18Bal0 - 9 + 2, '卖出后账本 +2');
+assert(WAR.shop.count(pShop, 'minecraft:bread') === have18 - 2, '卖出后背包 -2');
+assert(WAR.shop.sell('buyer', pShop, 'minecraft:bread', 99).ok === false, '持有不足 → 拒绝');
+t18Identity('卖出后');
+// —— 背包满：买入按差额退回（钱侧仍走账本 API） ——
+var pFull18 = new FakePlayer('fullshop', 'uuid-fullshop'); srvE.players.push(pFull18);
+WAR.econ.mint('console', 'uuid-fullshop', 50, null);
+for (var f18 = 0; f18 < 36; f18++) pFull18.inventory.setStackInSlot(f18, new FakeStack('minecraft:stone', 64));
+var fullBal0 = WAR.econ.balanceOf('uuid-fullshop');
+var buyFull = WAR.shop.buy('fullshop', pFull18, 'minecraft:bread', 4);
+assert(buyFull.ok === false && buyFull.rolledBack === 12, '背包满：买入失败并按差额退回 12（rolledBack=' + buyFull.rolledBack + '）');
+assert(WAR.econ.balanceOf('uuid-fullshop') === fullBal0, '退回后余额恢复原值');
+t18Identity('买入回滚后');
+// —— 命令路径（玩家实执行） ——
+var sList18 = new FakeSource(0, pShop);
+runPath(registeredRoot, ['shop', 'list'], sList18, {});
+assert(sList18.messages.join('').indexOf('货架(') === 0, '/war shop list 输出货架');
+var sBuy18 = new FakeSource(0, pShop);
+runPath(registeredRoot, ['shop', 'buy', 'id', 'n'], sBuy18, { id: 'minecraft:torch', n: 2 });
+assert(sBuy18.messages.join('').indexOf('买入 2×minecraft:torch') === 0, '/war shop buy <id> <n> 命令路径成功');
+var sSell18 = new FakeSource(0, pShop);
+runPath(registeredRoot, ['shop', 'sell', 'id'], sSell18, { id: 'minecraft:torch' });
+assert(sSell18.messages.join('').indexOf('卖出 1×minecraft:torch') === 0, '/war shop sell <id> 默认卖 1 个');
+t18Identity('命令路径后');
+// —— 审计与数据源 ——
+var act18 = {};
+var j18 = WAR.audit.tail(WAR.audit.count());
+for (var jj18 = 0; j18 && jj18 < j18.length; jj18++) act18[j18[jj18].action] = (act18[j18[jj18].action] || 0) + 1;
+assert((act18['shop.buy'] || 0) >= 3 && (act18['shop.sell'] || 0) >= 2, '审计覆盖 shop.buy / shop.sell（实测 ' + JSON.stringify(act18) + '）');
+var cat18 = WAR.shop.catalog();
+assert(cat18.loaded === true && cat18.source != null && cat18.source.indexOf('catalog.json') >= 0, '货架来源指向 catalog.json（价格是数据）');
+assert(WAR.shop.priceOf('minecraft:iron_ingot', 'buy') === 12 && WAR.shop.priceOf('minecraft:iron_ingot', 'sell') === 6,
+       '价格确实来自数据文件（铁锭 买12/卖6）');
+// —— 开关可关（暂定默认值可被覆盖） ——
+WAR.config.shop.enabled = false;
+var off18 = WAR.shop.buy('buyer', pShop, 'minecraft:bread', 1);
+assert(off18.ok === false && off18.error.indexOf('商店未开放') >= 0, 'enabled=false 时买入被拒');
+WAR.config.shop.enabled = true;
+assert(WAR.shop.buy('buyer', pShop, 'minecraft:bread', 1).ok === true, '恢复 enabled=true 后买入恢复');
+assert(WAR.econ.invariant().ok === true, 'T18 收尾不变量仍成立');
 
 console.log('\n--- 汇总 ---');
 console.log('PASS=' + passN + ' FAIL=' + failN + ' SKIP=' + skipN);

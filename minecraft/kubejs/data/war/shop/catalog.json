@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "note": "系统商店货架。**价格是数据不是代码**：直接编辑本文件即可（KubeJS 重载或服务器重启后生效）。单位 = 1 枚 kubejs:credit。buy = 玩家买入单价；sell = 玩家卖出单价，省略时按 buy×(1-spread) 推导（默认 spread=0，即买卖同价）。只接受已注册的物品 id；不要在这里上架货币本身（货币请走 /war money deposit|withdraw）。下面的价格是**暂定默认值**，请服务器主人按经济口径自行调整。",
+  "currency": "war.credit",
+  "items": [
+    { "id": "minecraft:bread",        "buy": 3,  "sell": 1, "label": "面包" },
+    { "id": "minecraft:torch",        "buy": 2,  "sell": 1, "label": "火把" },
+    { "id": "minecraft:coal",         "buy": 4,  "sell": 2, "label": "煤炭" },
+    { "id": "minecraft:oak_log",      "buy": 2,  "sell": 1, "label": "橡木原木" },
+    { "id": "minecraft:copper_ingot", "buy": 6,  "sell": 3, "label": "铜锭" },
+    { "id": "minecraft:iron_ingot",   "buy": 12, "sell": 6, "label": "铁锭" },
+    { "id": "minecraft:string",       "buy": 5,  "sell": 2, "label": "线" },
+    { "id": "minecraft:leather",      "buy": 8,  "sell": 4, "label": "皮革" }
+  ]
+}
