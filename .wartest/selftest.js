@@ -841,6 +841,35 @@ warWarnOnce('t15-once', '第二次');
 console.error = origErr2;
 assert(errN === 1 && WAR.data.warned['t15-once'] === true, 'warWarnOnce 同名只报一次（第二次静默），已记录该键');
 
+// ================================================================ T16 actorName 归一（抽取步骤 4a）
+console.log('\n--- T16 actorName 归一 ---');
+assert(typeof WAR.actorName === 'function', 'WAR.actorName 已由 core 导出');
+var pActor = new FakePlayer('actorx', 'uuid-actorx');
+assert(WAR.actorName(new FakeSource(0, pActor)) === WAR.nameOf(pActor), '有玩家：等于 WAR.nameOf(玩家)（与原两处实现一致）');
+assert(WAR.actorName(new FakeSource(0, pActor)) === 'actorx', '有玩家：实际返回玩家名');
+assert(WAR.actorName(new FakeSource(0, null)) === 'console', '无玩家（控制台）：返回 console（与原实现一致）');
+assert(WAR.actorName({ getPlayer: function () { throw new Error('x'); } }) === 'console', 'getPlayer 抛异常：返回 console（与原实现一致）');
+var teamSrc4 = fs.readFileSync(WAR_DIR + '/10_team.js', 'utf8');
+assert(teamSrc4.indexOf('currentSource = ctx.source') >= 0, '隐式契约保留：actorOf 仍为 currentSource 赋值（werr 依赖）');
+assert(teamSrc4.indexOf('name: WAR.actorName(ctx.source)') >= 0 && teamSrc4.indexOf('name: WAR.nameOf(p)') < 0, '10_team 取名改用 WAR.actorName(source)');
+var econSrc4 = fs.readFileSync(WAR_DIR + '/30_economy.js', 'utf8');
+assert(econSrc4.indexOf('function actorName(ctx) { return WAR.actorName(ctx.source); }') >= 0, '30_economy 的 actorName 改为传 source 的薄包装');
+assert(econSrc4.indexOf('function actorName(ctx) { try { var p = ctx.source.getPlayer()') < 0, '30_economy 的 actorName 不再自己取 player 取名（断言收窄到该函数，selfPlayer 仍是 4a 范围之外）');
+var pActor2 = new FakePlayer('actorpay', 'uuid-actorpay');
+srvE.players.push(pActor2);
+WAR.econ.mint('console', 'uuid-actorpay', 30, null);
+var sActorPay = new FakeSource(0, pActor2);
+runPath(registeredRoot, ['money', 'pay', 'player', 'amount'], sActorPay, { player: pZ, amount: 3 });
+var payAudit4 = WAR.audit.tail(WAR.audit.count()).filter(function (x) { return x.action === 'econ.pay'; });
+assert(payAudit4.length >= 1 && payAudit4[payAudit4.length - 1].actor === 'actorpay',
+       '端到端：玩家执行时审计 actor = 玩家名（实测 ' + (payAudit4.length ? payAudit4[payAudit4.length - 1].actor : '无') + '）');
+var sConsole4 = new FakeSource(2, null);
+runPath(registeredRoot, ['admin', 'save'], sConsole4, {});
+var saveAudit4 = WAR.audit.tail(WAR.audit.count()).filter(function (x) { return x.action === 'admin.save'; });
+assert(saveAudit4.length >= 1 && saveAudit4[saveAudit4.length - 1].actor === 'cmd:console',
+       '端到端：控制台执行时审计 actor = cmd:console（无玩家分支价值不变）');
+assert(WAR.econ.invariant().ok === true, 'T16 后不变量仍成立');
+
 console.log('\n--- 汇总 ---');
 console.log('PASS=' + passN + ' FAIL=' + failN + ' SKIP=' + skipN);
 console.log(ok ? 'ALL_PASS' : 'SOME_FAILED');

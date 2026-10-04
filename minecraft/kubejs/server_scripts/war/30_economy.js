@@ -444,7 +444,7 @@ WAR.commands.add(function (Commands, Arguments, event) {
 
   function intOf(ctx, name) { return warIntArg(Arguments.INTEGER, ctx, name, -1); }   // 步骤 2/3：必须传包装对象（I 是 create(event) 的结果，没有 getResult）
   function playerOf(ctx, name) { return warPlayerArg(Arguments.PLAYER, ctx, name); }   // 步骤 3：同上，传包装对象
-  function actorName(ctx) { try { var p = ctx.source.getPlayer(); if (p != null) return WAR.nameOf(p); } catch (e) { } return 'console'; }
+  function actorName(ctx) { return WAR.actorName(ctx.source); }   // 步骤 4a：取名逻辑归 core，这里只做 ctx→source 的薄适配
   function selfPlayer(ctx) { try { return ctx.source.getPlayer(); } catch (e) { return null; } }
 
   function replyResult(ctx, res, okMsg) {

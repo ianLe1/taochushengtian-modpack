@@ -727,6 +727,7 @@ global.WAR = {
   run: warRun,
   uuidOf: warUuid,
   nameOf: warName,
+  actorName: warActorName,          // 步骤 4a：域侧统一用它取「执行者名字」（无玩家 → 'console'）
   hasPermission: warHasPermission,
   opPredicate: warOpPredicate,
   intArg: warIntArg,

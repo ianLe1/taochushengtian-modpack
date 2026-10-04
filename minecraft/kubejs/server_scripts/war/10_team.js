@@ -449,7 +449,7 @@ WAR.commands.add(function (Commands, Arguments, event) {
     var p = null;
     try { p = ctx.source.getPlayer(); } catch (e) { }
     if (p == null) return null;
-    return { p: p, name: WAR.nameOf(p), source: ctx.source };
+    return { p: p, name: WAR.actorName(ctx.source), source: ctx.source };   // 步骤 4a：取名归 core；currentSource 赋值保留（werr 依赖）
   }
   var team = Commands.literal('team')
     .executes(function (ctx) {
