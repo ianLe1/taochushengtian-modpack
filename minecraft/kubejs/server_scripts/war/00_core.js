@@ -61,7 +61,20 @@ var WAR_CONFIG = {
     autosaveTicks: 6000,         // 暂定默认值：脏数据自动落盘间隔（20 tick = 1 秒 → 300 秒）
     saveOnUnload: true           // 暂定默认值：服务器卸载时落盘
   },
-  econ:  { currencyItem: 'war:credit', startBalance: 0 },  // 暂定默认值；账本 30_economy.js
+  // 经济数值：2026-10-04 按 lead 批复从 30_economy.js 迁入（数值逐项一致，只挪位置；账本实现仍在 30_economy.js）
+  econ: {
+    currencyItem: 'kubejs:credit',   // 暂定默认值：货币物品 id（与 startup_scripts/war_items.js 注册的一致）
+    ledgerKey: 'war.credit',         // 暂定默认值：账本键名（文档口径；实际存储位置 state.econ.balance）
+    startBalance: 0,                 // 暂定默认值：新档初始发放（0 = 不自动发）
+    firstJoinGrant: 0,               // 暂定默认值：玩家首次进服自动发放量（0 = 不发放，机制已就位）
+    payMin: 1,                       // 暂定默认值：/war money pay 单笔最小额
+    payMax: 1000,                    // 暂定默认值：单笔上限（pay / withdraw / deposit / admin 共用）
+    feeEnabled: false,               // 暂定默认值：是否需要手续费
+    feeRate: 0,                      // 暂定默认值：手续费比例（feeEnabled=false 时不生效）
+    maxBalance: 1000000,             // 暂定默认值：单账户余额上限（防溢出/防空投砸盘）
+    journalSize: 200,                // 暂定默认值：经济流水环大小
+    opMemory: 200                    // 暂定默认值：幂等 opId 记忆条数
+  },
   spawn: { mode: 'cm-score', candidateRadius: 5000, tries: 64 }, // 暂定默认值；20_spawn.js
   claim: { enabled: false, defaultRadius: 32 },            // 暂定默认值；40_base.js
   base:  { enabled: false, maxPerTeam: 3 },                // 暂定默认值；40_base.js
