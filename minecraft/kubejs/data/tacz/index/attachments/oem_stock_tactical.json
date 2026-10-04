@@ -1,0 +1,8 @@
+{
+  "name": "tacz.attachment.oem_stock_tactical.name",
+  "display": "tacz:oem_stock_tactical_display",
+  "data": "tacz:oem_stock_tactical_data",
+  "tooltip": "tacz.attachment.oem_stock_tactical.desc",
+  "type": "stock",
+  "sort": 1
+}

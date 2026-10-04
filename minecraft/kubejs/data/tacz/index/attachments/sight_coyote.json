@@ -1,0 +1,8 @@
+{
+  "name": "tacz.attachment.sight_coyote.name",
+  "display": "tacz:sight_coyote_display",
+  "data": "tacz:sight_coyote_data",
+  "tooltip": "tacz.attachment.sight_coyote.desc",
+  "type": "scope",
+  "sort": 10
+}

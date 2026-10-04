@@ -1,0 +1,8 @@
+{
+  "name": "tacz.attachment.scope_qmk152.name",
+  "display": "tacz:scope_qmk152_display",
+  "data": "tacz:scope_qmk152_data",
+  "tooltip": "tacz.attachment.scope_qmk152.desc",
+  "type": "scope",
+  "sort": 100
+}

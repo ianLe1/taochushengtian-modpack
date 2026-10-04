@@ -1,0 +1,8 @@
+{
+  "name": "tacz.attachment.scope_contender.name",
+  "display": "tacz:scope_contender_display",
+  "data": "tacz:scope_contender_data",
+  "tooltip": "tacz.attachment.scope_contender.desc",
+  "type": "scope",
+  "sort": 1000
+}

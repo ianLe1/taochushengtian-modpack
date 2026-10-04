@@ -1,0 +1,8 @@
+{
+  "name": "tacz.attachment.stock_tactical_ar.name",
+  "display": "tacz:stock_tactical_ar_display",
+  "data": "tacz:stock_tactical_ar_data",
+  "tooltip": "tacz.attachment.stock_tactical_ar.desc",
+  "type": "stock",
+  "sort": 10
+}

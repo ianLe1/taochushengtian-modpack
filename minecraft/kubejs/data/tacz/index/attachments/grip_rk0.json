@@ -1,0 +1,8 @@
+{
+  "name": "tacz.attachment.grip_rk0.name",
+  "display": "tacz:grip_rk0_display",
+  "data": "tacz:grip_rk0_data",
+  "tooltip": "tacz.attachment.grip_rk0.desc",
+  "type": "grip",
+  "sort": 10
+}

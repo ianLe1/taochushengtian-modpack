@@ -1,0 +1,8 @@
+{
+  "name": "tacz.attachment.stock_tactical_spas_12.name",
+  "display": "tacz:stock_tactical_spas_12_display",
+  "data": "tacz:stock_tactical_spas_12_data",
+  "tooltip": "tacz.attachment.stock_tactical_spas_12.desc",
+  "type": "stock",
+  "sort": 12
+}

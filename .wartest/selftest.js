@@ -785,6 +785,62 @@ assert(WAR.econ.balanceOf('uuid-cmduser') === balCmd0 - 20, '命令路径 pay：
 assert(WAR.econ.balanceOf('uuid-zero') === balTarget0 + 5, '命令路径 pay：收款方 +5');
 assert(WAR.econ.invariant().ok === true, 'T14 后不变量仍成立');
 
+// ================================================================ T15 warWarnOnce 归一（抽取步骤 5）
+console.log('\n--- T15 warWarnOnce 归一 ---');
+var econSrc5 = fs.readFileSync(WAR_DIR + '/30_economy.js', 'utf8');
+assert(econSrc5.indexOf('function econWarnOnce') < 0, 'econWarnOnce 包裱已删除（不再有第二层）'.replace('裱', '装'));
+assert(econSrc5.split('warWarnOnce(').length - 1 === 3, '30_economy 直接调用核心 warWarnOnce 共三处');
+assert(econSrc5.indexOf("warWarnOnce('econ-count'") >= 0 && econSrc5.indexOf("warWarnOnce('econ-take'") >= 0 &&
+       econSrc5.indexOf("warWarnOnce('econ-give'") >= 0,
+       '三处告警键与替换前逐字一致（econ-count / econ-take / econ-give）');
+// 三条真实失败路径各触发一次，证明调用点仍然走到核心工具且键不变
+var pBadCount = new FakePlayer('badcount', 'uuid-badcount');
+srvE.players.push(pBadCount);
+pBadCount.inventory = { getSlots: function () { throw new Error('boom'); } };
+var rBadCount = WAR.econ.deposit('tester', pBadCount, 1, null);
+assert(rBadCount.ok === false && rBadCount.error === '背包不可用', '清点失败 → deposit 返回口径不变');
+assert(WAR.data.warned['econ-count'] === true, '清点失败路径：键 econ-count 在位（直呼核心工具成功）');
+var pBadTake = new FakePlayer('badtake', 'uuid-badtake');
+srvE.players.push(pBadTake);
+// 让「清点成功、取物时访问背包才抛」—— 这是 econ-take 告警唯一可达的路径
+var slotsCalls = 0;
+pBadTake.inventory = {
+  getSlots: function () { slotsCalls++; if (slotsCalls >= 2) throw new Error('slots-boom'); return 1; },
+  getStackInSlot: function () { return new FakeStack('kubejs:credit', 3); },
+  extractItem: function () { throw new Error('extract-boom'); }
+};
+var balBadTake = WAR.econ.balanceOf('uuid-badtake');
+var rBadTake = WAR.econ.deposit('tester', pBadTake, 2, null);
+assert(rBadTake.ok === false && WAR.econ.balanceOf('uuid-badtake') === balBadTake, '取物异常 → 账本回滚（余额不变）');
+assert(WAR.data.warned['econ-take'] === true, '取物前访问背包抛异常：键 econ-take 在位');
+// 观察（未改代码）：单槽 extractItem 抛异常走内层 catch（got=null→break），不写告警，只靠 rollback 文案暴露给玩家
+var pOneSlot = new FakePlayer('oneslot', 'uuid-oneslot');
+srvE.players.push(pOneSlot);
+pOneSlot.inventory = {
+  getSlots: function () { return 1; },
+  getStackInSlot: function () { return new FakeStack('kubejs:credit', 3); },
+  extractItem: function () { throw new Error('extract-boom'); }
+};
+var rOneSlot = WAR.econ.deposit('tester', pOneSlot, 2, null);
+assert(rOneSlot.ok === false && rOneSlot.rolledBack === 2, '单槽取物失败：按实际取到 0 件回滚 2（文案走 rollback）');
+var pBadGive = new FakePlayer('badgive', 'uuid-badgive');
+srvE.players.push(pBadGive);
+pBadGive.inventory = { getSlots: function () { return 0; }, insertItem: function () { throw new Error('give-boom'); } };
+pBadGive.give = function () { throw new Error('give-boom'); };
+WAR.econ.mint('console', 'uuid-badgive', 10, null);
+var balBadGive = WAR.econ.balanceOf('uuid-badgive');
+var rBadGive = WAR.econ.withdraw('tester', pBadGive, 5, null);
+assert(rBadGive.ok === false && WAR.econ.balanceOf('uuid-badgive') === balBadGive, '发币异常 → 账本回滚（余额不变）');
+assert(WAR.data.warned['econ-give'] === true, '发币失败路径：键 econ-give 在位');
+assert(WAR.econ.invariant().ok === true, 'T15 后不变量仍成立');
+// warn-once 语义本身：同名第二次不再报（数 console.error 次数）
+var errN = 0; var origErr2 = console.error;
+console.error = function () { errN++; };
+warWarnOnce('t15-once', '第一次');
+warWarnOnce('t15-once', '第二次');
+console.error = origErr2;
+assert(errN === 1 && WAR.data.warned['t15-once'] === true, 'warWarnOnce 同名只报一次（第二次静默），已记录该键');
+
 console.log('\n--- 汇总 ---');
 console.log('PASS=' + passN + ' FAIL=' + failN + ' SKIP=' + skipN);
 console.log(ok ? 'ALL_PASS' : 'SOME_FAILED');

@@ -1,0 +1,9 @@
+{
+  "hidden": false,
+  "name": "tacz.attachment.scope_mk5hd.name",
+  "display": "tacz:scope_mk5hd_display",
+  "data": "tacz:scope_mk5hd_data",
+  "tooltip": "tacz.attachment.scope_mk5hd.desc",
+  "type": "scope",
+  "sort": 100
+}

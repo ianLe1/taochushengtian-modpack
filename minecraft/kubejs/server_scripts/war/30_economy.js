@@ -180,7 +180,7 @@ function econCountItems(p) {
       var s = inv.getStackInSlot(i);
       if (s != null && !econStackIsEmpty(s) && econIsCredit(s)) n += econStackCount(s);
     }
-  } catch (e) { econWarnOnce('count', '背包清点失败：' + e); return -1; }
+  } catch (e) { warWarnOnce('econ-count', '背包清点失败：' + e); return -1; }
   return n;
 }
 
@@ -207,7 +207,7 @@ function econTakeItems(p, amount) {
       taken += gotN; need -= gotN;
       if (gotN < give) break;   // 实际取出少于预期：立刻停手，由调用方按 taken 结算
     }
-  } catch (e2) { econWarnOnce('take', '背包取物失败：' + e2); return taken; }
+  } catch (e2) { warWarnOnce('econ-take', '背包取物失败：' + e2); return taken; }
   return taken;
 }
 
@@ -227,10 +227,8 @@ function econGiveItems(p, amount) {
       return amount - restN;
     }
     try { p.give(stack); return amount; } catch (e1) { return -1; }   // 无 inventory 包装时的退路（已在报告标注风险）
-  } catch (e2) { econWarnOnce('give', '发币失败：' + e2); return -1; }
+  } catch (e2) { warWarnOnce('econ-give', '发币失败：' + e2); return -1; }
 }
-
-function econWarnOnce(tag, msg) { warWarnOnce('econ-' + tag, msg); }
 
 // ============================================================================
 // 1. 账本原语（只动数字，不动物品）

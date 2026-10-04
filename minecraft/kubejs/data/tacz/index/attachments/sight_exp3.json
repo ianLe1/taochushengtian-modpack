@@ -1,0 +1,8 @@
+{
+  "name": "tacz.attachment.sight_exp3.name",
+  "display": "tacz:sight_exp3_display",
+  "data": "tacz:sight_exp3_data",
+  "tooltip": "tacz.attachment.sight_exp3.desc",
+  "type": "scope",
+  "sort": 10
+}

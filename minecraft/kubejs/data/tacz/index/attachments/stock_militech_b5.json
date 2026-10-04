@@ -1,0 +1,8 @@
+{
+  "name": "tacz.attachment.stock_militech_b5.name",
+  "display": "tacz:stock_militech_b5_display",
+  "data": "tacz:stock_militech_b5_data",
+  "tooltip": "tacz.attachment.stock_militech_b5.desc",
+  "type": "stock",
+  "sort": 10
+}

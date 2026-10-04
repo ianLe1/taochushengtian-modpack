@@ -1,0 +1,8 @@
+{
+  "name": "tacz.attachment.stock_moe.name",
+  "display": "tacz:stock_moe_display",
+  "data": "tacz:stock_moe_data",
+  "tooltip": "tacz.attachment.stock_moe.desc",
+  "type": "stock",
+  "sort": 10
+}

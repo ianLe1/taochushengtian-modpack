@@ -1,0 +1,8 @@
+{
+  "name": "tacz.attachment.sight_rmr_dot.name",
+  "display": "tacz:sight_rmr_dot_display",
+  "data": "tacz:sight_rmr_dot_data",
+  "tooltip": "tacz.attachment.sight_rmr_dot.desc",
+  "type": "scope",
+  "sort": 1
+}

@@ -1,0 +1,8 @@
+{
+  "name": "tacz.attachment.sight_p90.name",
+  "display": "tacz:sight_p90_display",
+  "data": "tacz:sight_p90_data",
+  "tooltip": "tacz.attachment.sight_p90.desc",
+  "type": "scope",
+  "hidden": true
+}

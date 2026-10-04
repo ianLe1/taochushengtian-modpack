@@ -1,0 +1,8 @@
+{
+  "name": "tacz.attachment.stock_hk_slim_line.name",
+  "display": "tacz:stock_hk_slim_line_display",
+  "data": "tacz:stock_hk_slim_line_data",
+  "tooltip": "tacz.attachment.stock_hk_slim_line.desc",
+  "type": "stock",
+  "sort": 10
+}

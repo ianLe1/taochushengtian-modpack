@@ -1,0 +1,8 @@
+{
+  "name": "tacz.attachment.stock_m4ss.name",
+  "display": "tacz:stock_m4ss_display",
+  "data": "tacz:stock_m4ss_data",
+  "tooltip": "tacz.attachment.stock_m4ss.desc",
+  "type": "stock",
+  "sort": 10
+}

@@ -1,0 +1,8 @@
+{
+  "name": "tacz.attachment.scope_1873_6x.name",
+  "display": "tacz:scope_1873_6x_display",
+  "data": "tacz:scope_1873_6x_data",
+  "tooltip": "tacz.attachment.scope_1873_6x.desc",
+  "type": "scope",
+  "sort": 1000
+}

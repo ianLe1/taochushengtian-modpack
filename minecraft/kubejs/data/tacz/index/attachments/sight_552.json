@@ -1,0 +1,9 @@
+{
+  "hidden": false,
+  "name": "tacz.attachment.sight_552.name",
+  "display": "tacz:sight_552_display",
+  "data": "tacz:sight_552_data",
+  "tooltip": "tacz.attachment.sight_552.desc",
+  "type": "scope",
+  "sort": 10
+}

@@ -1,0 +1,9 @@
+{
+  "hidden": false,
+  "name": "tacz.attachment.sight_deltapoint_pistol.name",
+  "display": "tacz:sight_deltapoint_pistol_display",
+  "data": "tacz:sight_deltapoint_pistol_data",
+  "tooltip": "tacz.attachment.sight_deltapoint_pistol.desc",
+  "type": "scope",
+  "sort": 1
+}
