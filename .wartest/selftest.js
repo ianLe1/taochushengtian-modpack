@@ -196,7 +196,7 @@ FakeSource.prototype.sendFailure = function (c) { this.failures.push(String(c));
 // war/ 目录是多名成员共写的（例如 20_spawn.js 属出生点域，依赖 chunk_metrics 的 global.CM）——
 // 全量 glob 会把别人正在写的文件一起拉进来：既让本 harness 与他们的代码耦合，又会污染事件计数。
 // ⇒ 只加载本 harness 负责的文件（显式白名单），其余只报告不加载。
-var WAR_FILES = ['00_core.js', '10_team.js', '30_economy.js'];
+var WAR_FILES = ['00_core.js', '10_team.js', '30_economy.js', '90_admin.js'];
 var present = fs.readdirSync(WAR_DIR).filter(function (f) { return /[.]js$/.test(f); }).sort();
 var skipped = present.filter(function (f) { return WAR_FILES.indexOf(f) < 0; });
 console.log('=== 加载 war/ 脚本（白名单）：' + WAR_FILES.join(', '));
@@ -218,9 +218,12 @@ function findChild(node, name) {
 }
 function runPath(node, p, source, args) {
   var cur = node;
+  function gate(n) { return (typeof n.requires_ === 'function') ? (n.requires_(source) === true) : true; }
+  if (!gate(cur)) return null;                       // 根节点自身的权限门
   for (var i = 0; i < p.length; i++) {
     var c = findChild(cur, p[i]);
     if (c == null) return null;
+    if (!gate(c)) return null;                       // 逐级权限门：无权限 → 不可达（不回显）
     cur = c;
   }
   if (typeof cur.executor !== 'function') return null;
@@ -869,6 +872,133 @@ var saveAudit4 = WAR.audit.tail(WAR.audit.count()).filter(function (x) { return 
 assert(saveAudit4.length >= 1 && saveAudit4[saveAudit4.length - 1].actor === 'cmd:console',
        '端到端：控制台执行时审计 actor = cmd:console（无玩家分支价值不变）');
 assert(WAR.econ.invariant().ok === true, 'T16 后不变量仍成立');
+
+// ================================================================ T17 /war admin（90_admin.js，D1-a 搬移 + 四条批准项）
+console.log('\n--- T17 /war admin（90_admin.js）---');
+// ① admin 字面量只有一份 + 权限门
+var adminNodes = [];
+for (var an = 0; an < registeredRoot.children.length; an++) {
+  if (registeredRoot.children[an].name === 'admin') adminNodes.push(registeredRoot.children[an]);
+}
+assert(adminNodes.length === 1, '/war admin 在命令树里只有一份（D1-a：不留第二个字面量，实际 ' + adminNodes.length + ' 份）');
+var adminNode = adminNodes[0];
+assert(typeof adminNode.requires_ === 'function', '/war admin 有权限门');
+assert(adminNode.requires_(new FakeSource(1, null)) === false && adminNode.requires_(new FakeSource(2, null)) === true,
+       '/war admin 权限门：level1 拒 / level2 过');
+var adminSubs = ['status', 'audit', 'save', 'help', 'domains', 'tasks', 'profile', 'auditf'];
+for (var asn = 0; asn < adminSubs.length; asn++) {
+  assert(findChild(adminNode, adminSubs[asn]) != null, '/war admin ' + adminSubs[asn] + ' 子命令存在');
+}
+// ② 四个**新增**子命令的权限门（level1 不可达且无回显 / level2 可达）
+var newSubs = ['domains', 'tasks', 'profile', 'auditf'];
+var pProfForGate = new FakePlayer('gate', 'uuid-gate');   // 供 profile 权限门测试用（不出现在输出断言里）
+for (var nsn = 0; nsn < newSubs.length; nsn++) {
+  var subNode = findChild(adminNode, newSubs[nsn]);
+  var sLow = new FakeSource(1, null);
+  runPath(registeredRoot, ['admin', newSubs[nsn]], sLow, {});
+  assert(sLow.messages.length === 0, 'level1 时 /war admin ' + newSubs[nsn] + ' 不可达（无回显，继承 admin 的权限门）');
+  var sHigh = new FakeSource(2, null);
+  var hiPath = (newSubs[nsn] === 'profile') ? ['admin', 'profile', 'player'] : ['admin', newSubs[nsn]];
+  runPath(registeredRoot, hiPath, sHigh, { player: pProfForGate });
+  assert(sHigh.messages.length === 1, 'level2 时 /war admin ' + newSubs[nsn] + ' 可达');
+}
+// ③ status 逐字：14 段键名/顺序 + 同一快照整串全等 + 关键段与 state 独立对账
+var sSt1 = new FakeSource(2, null);
+runPath(registeredRoot, ['admin', 'status'], sSt1, {});
+var st1 = sSt1.messages.join('');
+var stSegs = st1.split(' | ');
+var expectKeys = ['OP 自检', 'ready=', 'java桥=', 'dirty=', '存储键=', 'NBT键=', 'bootCount=', '队伍=', '玩家映射=', '审计=', 'lastLoad=', 'lastSave=', 'tick=', '定时器='];
+assert(stSegs.length === expectKeys.length, '/war admin status 恰好 ' + expectKeys.length + ' 段（实际 ' + stSegs.length + '）');
+for (var sk = 0; sk < expectKeys.length; sk++) {
+  assert(stSegs[sk].indexOf(expectKeys[sk]) === 0, '第 ' + (sk + 1) + ' 段以「' + expectKeys[sk] + '」开头');
+}
+var sSt2 = new FakeSource(2, null);
+runPath(registeredRoot, ['admin', 'status'], sSt2, {});
+assert(sSt2.messages.join('') === st1, '同一状态快照下两次 /war admin status 整串全等（值也是逐字，不只是键序）');
+assert(stSegs[6] === 'bootCount=' + WAR.data.state.bootCount, 'bootCount 段与 state 对账一致');
+assert(stSegs[7] === '队伍=' + Object.keys(WAR.data.state.teams.byId).length, '队伍 段与 state 对账一致');
+assert(stSegs[8] === '玩家映射=' + Object.keys(WAR.data.state.teams.byPlayer).length, '玩家映射 段与 state 对账一致');
+assert(stSegs[9] === '审计=' + WAR.audit.count() + '/' + WAR.config.audit.bufferSize + '（丢帧 ' + WAR.data.state.audit.dropped + '）', '审计 段与 state 对账一致');
+assert(/^tick=\d+$/.test(stSegs[12]) && stSegs[13] === '定时器=' + WAR.timers().length, 'tick 段为数字、定时器段与 WAR.timers() 对账一致');
+// ④ domains：8 域 + 形状 + implemented 真假 + stubStatus 接管
+var sDom = new FakeSource(2, null);
+runPath(registeredRoot, ['admin', 'domains'], sDom, {});
+var domMsg = sDom.messages.join('');
+assert(domMsg.indexOf('域状态(8)') === 0, '/war admin domains 输出 8 域总览');
+assert(domMsg.indexOf('team=on(') >= 0 && domMsg.indexOf('econ=on(') >= 0 && domMsg.indexOf('claim=off(') >= 0, 'domains 里 on/off 与实现状态相符');
+var domObj = WAR.admin.domains();
+var domNames = ['team', 'econ', 'spawn', 'claim', 'base', 'trade', 'shop', 'think'];
+for (var dn = 0; dn < domNames.length; dn++) {
+  var dN = domNames[dn], dS = domObj[dN];
+  assert(dS != null && dS.domain === dN && typeof dS.implemented === 'boolean' && dS.owner != null, '域 ' + dN + ' 的 status 形状正确');
+}
+assert(domObj.team.implemented === true && domObj.econ.implemented === true, '已实现域标记 implemented=true（team/econ）');
+assert(domObj.spawn.implemented === false, 'spawn 在本 harness 里仍是 stub（20_spawn.js 属他人文件、白名单不加载）——断言口径与实际加载面一致');
+assert(domObj.claim.implemented === false && domObj.think.implemented === false, '未实现域标记 implemented=false（claim/think）');
+assert(typeof WAR.stubStatus === 'function' && WAR.stubStatus().team.implemented === true,
+       'WAR.stubStatus 已被 90_admin 接管，team 报真实状态（core 旧聚合用的是 WAR_TEAM_STUB，永远 false）');
+assert(WAR.admin.status().implemented === true && WAR.admin.status().readOnly === true, 'WAR.admin.status() 声明 implemented + readOnly');
+// ⑤ tasks：与 WAR.timers() 注册表一致
+var tasks = WAR.timers();
+var tLabels = tasks.map(function (t) { return t.label; });
+assert(tLabels.indexOf('team.invite-expire') >= 0, '定时器注册表含 team.invite-expire');
+var sTk = new FakeSource(2, null);
+runPath(registeredRoot, ['admin', 'tasks'], sTk, {});
+var tkMsg = sTk.messages.join('');
+assert(tkMsg.indexOf('定时任务(' + tasks.length + ')') === 0, '/war admin tasks 条数与 WAR.timers() 一致');
+var tkMissing = null;
+for (var tl = 0; tl < tLabels.length; tl++) if (tkMsg.indexOf(tLabels[tl] + '(') < 0) { tkMissing = tLabels[tl]; break; }
+assert(tkMissing == null, '/war admin tasks 列出了全部 label' + (tkMissing == null ? '' : '（漏 ' + tkMissing + '）'));
+// ⑥ auditf：无过滤 == audit <n>；单条件过滤逐条匹配
+var sAf0 = new FakeSource(2, null);
+runPath(registeredRoot, ['admin', 'auditf', 'n'], sAf0, { n: 7 });
+assert(sAf0.messages.join('') === WAR.audit.text(7), 'auditf 无过滤条件时与 /war admin audit 7 逐字一致（格式未漂移）');
+var items5 = WAR.data.state.audit.items, lastDeny = null, lastSave5 = null;
+for (var i5 = items5.length - 1; i5 >= 0; i5--) {
+  if (lastDeny == null && items5[i5].result === 'deny') lastDeny = items5[i5];
+  if (lastSave5 == null && items5[i5].action === 'admin.save') lastSave5 = items5[i5];
+}
+assert(lastDeny != null, '存在可用于过滤对照的 deny 条目');
+var sAf1 = new FakeSource(2, null);
+runPath(registeredRoot, ['admin', 'auditf', 'n', 'result', 'resultName'], sAf1, { n: 200, resultName: 'deny' });
+var fMsg1 = sAf1.messages.join('');
+assert(fMsg1.indexOf(' = deny') >= 0, 'auditf result=deny 命中条目');
+assert(fMsg1.indexOf(' = ok') < 0 && fMsg1.indexOf(' = fail') < 0 && fMsg1.indexOf(' = rollback') < 0, 'auditf result=deny 未混入其它 result');
+assert(fMsg1.indexOf('#' + lastDeny.seq + ' ') >= 0, 'auditf result=deny 命中最新 deny（#' + lastDeny.seq + '）');
+assert(lastSave5 != null, '存在可用于过滤对照的 admin.save 条目');
+var sAf2 = new FakeSource(2, null);
+runPath(registeredRoot, ['admin', 'auditf', 'n', 'action', 'actionName'], sAf2, { n: 200, actionName: 'admin.save' });
+var fMsg2 = sAf2.messages.join('');
+assert(fMsg2.indexOf('admin.save') >= 0 && fMsg2.indexOf('econ.') < 0 && fMsg2.indexOf('team.') < 0, 'auditf action=admin.save 只命中该动作');
+var sAf3 = new FakeSource(2, null);
+runPath(registeredRoot, ['admin', 'auditf', 'n', 'result', 'resultName', 'action', 'actionName'], sAf3, { n: 200, resultName: 'deny', actionName: 'econ.mint' });
+assert(sAf3.messages.join('').indexOf('econ.mint') >= 0 && sAf3.messages.join('').indexOf(' = deny') >= 0, 'auditf 两维叠加（result=deny + action=econ.mint）生效');
+// ⑦ profile：只读（state 快照相等 + 不写审计）
+var pProf = new FakePlayer('profu', 'uuid-profu');
+srvE.players.push(pProf);
+WAR.econ.mint('console', 'uuid-profu', 12, null);
+var snapT = JSON.stringify(WAR.data.state.teams), snapE = JSON.stringify(WAR.data.state.econ);
+var audN0 = WAR.audit.count();
+var sPr = new FakeSource(2, null);
+runPath(registeredRoot, ['admin', 'profile', 'player'], sPr, { player: pProf });
+var prMsg = sPr.messages.join('');
+assert(prMsg.indexOf('玩家档案') === 0 && prMsg.indexOf('余额=12') >= 0 && prMsg.indexOf('首见=') >= 0, 'profile 输出档案字段（含余额与首见）');
+assert(JSON.stringify(WAR.data.state.teams) === snapT && JSON.stringify(WAR.data.state.econ) === snapE, 'profile 前后 state 快照相等（只读）');
+assert(WAR.audit.count() === audN0, 'profile 不写审计（不污染审计面）');
+var sPr2 = new FakeSource(2, null);
+runPath(registeredRoot, ['admin', 'profile', 'player'], sPr2, {});
+assert(sPr2.messages.join('') === '找不到目标玩家（当前仅支持在线玩家）', 'profile 缺目标：文案与其它域一致');
+// ⑧ save：补断言（lastSaveAt + 审计留痕），功能未改
+var sSv = new FakeSource(2, null);
+runPath(registeredRoot, ['admin', 'save'], sSv, {});
+assert(WAR.data.lastSaveAt != null, 'save 后 lastSaveAt 有值（落盘时间供 status 显示）');
+var svAudit = WAR.audit.tail(WAR.audit.count()).filter(function (x) { return x.action === 'admin.save'; });
+assert(svAudit.length >= 1 && svAudit[svAudit.length - 1].actor === 'cmd:console', 'save 写审计且 actor=cmd:console');
+assert(sSv.messages.join('') === '已落盘（reason=manual）', 'save 回显逐字未变');
+var sBare = new FakeSource(2, null);
+runPath(registeredRoot, ['admin'], sBare, {});
+assert(sBare.messages.join('') === '用法：/war admin status | audit [n] | save', '裸 /war admin 的用法串逐字未变（未因新增子命令改写）');
+assert(WAR.econ.invariant().ok === true, 'T17 后不变量仍成立');
 
 console.log('\n--- 汇总 ---');
 console.log('PASS=' + passN + ' FAIL=' + failN + ' SKIP=' + skipN);

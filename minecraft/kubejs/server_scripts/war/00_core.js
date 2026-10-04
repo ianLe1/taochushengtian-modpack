@@ -582,24 +582,9 @@ ServerEvents.commandRegistry(function (event) {
         return warReply(ctx.source, warHelpText());
       }));
 
-    var admin = Commands.literal('admin')
-      .requires(warOpPredicate())
-      .executes(function (ctx) { return warReply(ctx.source, '用法：/war admin status | audit [n] | save'); })
-      .then(Commands.literal('status').executes(function (ctx) {
-        return warReply(ctx.source, warAdminStatusText());
-      }))
-      .then(Commands.literal('audit')
-        .executes(function (ctx) { return warReply(ctx.source, WAR_AUDIT.text(20)); })
-        .then(Commands.argument('n', Arguments.INTEGER.create(event)).executes(function (ctx2) {
-          var auditN = warClampInt(warIntArg(Arguments.INTEGER, ctx2, 'n', 20), 1, WAR_CONFIG.audit.bufferSize, 20);
-          return warReply(ctx2.source, WAR_AUDIT.text(auditN));
-        })))
-      .then(Commands.literal('save').executes(function (ctx) {
-        var ok = WAR_DATA.save('manual');
-        WAR_AUDIT.append('cmd:' + warActorName(ctx.source), 'admin.save', WAR_NS, ok ? 'ok' : 'fail');
-        return warReply(ctx.source, ok ? '已落盘（reason=manual）' : '落盘失败：见服务器日志');
-      }));
-    root.then(admin);
+    // /war admin 子树已整体迁至 90_admin.js（D1-a，lead 批复：权限声明唯一，避免第二个字面量漏挂 requires
+    // 形成权限洞）。status/audit/save 三个子命令的文本、审计字段与回显**逐字搬移**，未改动。
+    // warAdminStatusText() 仍留在本文件（被 90_admin.js 复用）。
 
     // 各域脚本注册的命令节点（10_team.js 等）
     for (var i = 0; i < WAR_COMMANDS.nodes.length; i++) {
@@ -632,6 +617,18 @@ function warActorName(source) {
 function warEvery(ticks, label, fn) {
   WAR_TICK.timers.push({ ticks: Math.max(1, warToInt(ticks, 20)), last: WAR_TICK.n, label: String(label || '?'), fn: fn });
   return true;
+}
+
+// 只读入口（C1，lead 批复）：供 90_admin.js 的 /war admin tasks 用；只列 label/ticks/last，**不导出 fn**
+function warTimerList() {
+  var out = [];
+  try {
+    for (var i = 0; i < WAR_TICK.timers.length; i++) {
+      var t = WAR_TICK.timers[i];
+      out.push({ label: t.label, ticks: t.ticks, last: t.last });
+    }
+  } catch (e) { warWarnOnce('timer-list', '定时器清单读取失败：' + e); }
+  return out;
 }
 
 function warTick(server) {
@@ -717,6 +714,7 @@ global.WAR = {
   commands: WAR_COMMANDS,
   hooks: WAR_HOOKS,
   every: warEvery,
+  timers: warTimerList,             // C1：定时器只读清单（label/ticks/last）
   tick: warTick,
   boot: warBoot,
   shutdown: warShutdown,
