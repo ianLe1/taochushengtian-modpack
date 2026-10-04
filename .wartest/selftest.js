@@ -1263,6 +1263,27 @@ REG.loaded[0]({ server: srv22 });
 assert(WAR.ready === true && WAR.data.readOnly === false && WAR_SCHEMA.refused === false,
        '换回正常（无数据）后：ready=是、非只读、拒绝标记清除');
 
+// ================================================================ T21 出生点硬门配置真源（WAR_CONFIG.spawn.dMax）
+console.log('\n--- T21 WAR_CONFIG.spawn.dMax（出生点硬门配置真源）---');
+assert('dMax' in WAR.config.spawn && WAR.config.spawn.dMax === 0.05, 'WAR.config.spawn.dMax 存在且为 0.05');
+var coreSrc21 = fs.readFileSync(WAR_DIR + '/00_core.js', 'utf8');
+assert(/spawn:\s*\{[^}]*dMax:\s*0\.05/.test(coreSrc21), 'core 的 spawn CONFIG 里写着 dMax: 0.05（文件里的事实，不是运行时补的）');
+assert(coreSrc21.indexOf('唯一真源') >= 0 && coreSrc21.indexOf('dcalib') >= 0 && coreSrc21.indexOf('暂定') >= 0,
+       'core 注释写明：暂定待标定 + 标定方法(dcalib) + 唯一真源');
+var spawnSrc21 = fs.readFileSync(WAR_DIR + '/20_spawn.js', 'utf8');
+assert(/SP_D_MAX_FALLBACK\s*=\s*0\.05/.test(spawnSrc21), '20_spawn.js 侧有 SP_D_MAX_FALLBACK = 0.05（缺键保底常量）');
+var lit21 = [];
+var lines21 = spawnSrc21.split('\n');
+for (var i21 = 0; i21 < lines21.length; i21++) {
+  if (lines21[i21].indexOf('0.05') < 0) continue;
+  if (/SP_D_MAX_FALLBACK\s*=\s*0\.05/.test(lines21[i21])) continue;   // 保底常量本身
+  if (/^\s*\/\//.test(lines21[i21])) continue;                          // 注释里出现不算第二份真源
+  lit21.push((i21 + 1) + ': ' + lines21[i21].trim());
+}
+assert(lit21.length === 0, '20_spawn.js 里没有第二份 dMax 阈值字面量赋值（命中 ' + lit21.length + ' 行' + (lit21.length ? '：' + lit21.join(' | ') : '') + '）');
+assert(spawnSrc21.indexOf('core.dMax != null') >= 0 && spawnSrc21.indexOf('spawn-cfg-dmax') >= 0,
+       '20_spawn.js 只在 core 缺键时回落，并 warnOnce 点名 spawn-cfg-dmax');
+
 console.log('\n--- 汇总 ---');
 console.log('PASS=' + passN + ' FAIL=' + failN + ' SKIP=' + skipN);
 console.log(ok ? 'ALL_PASS' : 'SOME_FAILED');

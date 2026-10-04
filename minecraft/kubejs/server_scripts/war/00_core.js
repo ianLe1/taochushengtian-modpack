@@ -75,7 +75,11 @@ var WAR_CONFIG = {
     journalSize: 200,                // 暂定默认值：经济流水环大小
     opMemory: 200                    // 暂定默认值：幂等 opId 记忆条数
   },
-  spawn: { mode: 'cm-score', candidateRadius: 5000, tries: 64 }, // 暂定默认值；20_spawn.js
+  // 暂定默认值；出生点域实现在 20_spawn.js。dMax = 出生点硬门的**破坏度上限**：
+  //   ① **暂定值、待实机标定** —— 标定方法：/cm scan 之后用 /war spawn admin dcalib 看 d 的真实分位数，
+  //      **自然底噪的 p75 决定阈值下限**（当前这个数只是猜，不是结论）。
+  //   ② **唯一真源** —— 20_spawn.js 侧的 SP_D_MAX_FALLBACK=0.05 只在 core 缺键时保底，并 warWarnOnce('spawn-cfg-dmax') 点名。
+  spawn: { mode: 'cm-score', candidateRadius: 5000, tries: 64, dMax: 0.05 },
   claim: { enabled: false, defaultRadius: 32 },            // 暂定默认值；40_base.js
   base:  { enabled: false, maxPerTeam: 3 },                // 暂定默认值；40_base.js
   trade: { enabled: false, taxRate: 0 },                   // 暂定默认值；50_trade.js
