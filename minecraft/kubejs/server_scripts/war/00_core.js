@@ -79,7 +79,7 @@ var WAR_CONFIG = {
   claim: { enabled: false, defaultRadius: 32 },            // 暂定默认值；40_base.js
   base:  { enabled: false, maxPerTeam: 3 },                // 暂定默认值；40_base.js
   trade: { enabled: false, taxRate: 0 },                   // 暂定默认值；50_trade.js
-  shop:  { enabled: false, catalogPath: 'war/shop/catalog.json' }, // 暂定默认值；60_shop.js
+  shop:  { enabled: true, catalogPath: 'war/shop/catalog.json', spread: 0, maxPerTransaction: 64 }, // 暂定默认值；60_shop.js（唯一真源，域侧只读）
   think: { enabled: false, intelTtlSeconds: 900 },         // 暂定默认值；70_think.js
   admin: { commandPermissionLevel: 2 }                     // /war admin * 所需原版权限等级
 };

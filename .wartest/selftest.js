@@ -1111,6 +1111,53 @@ WAR.config.shop.enabled = true;
 assert(WAR.shop.buy('buyer', pShop, 'minecraft:bread', 1).ok === true, '恢复 enabled=true 后买入恢复');
 assert(WAR.econ.invariant().ok === true, 'T18 收尾不变量仍成立');
 
+// ================================================================ T19 商店数值口径：core 唯一真源（lead 批复）
+console.log('\n--- T19 商店数值口径单一起源 ---');
+assert(typeof SHOP_CONFIG !== 'undefined' && SHOP_CONFIG === WAR.config.shop, 'SHOP_CONFIG 与 WAR.config.shop 是同一个对象引用（不是值相等的副本）');
+assert(WAR.config.shop.enabled === true && WAR.config.shop.spread === 0 && WAR.config.shop.maxPerTransaction === 64,
+       'core 的 WAR_CONFIG.shop 默认值：enabled=true / spread=0 / maxPerTransaction=64');
+var shopSrc19 = fs.readFileSync(WAR_DIR + '/60_shop.js', 'utf8');
+var assign19 = shopSrc19.split('\n').filter(function (ln) { return /^\s*SHOP_CONFIG\./.test(ln); });
+assert(assign19.length === 0, '60_shop.js 里没有任何 SHOP_CONFIG.xxx = 赋值（域侧只读；命中 ' + assign19.length + ' 行）');
+var coreSrc19 = fs.readFileSync(WAR_DIR + '/00_core.js', 'utf8');
+assert(/shop:\s*\{[^}]*enabled:\s*true/.test(coreSrc19) && /shop:\s*\{[^}]*spread:\s*0/.test(coreSrc19) &&
+       /shop:\s*\{[^}]*maxPerTransaction:\s*64/.test(coreSrc19),
+       'core 的 WAR_CONFIG.shop 三个值都写在文件里（不靠运行时覆盖）');
+// 超上限的拒绝必须给出「本次最多可买/可卖多少」——可执行的下一步
+var entryIron19 = WAR.shop.entryOf('minecraft:iron_ingot');
+var ironBuy019 = entryIron19.buy, ironSell019 = entryIron19.sell;
+entryIron19.buy = 100;                                   // 测试用：临时抬价，让 64 件撞上账本上限 1000
+entryIron19.sell = null;                                 // 卖出价省略 → 按 buy×(1-spread) 推导 = 100（顺带验证推导分支）
+WAR.econ.mint('console', 'uuid-buyer', 1000, null);
+var balBuy19 = WAR.econ.balanceOf('uuid-buyer');
+var sMsg19 = new FakeSource(0, pShop);
+runPath(registeredRoot, ['shop', 'buy', 'id', 'n'], sMsg19, { id: 'minecraft:iron_ingot', n: 20 });
+var m19 = sMsg19.messages.join('');
+assert(m19.indexOf('超过账本单笔上限 1000') >= 0 && m19.indexOf('本次最多可买 10 件') >= 0,
+       '买入超上限：消息给出「本次最多可买 10 件」（实际：' + m19.slice(0, 70) + '）');
+var resBuy19 = WAR.shop.buy('buyer', pShop, 'minecraft:iron_ingot', 20);
+assert(resBuy19.ok === false && resBuy19.maxAffordable === 10, '买入拒绝返回 maxAffordable=10（玩家可直接照做）');
+assert(WAR.econ.balanceOf('uuid-buyer') === balBuy19, '买入超上限被拒：账本未动');
+assert(WAR.shop.priceOf('minecraft:iron_ingot', 'sell') === 100, '卖出价省略时按 buy×(1-spread) 推导 = 100');
+pShop.inventory.insertItem(new FakeStack('minecraft:iron_ingot', 20), false);
+var balSell19 = WAR.econ.balanceOf('uuid-buyer');
+var resSell19 = WAR.shop.sell('buyer', pShop, 'minecraft:iron_ingot', 20);
+assert(resSell19.ok === false && resSell19.maxSellable === 10 && resSell19.error.indexOf('本次最多可卖 10 件') >= 0 &&
+       resSell19.error.indexOf('货已退回') >= 0,
+       '卖出超上限：消息给出「本次最多可卖 10 件（货已退回）」（实际：' + resSell19.error + '）');
+assert(WAR.shop.count(pShop, 'minecraft:iron_ingot') === 20, '卖出超上限：货物全部退回（一件不少）');
+assert(WAR.econ.balanceOf('uuid-buyer') === balSell19, '卖出超上限被拒：账本未动');
+// 单件价就超过账本上限（K=0 分支）：必须明确说「本商品当前不可购买/回收」，而不是给出「最多可买 0 件」
+entryIron19.buy = 2000; entryIron19.sell = 2000;
+var resZero = WAR.shop.buy('buyer', pShop, 'minecraft:iron_ingot', 1);
+assert(resZero.ok === false && resZero.maxAffordable === 0 && resZero.error.indexOf('本商品当前不可购买') >= 0,
+       '单件超上限：给出「本商品当前不可购买」（实际：' + resZero.error + '）');
+var resZeroS = WAR.shop.sell('buyer', pShop, 'minecraft:iron_ingot', 1);
+assert(resZeroS.ok === false && resZeroS.error.indexOf('本商品当前不可回收') >= 0, '单件超上限（卖）：给出「本商品当前不可回收」');
+entryIron19.buy = ironBuy019; entryIron19.sell = ironSell019;   // 还原货架数据（价格是数据，测试也要还原）
+assert(WAR.shop.priceOf('minecraft:iron_ingot', 'buy') === 12 && WAR.shop.priceOf('minecraft:iron_ingot', 'sell') === 6, '货架价格已还原（买12/卖6）');
+assert(WAR.econ.invariant().ok === true, 'T19 后账目恒等式仍成立');
+
 console.log('\n--- 汇总 ---');
 console.log('PASS=' + passN + ' FAIL=' + failN + ' SKIP=' + skipN);
 console.log(ok ? 'ALL_PASS' : 'SOME_FAILED');

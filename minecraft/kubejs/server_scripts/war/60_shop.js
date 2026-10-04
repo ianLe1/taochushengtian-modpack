@@ -15,13 +15,10 @@
 //   Item.getId(Item)；WAR.econ.{burn,mint,withdraw,deposit,balanceOf,total,invariant}；WAR.audit.append。
 // ============================================================================
 
-// 暂定默认值（lead 批复的口径）。注意：core 的 WAR_CONFIG.shop 只声明了 { enabled:false, catalogPath }，
-//   enabled 的旧值 false 是实现前占位；按「单一起源」我不改 core 文件，只在本域加载时把口径对齐到批复值，
-//   并在交付报告里列明。要改回文件里的字面值，改 00_core.js 一行即可（需报备）。
+// 数值口径的**唯一真源是 00_core.js 的 WAR_CONFIG.shop**（2026-10-04 按 lead 批复改：原来的三行运行时
+//   覆盖已删除 —— 两个真源迟早漂移；现在本文件只做别名，不写任何 SHOP_CONFIG.xxx = ... 赋值）。
+//   默认值：enabled=true / catalogPath='war/shop/catalog.json' / spread=0 / maxPerTransaction=64。
 var SHOP_CONFIG = WAR.config.shop;
-SHOP_CONFIG.enabled = true;              // 暂定默认值：商店默认开放
-SHOP_CONFIG.spread = 0;                  // 暂定默认值：买卖差价（0 = 卖出价省略时按 buy 同价）
-SHOP_CONFIG.maxPerTransaction = 64;      // 暂定默认值：单次上限
 
 var SHOP_CATALOG = { loaded: false, source: null, error: null, items: [], byId: {} };
 
@@ -223,7 +220,14 @@ function shopBuy(actor, player, id, n) {
   if (unit <= 0) { WAR.audit.append(actor, 'shop.buy', String(id), 'deny', 'buy 价不合法：' + g.entry.buy); return { ok: false, error: '货架价格不合法（buy=' + g.entry.buy + '）' }; }
   var total = unit * g.qty;
   var payMax = warToInt(WAR.config.econ.payMax, 1000);
-  if (total > payMax) { WAR.audit.append(actor, 'shop.buy', String(id), 'deny', '超单笔上限 ' + payMax); return { ok: false, error: '本次共 ' + total + '，超过账本单笔上限 ' + payMax + '，请分次购买' }; }
+  if (total > payMax) {
+    var canBuy = (unit > 0) ? Math.floor(payMax / unit) : 0;
+    var buyMsg = (canBuy >= 1)
+      ? ('本次 ' + g.qty + ' 件共 ' + total + '，超过账本单笔上限 ' + payMax + '；本次最多可买 ' + canBuy + ' 件')
+      : ('单件 ' + unit + ' 已超过账本单笔上限 ' + payMax + '，本商品当前不可购买');
+    WAR.audit.append(actor, 'shop.buy', String(id), 'deny', buyMsg);
+    return { ok: false, error: buyMsg, maxAffordable: canBuy };
+  }
   // 先账本：burn 扣款（走 30_economy，不在本文件改余额）
   var burn = WAR.econ.burn(actor, g.uuid, total, null);
   if (burn.ok !== true) { WAR.audit.append(actor, 'shop.buy', String(id), 'deny', burn.error); return { ok: false, error: burn.error }; }
@@ -260,9 +264,13 @@ function shopSell(actor, player, id, n) {
   var payout = unit * taken;
   var payMax = warToInt(WAR.config.econ.payMax, 1000);
   if (payout > payMax) {                        // 进款超账本单笔上限 → 把货退回去，不留半截状态
+    var canSell = (unit > 0) ? Math.floor(payMax / unit) : 0;
     var backItems = shopGive(player, g.entry.id, taken);
-    WAR.audit.append(actor, 'shop.sell', String(id), 'rollback', '进款 ' + payout + ' 超单笔上限 ' + payMax + '，退货 ' + backItems);
-    return { ok: false, error: '本次应收 ' + payout + '，超过账本单笔上限 ' + payMax + '，请分次卖出' };
+    var sellMsg = (canSell >= 1)
+      ? ('本次 ' + taken + ' 件应收 ' + payout + '，超过账本单笔上限 ' + payMax + '；本次最多可卖 ' + canSell + ' 件')
+      : ('单件 ' + unit + ' 已超过账本单笔上限 ' + payMax + '，本商品当前不可回收');
+    WAR.audit.append(actor, 'shop.sell', String(id), 'rollback', sellMsg + '，退货 ' + backItems);
+    return { ok: false, error: sellMsg + '（货已退回）', returned: backItems, maxSellable: canSell };
   }
   // 后账本：mint 进款；失败就把货退回去
   var mint = WAR.econ.mint(actor, g.uuid, payout, null);
