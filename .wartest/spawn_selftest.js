@@ -10,6 +10,8 @@
 // 假 CM 桥覆盖 task 要求的三类输入：
 //   已扫描（正常记录） / 未扫描（null 或全 stale） / CM 缺失（global.CM = null）
 //   —— 另加 getAt 抛异常、地形不合格、冷却/上限、非 OP 拒绝等边界。
+// v2 追加：CM.scoreArea 批量路径 / 旧版 CM 逐点退化 / world data 读取失败（CM_READ_FAIL）
+//   与「未扫描」的区分（含用 getStatus 复核原因的那条分支）。
 //
 // ⚠ 证据边界：本自检全部是离线证据（假 Java 桥）。真正只有实机能证的见文件末尾
 //   「只能实机验证」清单（Java 方法名/签名、事件对象形态、传送与伤害事件的真实语义）。
@@ -201,11 +203,21 @@ FakeSource.prototype.sendSuccess = function (sup) { this.messages.push(String(su
 FakeSource.prototype.sendFailure = function (c) { this.failures.push(String(c)); };
 
 // ---------------------------------------------------------------- 加载真实脚本
+// 只加载本域自检需要的脚本，顺序 = 文件名顺序（复刻 KubeJS 的加载序）。
+// 同目录其它域脚本（30_* 等，由别的 teammate 负责、可能随时在改）**刻意不加载**：
+// 本 harness 只依赖 00_core 的框架契约 + 10_team 的队内免伤（T9 要按函数身份挑处理器）
+// + 本域 20_spawn。—— 与 .wartest/selftest.js 的白名单做法一致。
+var WANT = ['00_core.js', '10_team.js', '20_spawn.js'];
 var files = fs.readdirSync(WAR_DIR).filter(function (f) { return /[.]js$/.test(f); }).sort();
-console.log('=== 加载 war/ 脚本：' + files.join(', '));
-for (var fi = 0; fi < files.length; fi++) {
-  var src = fs.readFileSync(path.join(WAR_DIR, files[fi]), 'utf8');
-  vm.runInThisContext(src, { filename: path.join(WAR_DIR, files[fi]) });
+var load = [];
+for (var wi = 0; wi < WANT.length; wi++) {
+  if (files.indexOf(WANT[wi]) >= 0) load.push(WANT[wi]);
+  else console.log('[warn] war/ 里缺少 ' + WANT[wi]);
+}
+console.log('=== 加载 war/ 脚本：' + load.join(', ') + '（目录内共 ' + files.length + ' 个 js，其余不加载）');
+for (var fi = 0; fi < load.length; fi++) {
+  var src = fs.readFileSync(path.join(WAR_DIR, load[fi]), 'utf8');
+  vm.runInThisContext(src, { filename: path.join(WAR_DIR, load[fi]) });
 }
 var WAR = global.WAR;
 
@@ -254,11 +266,52 @@ function runPath(names, source, args) {
 function cmRec(d, a, stale, partial) {
   return { d: d, a: a, stale: stale === true, partial: partial === true, dim: 'minecraft:overworld', ts: Date.now() };
 }
+// 假 CM 桥：同时提供扩展版接口（scoreArea/getStatus）与旧版接口（getAt），
+// 好分别驱动「批量路径」与「退化为逐点」两条代码路径。
+//   _fn(bx,bz)  单点记录；返回 null = 该区块没有记录
+//   _pd         'ok' | 'fail'，'fail' 模拟 level.persistentData 读取失败
+//   _statusFn   可选，覆盖 getStatus 的返回值
 var CM = {
   version: 1,
-  nGetAt: 0, nRank: 0, nStats: 0,
+  nGetAt: 0, nRank: 0, nStats: 0, nScoreArea: 0, nGetStatus: 0,
   _fn: function (bx, bz) { return cmRec(0.1, 0.2, false, false); },
+  _pd: 'ok',
+  _statusFn: null,
   getAt: function (level, bx, bz) { this.nGetAt++; return this._fn(bx, bz); },
+  scoreArea: function (level, cx, cz, radius) {
+    this.nScoreArea++;
+    var rr = (radius == null ? 0 : radius), cands = [];
+    var counts = { ok: 0, fresh: 0, stale: 0, noRecord: 0, readFail: 0, mem: 0 };
+    for (var x = cx - rr; x <= cx + rr; x++) {
+      for (var z = cz - rr; z <= cz + rr; z++) {
+        var rec;
+        if (this._pd === 'fail') {
+          rec = { cx: x, cz: z, status: 'read-fail', stale: false, source: 'none', d: null, a: null, rev: null };
+          counts.readFail++;
+        } else {
+          var m = this._fn(x * 16 + 8, z * 16 + 8);
+          if (m == null) {
+            rec = { cx: x, cz: z, status: 'no-record', stale: false, source: 'none', d: null, a: null, rev: null };
+            counts.noRecord++;
+          } else {
+            rec = { cx: x, cz: z, status: 'ok', stale: m.stale === true, source: 'disk',
+                    d: m.d, a: m.a, partial: m.partial === true, dim: m.dim, rev: 3 };
+            counts.ok++;
+            if (rec.stale) counts.stale++; else counts.fresh++;
+          }
+        }
+        cands.push(rec);
+      }
+    }
+    return { ok: true, pd: this._pd, cx: cx, cz: cz, radius: rr, width: rr * 2 + 1, curRev: 3,
+             candidates: cands, counts: counts, usable: counts.fresh };
+  },
+  getStatus: function (level, cx, cz) {
+    this.nGetStatus++;
+    if (typeof this._statusFn === 'function') return this._statusFn(cx, cz);
+    if (this._pd === 'fail') return { ok: false, status: 'read-fail', pd: 'fail', cx: cx, cz: cz, stale: false, rev: null, curRev: 3 };
+    return { ok: true, status: 'ok', pd: 'ok', cx: cx, cz: cz, stale: false, rev: 3, curRev: 3, d: 0.1, a: 0.2 };
+  },
   get: function () { return null; },
   ensure: function () { return null; },
   rank: function () { this.nRank++; return []; },
@@ -279,7 +332,7 @@ var st0 = null, stThrew = null;
 try { st0 = WAR.spawn.status(); } catch (e) { stThrew = e; }
 assert(stThrew == null, 'WAR.spawn.status() 不抛异常（stubStatus 会调用它）' + (stThrew ? ('：' + stThrew) : ''));
 assert(st0 != null && st0.implemented === true && st0.domain === 'spawn', 'status(): implemented=true / domain=spawn');
-assert(st0 != null && Array.isArray(st0.gaps) === false && st0.gaps === 6, 'status(): 接口缺口计数 = 6');
+assert(st0 != null && Array.isArray(st0.gaps) === false && st0.gaps === 3, 'status(): 剩余接口缺口计数 = 3');
 
 assert(REG.commandRegistry.length >= 1, 'commandRegistry 处理器已注册');
 REG.commandRegistry[0]({
@@ -333,9 +386,12 @@ var lvl = new FakeLevel();
 var alice = new FakePlayer('alice', 'uuid-a');
 alice.level = lvl;
 var before = CM.nGetAt;
+var beforeSA = CM.nScoreArea;
 var r2 = WAR.spawn.roll(alice, { level: lvl, op: true });
 assert(r2 != null && r2.ok === true, '掷点成功（ok=true）' + (r2 && r2.message ? ('：' + r2.message) : ''));
-assert(CM.nGetAt - before === 9, '一次候选恰好 9 次 CM.getAt（3×3）：' + (CM.nGetAt - before));
+assert(CM.nScoreArea - beforeSA === 1, '一次候选恰好 1 次 CM.scoreArea（批量读 3×3）：' + (CM.nScoreArea - beforeSA));
+assert(CM.nGetAt - before === 0, '批量路径完全不调 CM.getAt（旧路径要 9 次）：' + (CM.nGetAt - before));
+assert(r2.ok && r2.scoredVia === 'batch', '返回体标注读数路径 scoredVia=batch');
 assert(r2.ok && near(r2.d, 0.1) && near(r2.a, 0.2), 'D̄=' + (r2.d) + ' Ā=' + (r2.a) + '（= 假 CM 的 0.1/0.2）');
 assert(r2.ok && r2.coverage === 9, '覆盖率 9/9');
 // S = (0.6·(1-0.1) + 1.0·(1-0.2)) / 1.6 - 0.35·0 = 1.34/1.6 = 0.8375
@@ -554,6 +610,7 @@ try { t12 = WAR.spawn.text(new FakeSource(0, alice)); } catch (e) { t12Threw = e
 assert(t12Threw == null && Array.isArray(t12) && t12.length >= 3, 'text(source) 返回多行（不抛）');
 assert(t12.join(' ').indexOf('[出生点]') >= 0, 'status 首行含 [出生点]');
 assert(t12.join(' ').indexOf('掷点统计') >= 0, 'status 含掷点统计');
+assert(t12.join(' ').indexOf('读数=') >= 0, 'status 暴露读数路径（批量 scoreArea / 逐点 getAt）');
 var srcSt = new FakeSource(2, alice);
 var c12 = runPath(['spawn', 'status'], srcSt);
 assert(c12.ok === true && srcSt.messages.join(' ').indexOf('[出生点]') >= 0, '/war spawn status 命令回显状态');
@@ -563,7 +620,8 @@ assert(c12b.ok === true && srcLast.messages.join(' ').indexOf('上次落点') >=
 var srcGaps = new FakeSource(0, null);
 var c12c = runPath(['spawn', 'gaps'], srcGaps);
 assert(c12c.ok === true && srcGaps.messages.join(' ').indexOf('接口缺口') >= 0, '/war spawn gaps 命令列出缺口');
-assert(WAR.spawn.gaps().length === 6, 'WAR.spawn.gaps() 返回 6 条');
+assert(srcGaps.messages.join(' ').indexOf('已解决') >= 0, '/war spawn gaps 同时说明已由 CM 扩展解决的三条');
+assert(WAR.spawn.gaps().length === 3, 'WAR.spawn.gaps() 返回 3 条（剩余缺口）');
 var srcRoll = new FakeSource(0, bob);
 SPS.config.cooldownMs = 0; SPS.config.maxRolls = 50;
 var c12d = runPath(['spawn', 'roll'], srcRoll);
@@ -581,6 +639,52 @@ assert(verRet.ok === true && verRet.ret === 1, '/war version 仍可执行（未�
 assert(srcVer.messages.join(' ').indexOf('战服 v') >= 0, '/war version 输出正常');
 assert(WAR.ready === true, 'restart 后 WAR.ready = true（boot 钩子跑过）');
 
+// ---- T14 批量路径 vs 旧版 CM：自动退化 + 读数路径可观测 ----
+console.log('\n--- T14 CM.scoreArea 批量路径 / 旧版 CM 自动退化 ---');
+CM._fn = function (bx, bz) { return cmRec(0.1, 0.2, false, false); };
+var pvBatch = WAR.spawn.preview(lvl, 8, 8);
+assert(pvBatch.ok === true && near(pvBatch.d, 0.1) && near(pvBatch.a, 0.2), '批量路径下 preview() 结果不变（D̄=0.1 Ā=0.2）');
+var saBefore = CM.nScoreArea, gaBefore = CM.nGetAt;
+WAR.spawn.preview(lvl, 8, 8);
+assert(CM.nScoreArea - saBefore === 1 && CM.nGetAt - gaBefore === 0, 'preview 走 1 次 scoreArea、0 次 getAt');
+var saKeep = CM.scoreArea;
+CM.scoreArea = undefined;                       // 模拟旧版 CM（只有 getAt）
+var pvLegacy = WAR.spawn.preview(lvl, 8, 8);
+assert(pvLegacy.ok === true && near(pvLegacy.d, 0.1) && near(pvLegacy.a, 0.2), '旧版 CM（无 scoreArea）自动退化为逐点 getAt，结果一致');
+assert(CM.nGetAt - gaBefore === 9, '退化路径恰好 9 次 getAt：' + (CM.nGetAt - gaBefore));
+var r14 = WAR.spawn.roll(new FakePlayer('erin', 'uuid-e2'), { level: lvl, op: true });
+assert(r14.ok === true && r14.scoredVia === 'legacy', '退化路径的 roll 也正常，scoredVia=legacy');
+CM.scoreArea = saKeep;
+CM._fn = function () { throw new Error('scoreArea 内部炸（模拟）'); };
+var r14b = WAR.spawn.roll(new FakePlayer('frank', 'uuid-f2'), { level: lvl, op: true });
+assert(r14b.ok === false && r14b.code === 'NO_SCANNED_CANDIDATE', 'scoreArea 抛异常 ⇒ 退化为逐点读取（不冒泡）');
+CM._fn = function (bx, bz) { return cmRec(0.1, 0.2, false, false); };
+
+// ---- T15 world data 读取失败（CM_READ_FAIL）≠ 未扫描 ----
+console.log('\n--- T15 读取失败 ⇒ CM_READ_FAIL（与「未扫描」区分）---');
+CM._pd = 'fail';
+var r15 = WAR.spawn.roll(new FakePlayer('gina', 'uuid-g2'), { level: lvl, op: true });
+assert(r15.ok === false && r15.code === 'CM_READ_FAIL', '全场读取失败 ⇒ code=CM_READ_FAIL（不是 NO_SCANNED_CANDIDATE）');
+assert(String(r15.message).indexOf('不是「还没扫描」') >= 0, '消息明确区分「读取失败」与「未扫描」');
+assert(String(r15.message).indexOf('/cm scan') < 0, '读取失败不误导玩家去 /cm scan');
+assert(r15.detail != null && r15.detail.readFail === r15.detail.notScanned && r15.detail.readFail >= 1, '分解计数 readFail = notScanned（全部候选都是读失败）');
+var src15 = new FakeSource(0, alice);
+var c15 = runPath(['spawn'], src15);
+assert(c15.ok === true && src15.messages.join(' ').indexOf('读取失败') >= 0, '/war spawn 把 CM_READ_FAIL 原因回给玩家');
+CM._pd = 'ok';
+var r15b = WAR.spawn.roll(new FakePlayer('hank', 'uuid-h2'), { level: lvl, op: true });
+assert(r15b.ok === true, '读取恢复正常后掷点正常（CM_READ_FAIL 不是粘性状态）');
+// scoreArea 说「无记录」、getStatus 复核出「读取失败」⇒ 原因纠正为 CM_READ_FAIL
+CM._fn = function () { return null; };
+CM._statusFn = function (cx, cz) { return { ok: false, status: 'read-fail', pd: 'fail', cx: cx, cz: cz, stale: false, rev: null, curRev: 3 }; };
+var r15c = WAR.spawn.roll(new FakePlayer('ivy', 'uuid-i2'), { level: lvl, op: true });
+assert(r15c.ok === false && r15c.code === 'CM_READ_FAIL', 'scoreArea 报「无记录」但 getStatus 复核出读取失败 ⇒ 仍报 CM_READ_FAIL');
+assert(CM.nGetStatus >= 1, 'getStatus 被用来复核失败原因（累计 ' + CM.nGetStatus + ' 次）');
+CM._statusFn = null;
+CM._fn = function (bx, bz) { return cmRec(0.1, 0.2, false, false); };
+var r15d = WAR.spawn.roll(new FakePlayer('jack', 'uuid-j2'), { level: lvl, op: true });
+assert(r15d.ok === true, '清掉读取失败注入后恢复成功（三类原因都只是当次判定）');
+
 // ================================================================ 汇总
 console.log('\n=== 汇总：PASS ' + passN + ' / FAIL ' + failN + ' ===');
 if (failN > 0) {
@@ -594,6 +698,7 @@ console.log('  · level.dimension().location() / level.getSharedSpawnPos() / get
 console.log('  · player.teleportToLevel(level,x,y,z,yaw,pitch) 与 teleportTo 的真实重载');
 console.log('  · EntityEvents.beforeHurt(target,fn) 的真实注册形态；DamageSource.getEntity/getDirectEntity');
 console.log('  · server.persistentData 与 WAR.data.mutate/save 的真实落盘；ServerEvents.loaded 的事件对象');
-console.log('  · 真实区块的地形/危险方块判定、性能（tries=64 × 9 次 getAt 的实际耗时）');
+console.log('  · 真实区块的地形/危险方块判定、性能（tries=64 × 1 次 CM.scoreArea + 64×9 的旧路径对照）；');
+console.log('    本自检的假桥是纯 JS 对象，只能证明「不再逐点读」，Java 边界开销须实机复测');
 console.log(failN > 0 ? '\nSOME_FAILED' : '\nALL_PASS');
 process.exit(failN > 0 ? 1 : 0);

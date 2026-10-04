@@ -114,6 +114,10 @@ level.persistentData
 ### 4.2 脚本接口（`global.CM`）
 
 ```js
+// 签名说明：所有接口的第一个参数都是 level（ServerLevel 对象），不是维度字符串——
+// 记录就写在 level.persistentData 上（每个维度各一份），调用方本来就持有 level；
+// dim→level 需要 server.getLevel，那条 Java 路径未做字节码验证，故不提供 dim 重载。
+
 // 只读，不计算。没有记录返回 null。
 const m = global.CM.get(level, chunkX, chunkZ)
 const m2 = global.CM.getAt(level, blockX, blockZ)   // 按方块坐标取所在区块
@@ -130,9 +134,11 @@ s.rev, s.curRev, s.d, s.a, s.raw
 // 批量候选读数：一次遍历 world data 读一整个方形区域。
 // 不调用 analyze、不加载/生成区块；逐条给出状态，绝不把过期记录混进可用数。
 const area = global.CM.scoreArea(level, chunkX, chunkZ, 1)   // 半径 1 => 3×3
-area.candidates   // 每个 { cx, cz, status, stale, source, d, a, rev }
+area.candidates   // 每个 { cx, cz, status, stale, source, d, a, rev, partial, dim }
+                  // ⚠ 默认**包含** stale 与 no-record 的候选并逐个标注，由调用方决定怎么用
 area.counts       // { ok, fresh, stale, noRecord, readFail, mem }
 area.usable       // = counts.fresh（非 stale 的有效记录数）
+                  // ⚠ 可用数只看这里：stale / no-record / read-fail 绝不混进 usable
 area.pd           // 'ok' | 'fail'：数据根是否可读
 global.CM.scoreArea(level, chunkX, chunkZ, 1, { freshOnly: true })   // 只返回有效记录
 global.CM.scoreArea(level, chunkX, chunkZ, 1, { raw: true })         // 附带 31 键分量明细

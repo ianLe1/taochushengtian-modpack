@@ -13,7 +13,12 @@
 // ── 降级策略（task 要求：三种输入必须有确定行为且不抛错）───────────────────
 //   CM 未加载       ⇒ 拒绝掷点，code=CM_MISSING
 //   候选区块未扫描   ⇒ 跳过该候选，全部失败后拒绝，code=NO_SCANNED_CANDIDATE
-//   CM 返回 null    ⇒ 与「未扫描」同路（API 无法区分二者，见 SP_GAPS），计入 nulReads
+//   读取失败        ⇒ 候选的失败原因**全是**「world data 读不出来」时，拒绝码用
+//                      CM_READ_FAIL（而不是 NO_SCANNED_CANDIDATE）——「还没扫描」与
+//                      「数据坏了」给管理员的下一步完全不同。只有 CM 扩展版
+//                      （有 scoreArea/getStatus，2026-10-04）才分得出这两者。
+//   旧版 CM（无 scoreArea）⇒ 自动退化回 9 次 CM.getAt，且无法区分「无记录 / 读取失败」，
+//                      统一按未扫描处理（与本次改动前的行为逐字一致）。
 //   选「明确拒绝并告知玩家」而不是生物群系/结构启发式回退，理由：
 //     ① 本域的验收标准就是「低破坏、低人工、已扫描」，启发式回退拿不到 D/A，
 //        会给出与口径不可比、事后无法解释的落点；
@@ -51,7 +56,7 @@
 // ============================================================================
 
 var SP_OWNER = '20_spawn.js';
-var SP_VERSION = 1;
+var SP_VERSION = 2;   // v2：读数切到 CM.scoreArea 批量接口（旧版 CM 自动退化回逐点）
 
 // ============================================================================
 // CONFIG —— 本域的「待补充参数」（方案 §10）。标「暂定默认值」= 尚未拍板。
@@ -101,13 +106,12 @@ var SP_CONFIG = {
 };
 
 // 接口缺口（task ⑤ 要求列出；扩 CM 属 chunk_metrics.js 改动，须单独授权）
+// 2026-10-04 的 CM 扩展已兑现其中三条（getStatus / scoreArea / rank 的 order+skipStale，
+// 见 chunk_metrics/README.md §4.2），下面是**仍然存在**的缺口。
 var SP_GAPS = [
-  'CM.get/getAt 无法区分「该区块没有记录」与「level.persistentData 读取失败」（两者都返回 null，见 chunk_metrics.js:884-914 的 warnOnce 后 return null）⇒ 本域只能统一按「未扫描」处理，报告里给不出准确原因。建议 CM 增加一个能区分状态的最小接口（如 getStatus）。',
-  'CM 没有「批量候选打分」接口：本域只能对每个候选做 9 次 getAt（3×3），64 次候选 = 576 次读取。CM 侧若提供 scoreArea/getBatch 可显著降开销。',
-  'CM.rank 只有「分数越大越好」一种口径（score = wA*a − wD*d，且过滤 minA/maxD 都是单向），要「越低越好」得传负 wA（README:150 的写法）⇒ 语义不自明，易误用。',
-  'CM.rank 不跳过 stale 记录、也不返回 stale 标记；出生点不能直接消费 rank 结果（本域自己过滤 stale）。',
-  '方案 §2 的 S 还含 资源潜力 / 他人基地距离 / 队伍聚集度 三项 ⇒ 分别依赖 40_base（基地与宣称）与尚未实现的资源域；本域把它们列为缺口、不参与加权（见下）。',
-  '方案 §2 的「预生成环带（Chunky）」与「落地 10 秒无敌」的时长参数仍是待补充项；本域只做 60 秒保护窗口。'
+  '方案 §2 的 S 还含 资源潜力 / 他人基地距离 / 队伍聚集度 三项 ⇒ 分别依赖 40_base（基地与宣称）与尚未实现的资源域；本域把它们列为缺口、不参与加权（按 0 参与会人为拉低所有候选分数、稀释 D/A 权重，且 0 会被误读成「无惩罚」）。',
+  '方案 §2 的「预生成环带（Chunky）」与「落地 10 秒无敌」的时长参数仍是待补充项；本域只做 60 秒保护窗口（SP_CONFIG.protectionMs，任务给的是暂定值）。',
+  'CM.scoreArea 只覆盖方形区域（radius ≤ 32），而本域的候选是环带上的散点 ⇒ 现在每个候选调一次 scoreArea(radius 1)，64 候选 = 64 次调用。若 CM 将来提供「一次多组散点坐标」的批量打分，这里还能再降一档。'
 ];
 
 // 运行期内存（不落盘）
@@ -411,6 +415,9 @@ function spTrimLog(sp) {
 //
 //   D̄/Ā  = 候选点所在区块 + 周围 8 区块（3×3）的算术均值，只计「非 stale」记录；
 //           覆盖数 < cfg.minScored 视为「未扫描」，候选作废。
+//   读数  = CM 扩展版走一次 CM.scoreArea(level,cx,cz,1)（不 analyze、不加载区块，
+//           逐条带 status/stale）；旧版 CM 自动退化为 9 次 CM.getAt。
+//           两条路径的聚合口径完全一致，返回值多带 how='batch'|'legacy' 便于观测。
 //   used  = 该区块已被用作出生点的次数 / cfg.usedScale，截到 0..1（防热点）。
 //   S     = ( wd·(1−D̄) + wa·(1−Ā) ) / (wd+wa)  −  wused·usedFrac
 //
@@ -419,9 +426,56 @@ function spTrimLog(sp) {
 //     那样会人为拉低所有候选的分数、稀释 D/A 权重，且 0 值会被误读成「无惩罚」。
 //     改为：只在已实现项之内归一，并把缺口暴露在 status/gaps() 里（见 SP_GAPS）。
 //
+// 读数入口：优先走 CM 的批量接口（扩展版），旧版 CM 自动退化为逐点读取。
+// 两条路径返回同形状：{ ok, code, n, nul, stale, partial, readFail, mem, pd, how, dim, d?, a? }
+//   code: 'ok' | 'CM_MISSING' | 'NOT_SCANNED' | 'CM_READ_FAIL'
 function spChunkAvg(level, cx, cz, cfg) {
   var cm = spCm();
-  if (cm == null) return { ok: false, code: 'CM_MISSING', n: 0, nul: 0, stale: 0, partial: 0 };
+  if (cm == null) {
+    return { ok: false, code: 'CM_MISSING', n: 0, nul: 0, stale: 0, partial: 0, readFail: 0, mem: 0, pd: '', how: 'none', dim: '' };
+  }
+  if (typeof cm.scoreArea === 'function') return spChunkAvgBatch(cm, level, cx, cz, cfg);
+  return spChunkAvgLegacy(cm, level, cx, cz, cfg);
+}
+
+// 批量路径（CM.scoreArea）：一次读 3×3，不 analyze、不加载区块，且逐条带 status/stale
+// ⇒ 能把「该区块还没扫过」（no-record）与「world data 读不出来」（read-fail）分开。
+// 任何异常/畸形返回都退回逐点路径，绝不把失败当成功。
+function spChunkAvgBatch(cm, level, cx, cz, cfg) {
+  var area = null;
+  try { area = cm.scoreArea(level, cx, cz, 1); } catch (e) { area = null; }
+  if (area == null || area.ok !== true || area.candidates == null) {
+    return spChunkAvgLegacy(cm, level, cx, cz, cfg);
+  }
+  var n = 0, nul = 0, stale = 0, partial = 0, readFail = 0, mem = 0, sumD = 0, sumA = 0, dim = '';
+  var list = area.candidates;
+  for (var i = 0; i < list.length; i++) {
+    var m = list[i];
+    if (m == null) continue;
+    if (m.status === 'read-fail') { readFail++; nul++; continue; }
+    if (m.status !== 'ok') { nul++; continue; }        // no-record：该区块还没扫过
+    if (m.stale === true) { stale++; continue; }       // 过期记录不参与均值
+    n++; sumD += spNum(m.d, 0); sumA += spNum(m.a, 0);
+    if (m.partial === true) partial++;
+    if (m.source === 'mem') mem++;
+    if (dim === '' && m.dim != null) dim = String(m.dim);
+  }
+  var pd = (area.pd === 'fail') ? 'fail' : 'ok';
+  if (n < cfg.minScored) {
+    var code = (readFail > 0 || pd === 'fail') ? 'CM_READ_FAIL' : 'NOT_SCANNED';
+    // 用 getStatus 复核一次中心区块，把「未扫描 / 读取失败」的原因问准
+    if (code === 'NOT_SCANNED' && typeof cm.getStatus === 'function') {
+      var s = null;
+      try { s = cm.getStatus(level, cx, cz); } catch (e2) { s = null; }
+      if (s != null && (s.status === 'read-fail' || s.pd === 'fail')) code = 'CM_READ_FAIL';
+    }
+    return { ok: false, code: code, n: n, nul: nul, stale: stale, partial: partial, readFail: readFail, mem: mem, pd: pd, how: 'batch', dim: dim };
+  }
+  return { ok: true, code: 'ok', n: n, d: sumD / n, a: sumA / n, nul: nul, stale: stale, partial: partial, readFail: readFail, mem: mem, pd: pd, how: 'batch', dim: dim };
+}
+
+// 逐点路径（旧版 CM；行为与本次改动前逐字一致：9 次 getAt，null 与 stale 都算「未扫描」）
+function spChunkAvgLegacy(cm, level, cx, cz, cfg) {
   var n = 0, nul = 0, stale = 0, partial = 0, sumD = 0, sumA = 0, dim = '';
   for (var dx = -1; dx <= 1; dx++) {
     for (var dz = -1; dz <= 1; dz++) {
@@ -436,9 +490,9 @@ function spChunkAvg(level, cx, cz, cfg) {
     }
   }
   if (n < cfg.minScored) {
-    return { ok: false, code: 'NOT_SCANNED', n: n, nul: nul, stale: stale, partial: partial, dim: dim };
+    return { ok: false, code: 'NOT_SCANNED', n: n, nul: nul, stale: stale, partial: partial, readFail: 0, mem: 0, pd: '', how: 'legacy', dim: dim };
   }
-  return { ok: true, code: 'ok', n: n, d: sumD / n, a: sumA / n, nul: nul, stale: stale, partial: partial, dim: dim };
+  return { ok: true, code: 'ok', n: n, d: sumD / n, a: sumA / n, nul: nul, stale: stale, partial: partial, readFail: 0, mem: 0, pd: '', how: 'legacy', dim: dim };
 }
 
 function spUsedFrac(root, key, cfg) {
@@ -680,7 +734,7 @@ function spRoll(player, opts) {
   // —— 候选采样 ——
   var seed = (cfg.rngSeed > 0) ? cfg.rngSeed : (warNow() & 0x7fffffff);
   var rng = spRngNew(seed);
-  var stat = { banned: 0, notLoaded: 0, notScanned: 0, noTerrain: 0, chunkErr: 0, noRecord: 0, stale: 0, budget: false, tried: 0, ok: null };
+  var stat = { banned: 0, notLoaded: 0, notScanned: 0, readFail: 0, noTerrain: 0, chunkErr: 0, noRecord: 0, stale: 0, budget: false, tried: 0, ok: null };
   for (var i = 0; i < cfg.tries; i++) {
     if (warNow() - t0 > cfg.maxMillis) { stat.budget = true; break; }
     stat.tried++;
@@ -692,6 +746,7 @@ function spRoll(player, opts) {
     var avg = spChunkAvg(level, cx, cz, cfg);
     if (!avg.ok) {
       if (avg.code === 'CM_MISSING') return spDeny('CM_MISSING', 'chunk_metrics 在读取候选区块时不可用。', {}, actor);
+      if (avg.code === 'CM_READ_FAIL') stat.readFail++;
       stat.notScanned++; stat.noRecord += avg.nul; stat.stale += avg.stale;
       continue;
     }
@@ -706,6 +761,7 @@ function spRoll(player, opts) {
     var cand = {
       cx: cx, cz: cz, key: key, x: spot.x, y: spot.y, z: spot.z, slope: spot.slope,
       score: score, d: avg.d, a: avg.a, cov: avg.n, partial: avg.partial, usedFrac: usedFrac,
+      how: (avg.how === 'legacy' ? 'legacy' : 'batch'),
       dim: (avg.dim !== '' ? avg.dim : spDimKey(level)), radius: pos.r
     };
     if (stat.ok == null || cand.score > stat.ok.score) stat.ok = cand;
@@ -716,7 +772,15 @@ function spRoll(player, opts) {
     var why = '候选 ' + stat.tried + ' 个全部作废：未加载 ' + stat.notLoaded +
               ' / 未扫描 ' + stat.notScanned + '（读到 null ' + stat.noRecord + '、过期 ' + stat.stale + '）' +
               ' / 地形不合格 ' + stat.noTerrain + ' / 其它 ' + stat.chunkErr +
-              ' / 已屏蔽 ' + stat.banned + (stat.budget ? ' / 预算用尽' : '');
+              ' / 已屏蔽 ' + stat.banned + (stat.readFail > 0 ? (' / 其中读取失败 ' + stat.readFail) : '') +
+              (stat.budget ? ' / 预算用尽' : '');
+    // 失败原因全是「world data 读不出来」⇒ 报 CM_READ_FAIL：这不是「还没扫描」，
+    // 让玩家/管理员拿到正确的下一步（查日志与存档，而不是去 /cm scan）。
+    if (stat.readFail > 0 && stat.readFail === stat.notScanned) {
+      return spDeny('CM_READ_FAIL',
+        '出生点打分不可用：候选区块的 world data 读取失败 —— 这不是「还没扫描」。' + why +
+        '。请管理员查服务端日志里的 [CM] 警告与存档完整性，修好后重试。', stat, actor);
+    }
     return spDeny('NO_SCANNED_CANDIDATE',
       '没找到「已扫描且地形安全」的落点。' + why +
       '。请先扫描：/cm scan <半径>（或用 Chunky 预生成环带后再 /cm scan）。', stat, actor);
@@ -766,6 +830,7 @@ function spRoll(player, opts) {
     ok: true, code: 'ok', message: msg,
     x: best.x, y: best.y, z: best.z, cx: best.cx, cz: best.cz, dim: best.dim,
     score: best.score, d: best.d, a: best.a, coverage: best.cov, slope: best.slope,
+    scoredVia: best.how,
     usedFrac: best.usedFrac, seed: seed, protectionMs: cfg.protectionMs, protectUntil: protectUntil,
     markedUsed: mut.ok === true, teleport: tp.how, note: mut.ok ? '' : ('记录写入失败：' + mut.error)
   };
@@ -800,7 +865,8 @@ function spStatusLines(source) {
     var lvl = null;
     try { lvl = source.getLevel(); } catch (e0) { }
     var parts = ['CM=v' + spNum(cm.version, '?') + ' rev=' + (typeof cm.rev === 'function' ? cm.rev() : '?') +
-                 ' 队列=' + (typeof cm.queueSize === 'function' ? cm.queueSize() : '?')];
+                 ' 队列=' + (typeof cm.queueSize === 'function' ? cm.queueSize() : '?') +
+                 ' 读数=' + (typeof cm.scoreArea === 'function' ? '批量(scoreArea)' : '逐点(getAt)')];
     try { if (typeof cm.stats === 'function' && lvl != null) parts.push(String(cm.stats(lvl))); } catch (e1) { }
     out.push(parts.join('｜'));
     // rank 洞察：本中心附近「最原始」的已扫描区块（README:150 的负 wA 写法）
@@ -862,8 +928,9 @@ function spLastText(source) {
 }
 
 function spGapsText() {
-  var out = ['出生点域接口缺口（' + SP_GAPS.length + ' 条；扩 CM 属 chunk_metrics.js 改动，需单独授权）：'];
+  var out = ['出生点域剩余接口缺口（' + SP_GAPS.length + ' 条；扩 CM 属 chunk_metrics.js 改动，需单独授权）：'];
   for (var i = 0; i < SP_GAPS.length; i++) out.push('(' + (i + 1) + ') ' + SP_GAPS[i]);
+  out.push('已解决（2026-10-04 CM 扩展）：getStatus 区分「无记录/读取失败」、scoreArea 批量读 3×3、rank 的 order 与 skipStale —— 见 chunk_metrics/README.md §4.2。');
   return out;
 }
 
