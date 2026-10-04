@@ -8,7 +8,7 @@
 // 【加固约定】2026-10-04 由 lead 授权动手，写范围仅本文件。加固动因：本文件是唯一可能在加载期抛错的
 //   KubeJS 注册点（其余 4 条都发生在回调期，不会拖垮加载）。三条约定：
 //   1) 每个注册各包一层 try/catch ⇒ 其中一条失败不会连带丢掉同文件里的其它注册；
-//   2) 失败一律留痕，前缀 [tacz-att-desc]（可 grep），不静默吞掉；
+//   2) 失败一律留痕（详情优先带 stack，取不到回落只打 err），前缀 [tacz-att-desc]（可 grep），不静默吞掉；
 //   3) 注册顺序 = 先 modifyTooltips（挂 dynamic 动作 id），再 dynamicTooltips（接管该 id）。
 //      依据 = API 语义推断（DYNAMIC_TOOLTIPS 是 TargetedEventHandler<String>，target 必须先被
 //      tooltip.dynamic(id) 注册过），**未实机证实** —— 若实机日志报 FAILED，见下面「实机检查项」。
@@ -27,13 +27,22 @@ const TACZ_ATT_DESC_TAG = '[tacz-att-desc]'; // 日志前缀；实机检查就�
 // 枪包原生 index 自带 tooltip 的 5 条：A 模式下跳过，避免与引擎自带的那一行重复
 const TACZ_ATT_DESC_NATIVE = ['ammo_mod_fmj', 'ammo_mod_he', 'ammo_mod_hp', 'ammo_mod_i', 'ammo_mod_slug'];
 
+// 异常详情：优先带 stack（加载期异常最需要知道「在哪一步炸的」——只打 err 字符串常常看不出调用点），
+// 取不到 stack 就回落只打 err；本函数自身也包一层 try，保证不引入新的抛错路径。
+function taczAttErrDetail(err) {
+  try {
+    return (err && err.stack) ? err.stack : String(err);
+  } catch (e) {
+    return '(异常详情读取失败)';
+  }
+}
 // 注册期防御性包裹：失败留痕并返回 false，但不外抛（外抛会连带丢掉同文件后续语句）
 function taczAttGuard(label, fn) {
   try {
     fn();
     return true;
   } catch (err) {
-    console.error(TACZ_ATT_DESC_TAG + ' FAILED [' + label + ']: ' + err);
+    console.error(TACZ_ATT_DESC_TAG + ' FAILED [' + label + ']: ' + taczAttErrDetail(err));
     return false;
   }
 }
@@ -42,7 +51,8 @@ let taczAttCallbackErrLogged = false;
 function taczAttCallbackGuard(label, err) {
   if (taczAttCallbackErrLogged) return;
   taczAttCallbackErrLogged = true;
-  console.error(TACZ_ATT_DESC_TAG + ' FAILED (callback) [' + label + ']: ' + err + ' —— 后续同类错误不再重复打印');
+  console.error(TACZ_ATT_DESC_TAG + ' FAILED (callback) [' + label + ']: ' + taczAttErrDetail(err) + ' —— 后续同类错误不再重复打印');
+  // 仍只打第一条：此处是回调期，逐次打印会把日志刷爆（带 stack 也一样，靠这个 once 标志兜住）
 }
 
 if (TACZ_ATT_DESC_A) {
