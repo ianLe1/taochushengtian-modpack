@@ -148,6 +148,25 @@ function warHasPermission(source, level) {
   try { return source.hasPermission(warToInt(level, 2)) === true; } catch (e) { return false; }
 }
 
+// 读 INTEGER 命令参数：argType = 命令事件里的 event.arguments.INTEGER（ArgumentTypeWrapper）。
+// 失败/非数字一律回落 dft —— 不再让 NaN 外泄（这是与 20_spawn 原 spIntOf 的唯一语义差异）。
+// 签名比最初设想多一个 argType：getResult 是 ArgumentTypeWrapper 的方法，而 core 里没有全局 Arguments
+// （它只在 commandRegistry 事件回调内有效），所以由调用方把已 create 好的类型传进来。
+function warIntArg(argType, ctx, name, dft) {
+  try { return warToInt(argType.getResult(ctx, name), dft); } catch (e) { return dft; }
+}
+
+// 整数钳位：语义**照抄 20_spawn.js:142 的 spClampInt**（Number → NaN/±Inf 回落 dft → 夹 [lo,hi] → Math.round），
+// 目的就是将来把它的 4 个调用点换过来时逐条等价。注意与 warToInt/parseInt 的差别：
+// 传入小数会四舍五入（3.6→4），Infinity 会回落 dft 而不是夹到上界 —— 这两条都是 spClampInt 的既有行为。
+function warClampInt(v, lo, hi, dft) {
+  var n = Number(v);
+  if (isNaN(n) || !isFinite(n)) n = dft;
+  if (n < lo) n = lo;
+  if (n > hi) n = hi;
+  return Math.round(n);
+}
+
 // OP 谓词工厂（三域统一入口）：给 admin 子命令挂权限；level 缺省 = WAR_CONFIG.admin.commandPermissionLevel。
 // 抽取理由：00_core / 20_spawn / 30_economy 原本各写一份内联谓词，写法还不一致（warHasPermission vs WAR.hasPermission）。
 function warOpPredicate(level) {
@@ -549,7 +568,8 @@ ServerEvents.commandRegistry(function (event) {
       .then(Commands.literal('audit')
         .executes(function (ctx) { return warReply(ctx.source, WAR_AUDIT.text(20)); })
         .then(Commands.argument('n', Arguments.INTEGER.create(event)).executes(function (ctx2) {
-          return warReply(ctx2.source, WAR_AUDIT.text(warToInt(Arguments.INTEGER.getResult(ctx2, 'n'), 20)));
+          var auditN = warClampInt(warIntArg(Arguments.INTEGER, ctx2, 'n', 20), 1, WAR_CONFIG.audit.bufferSize, 20);
+          return warReply(ctx2.source, WAR_AUDIT.text(auditN));
         })))
       .then(Commands.literal('save').executes(function (ctx) {
         var ok = WAR_DATA.save('manual');
@@ -686,6 +706,8 @@ global.WAR = {
   nameOf: warName,
   hasPermission: warHasPermission,
   opPredicate: warOpPredicate,
+  intArg: warIntArg,
+  clampInt: warClampInt,
   fmtTime: warFmtTime,
   stubStatus: function () {
     return {

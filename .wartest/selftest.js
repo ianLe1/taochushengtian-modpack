@@ -685,6 +685,44 @@ assert(moneyAdminNode != null && typeof moneyAdminNode.requires_ === 'function',
 assert(moneyAdminNode.requires_(new FakeSource(1, null)) === false && moneyAdminNode.requires_(new FakeSource(2, null)) === true,
        '/war money admin 权限行为一致（此前没有断言，这次补上）');
 
+// ================================================================ T12 整数参数与钳位归一（抽取步骤 2）
+console.log('\n--- T12 warIntArg / warClampInt ---');
+assert(typeof WAR.intArg === 'function' && typeof WAR.clampInt === 'function', 'WAR.intArg / WAR.clampInt 已暴露');
+var fakeInt = { getResult: function (ctx, n) { return ctx.args[n]; } };
+assert(WAR.intArg(fakeInt, { args: { n: 7 } }, 'n', 20) === 7, '正常整数原样返回');
+assert(WAR.intArg(fakeInt, { args: { n: '42' } }, 'n', 20) === 42, '数字字符串解析为整数');
+assert(WAR.intArg(fakeInt, { args: { n: 'abc' } }, 'n', 20) === 20, '非数字回落 dft（不再外泄 NaN）');
+assert(WAR.intArg(fakeInt, { args: {} }, 'n', 20) === 20, '缺参数回落 dft');
+assert(WAR.intArg({ getResult: function () { throw new Error('boom'); } }, { args: {} }, 'n', -1) === -1, 'getResult 抛异常回落 dft');
+assert(WAR.intArg(fakeInt, { args: { n: '-3' } }, 'n', 20) === -3, '负数原样返回（本层不钳位，交业务校验）');
+assert(WAR.clampInt(5, 1, 10, 3) === 5, '钳位：区间内原样');
+assert(WAR.clampInt(0, 1, 10, 3) === 1 && WAR.clampInt(99, 1, 10, 3) === 10, '钳位：越界夹到端点');
+assert(WAR.clampInt('abc', 1, 10, 4) === 4 && WAR.clampInt(undefined, 1, 10, 4) === 4, '钳位：非数字回落 dft 再夹');
+assert(WAR.clampInt(Infinity, 1, 10, 4) === 4, '钳位：Infinity 回落 dft（对齐 spClampNum 的 !isFinite 分支，不是夹到上界）');
+assert(WAR.clampInt(3.6, 1, 10, 4) === 4 && WAR.clampInt(7.2, 1, 10, 4) === 7, '钳位：小数四舍五入（对齐 spClampInt 的 Math.round）');
+// 端到端①：/war admin audit [n] 的 n 现在过 warIntArg + warClampInt
+var sAudit0 = new FakeSource(2, null);
+runPath(registeredRoot, ['admin', 'audit', 'n'], sAudit0, { n: 0 });
+var msg0 = sAudit0.messages.join(' ');
+function countAuditEntries(m) { var mm = m.match(/#\d+ \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/g); return mm ? mm.length : 0; }
+var cnt0 = countAuditEntries(msg0);
+assert(cnt0 === 1, '/war admin audit 0 → 夹到 1 条（实际 ' + cnt0 + ' 条）');
+var sAuditBig = new FakeSource(2, null);
+runPath(registeredRoot, ['admin', 'audit', 'n'], sAuditBig, { n: 999 });
+var cntBig = countAuditEntries(sAuditBig.messages.join(' '));
+assert(cntBig === WAR.audit.count(), '/war admin audit 999 → 夹到 bufferSize，等于当前审计条数（' + cntBig + '）');
+assert(cntBig <= WAR.config.audit.bufferSize, '输出条数不超过审计缓冲上限 ' + WAR.config.audit.bufferSize);
+// 端到端②：/war money withdraw <非整数> → -1 哨兵被 econCheckAmount 拒绝，余额不变
+var pZ = new FakePlayer('zero', 'uuid-zero');
+srvE.players.push(pZ);
+WAR.econ.mint('console', 'uuid-zero', 40, null);
+var sZ = new FakeSource(0, pZ);
+var balZ0 = WAR.econ.balanceOf('uuid-zero');
+runPath(registeredRoot, ['money', 'withdraw', 'amount'], sZ, { amount: 'abc' });
+assert(sZ.messages.join(' ').indexOf('必须为正整数') >= 0, '非整数金额被拒并给出原因（实际：' + sZ.messages.join(' ').slice(0, 40) + '）');
+assert(WAR.econ.balanceOf('uuid-zero') === balZ0, '被拒后余额不变');
+assert(WAR.econ.invariant().ok === true, '步骤 2 后端到端不变量仍成立');
+
 console.log('\n--- 汇总 ---');
 console.log('PASS=' + passN + ' FAIL=' + failN + ' SKIP=' + skipN);
 console.log(ok ? 'ALL_PASS' : 'SOME_FAILED');

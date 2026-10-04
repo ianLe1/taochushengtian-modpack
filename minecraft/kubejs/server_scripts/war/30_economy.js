@@ -444,7 +444,7 @@ WAR.commands.add(function (Commands, Arguments, event) {
   var I = Arguments.INTEGER.create(event);
   var P = Arguments.PLAYER.create(event);
 
-  function intOf(ctx, name) { return warToInt(Arguments.INTEGER.getResult(ctx, name), -1); }
+  function intOf(ctx, name) { return warIntArg(I, ctx, name, -1); }   // 步骤 2：三份整数解析归一（-1 哨兵保留，下游 econCheckAmount 继续拒绝 <=0）
   function playerOf(ctx, name) { try { return Arguments.PLAYER.getResult(ctx, name); } catch (e) { return null; } }
   function actorName(ctx) { try { var p = ctx.source.getPlayer(); if (p != null) return WAR.nameOf(p); } catch (e) { } return 'console'; }
   function selfPlayer(ctx) { try { return ctx.source.getPlayer(); } catch (e) { return null; } }
