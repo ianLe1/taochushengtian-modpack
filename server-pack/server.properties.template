@@ -1,0 +1,85 @@
+# ===== 逃出生天 战争服 server.properties 模板（M0）=====
+# 用法：server-pack/tools/make-server.sh 会把它拷成服务端目录下的 server.properties（已存在则不覆盖）。
+# 每项下面一行说明「为什么是这个值」。带 ← 待定 的项要等策划给出人数/规则后再定。
+
+# 服务器身份
+motd=逃出生天 · 战争服
+# 显示在多人列表里的名字；改它不影响任何玩法逻辑。
+
+# 正版验证与登录
+online-mode=true
+# 战争服必须开正版验证：关掉等于允许任意盗版客户端伪造 UUID，KubeJS 侧所有按 UUID 记账（经济/团队/基地）都会失去可信锚点。内网联调若临时关，记得联调结束改回。
+enforce-secure-profile=true
+# 1.19+ 的聊天签名校验，保持默认开启；关掉会让聊天记录无法作为「谁说了什么」的凭据。
+prevent-proxy-connections=false
+# 本服不用 BungeeCord/Velocity 转发，保持 false。
+
+# 白名单
+white-list=true
+enforce-whitelist=true
+# M0 先白名单制上线（服主/策划先上），确认稳定后再评估开放注册；enforce-whitelist=true 保证运行中加白才生效、不给已连入的旧会话留缝。
+op-permission-level=4
+# 只有服主用；KubeJS 的 /war admin 走自身权限判断，不依赖这个数字。
+function-permission-level=2
+# 数据包函数/命令方块权限，保持默认 2，不给 4。
+
+# 玩法规则
+gamemode=survival
+difficulty=hard
+# 战争服：生存 + 困难（怪物伤害与饥饿惩罚到位）。
+pvp=true
+# 战争服核心开关。若个别区域要禁 PvP，靠 KubeJS 区域判定，不靠全局开关。
+hardcore=false
+# 不用硬核模式：死亡应触发 KubeJS 的掉落/复活流程，而不是封号。
+force-gamemode=false
+# 允许 KubeJS 在某些场景临时切换玩家模式（如出生点教学）。
+allow-flight=true
+# **必须 true**：整合包有 Create 6 航空/飞艇与滑翔类内容，原版反作弊会把持续滞空判定为飞行并踢人。
+spawn-protection=0
+# 关掉原版出生点保护：基地保护由 KubeJS 自建（原版保护圈只会挡住管理工具和建筑），且半径小、语义与战争服不符。
+spawn-monsters=true
+generate-structures=true
+allow-nether=true
+# 下界保留（部分 Create/科技产线依赖下界资源）。
+player-idle-timeout=0
+# 不自动踢挂机（战争服挂机即战术，踢掉反而制造不公平）。
+
+# 视距与性能（专用服 CPU 预算，与客户端 options.txt 的 render-distance=12 是两件事）
+view-distance=10
+# 服务端只负责发区块；核显+16 线程的整机若还要跑客户端，10 已是上限，先按 10 起步再压测。
+simulation-distance=6
+# 模拟距离直接决定实体/tick 开销，是这台机器最容易爆的地方；6 起步，压测后再谈加减。
+entity-broadcast-range-percentage=100
+# 保持默认；若百人规模压测发现带宽打满，再降到 75 观察。
+max-players=20
+# ← 待定：方案 §10 的「服务器人数规模」未给，暂按 20 占位，确定后必须回来改。
+network-compression-threshold=256
+# 模组包流量大，256 是常见的性能/带宽折中点。
+sync-chunk-writes=false
+# SSD 上关掉同步写可明显减少 tick 卡顿；代价是意外断电可能丢最后几秒的区块写入（世界存档有定时备份兜底）。
+max-tick-time=-1
+# **关键**：NeoForge/模组在生成新世界或加载大型机械时会长时间占用 tick，默认 60000ms 的看门狗会误报「服务器卡死」并强杀进程；-1 = 交给管理员判断。
+level-name=world
+level-seed=
+# 留空 = 首次启动随机种子；定种子后不要改，改了等于换地图。
+level-type=minecraft\:normal
+# 保持原版地形生成（本包主要靠 Create/地形成分模组，不加超平坦等实验类型）。
+max-world-size=29999984
+# 原版上限，保持默认。
+
+# 状态与日志
+enable-status=true
+# 让多人列表能看到人数（白名单制下无害）。
+hide-online-players=false
+# 战争服需要知道谁在线。
+enable-rcon=false
+# 不开 RCON：管理走 KubeJS 的 /war admin，少一个网络暴露面。
+enable-query=false
+log-ips=true
+# 保留 IP 日志：排查小号/多开与作弊时是唯一凭据；服主需自行按当地法规处理这些日志。
+
+# 资源包
+require-resource-pack=false
+resource-pack=
+resource-pack-sha1=
+# 不强制下发资源包（本包资源靠客户端整合包自带，服务端下发会把首次进服变成大文件下载）。

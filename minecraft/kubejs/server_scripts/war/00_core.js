@@ -1,0 +1,678 @@
+// ============================================================================
+// 战服 · 00_core.js —— 命名空间 / 数据根 / 审计 / 命令框架 / 公共工具
+// ============================================================================
+// 定位：M0「服务器骨架」（战服开发方案.md §0.2 全局架构、§8 M0 行、文末「编码第一刀」第 1 项）
+// 权威存储：server.persistentData['war']（CompoundTag）——这是唯一权威，JSON 文件只当只读配置。
+//
+// 载荷约定（本文件是唯一读写入口，其它域脚本一律走 global.WAR.* API，禁止直接改 NBT）：
+//   · 标量键：version / dataVersion / createdAt / bootCount / savedAt（NBT 原生标量）
+//   · 结构化域：teams / audit / econ / spawn / claim / trade / shop / base / think / kv
+//     各以「JSON 字符串」存放，一个域一个键。
+//   ⚠ 为什么结构化域用 JSON 文本而不是嵌套 CompoundTag：
+//     ① 跨字段一致性（队伍表 byId/byPlayer 必须同一笔落盘，避免只写一半）；
+//     ② 不依赖 CompoundTag 的「创建」API（getCompound 在键缺失时返回游离空 tag，
+//        写进去会静默丢失，是本类代码的经典坑）；
+//     ③ 未来加字段无需改 NBT 结构，配合 dataVersion 迁移。
+//   ⚠ 规模上限（lead 2026-10-04 批注）：本方案「整域重写 JSON」在单域条目涨到数千级
+//     （M6 思索平台、M4 交易表）时序列化开销会变得可观；到那时应改为分片/增量落盘，先记于此。
+//     —— 这是本文件的设计决定，交付报告里已向 lead 标注为「判断与偏差」之一。
+//
+// 已核实的 KubeJS/原版 API（javap 字节码实证，不臆造）：
+//   ServerEvents.loaded / unloaded / tick / commandRegistry —— EventGroup 字符串名实证
+//   CommandRegistryKubeEvent.register(LiteralArgumentBuilder) / .commands / .arguments
+//   ArgumentTypeWrapper: create(CommandRegistryKubeEvent) / getResult(CommandContext, String)
+//   CommandSourceStack: hasPermission(int) getPlayer() getServer() getLevel()
+//                       sendSystemMessage(Component) sendSuccess(Supplier,boolean) sendFailure(Component)
+//   CompoundTag: contains/getInt/getLong/getString/getBoolean/putInt/putLong/putString/putBoolean/
+//                put/remove/getAllKeys
+//   Java.loadClass('net.minecraft.nbt.CompoundTag') —— 本实例 chunk_metrics.js:832 已有先例
+//   NBT.compoundTag()（兜底）；Text.string(String) -> MutableComponent；Text.<color>(Component)
+//   server.persistentData / player.persistentData（WithPersistentData.kjs$getPersistentData）
+//   server.runCommandSilent(String)
+// ============================================================================
+
+var WAR_NS = 'war';                 // server.persistentData 下的根键
+var WAR_TICK = { n: 0, timers: [] }; // tick 分发器
+var WAR_HOOKS = { boot: [] };        // 启动钩子（10_team.js 等域脚本往里挂）
+
+// ============================================================================
+// CONFIG —— 全部「待补充参数」集中在此，改一行即全局生效
+// 标「暂定默认值」的项 = 用户/策划尚未拍板（见方案 §10 待补充清单），先给能跑的数。
+// ============================================================================
+var WAR_CONFIG = {
+  version: '0.1.0-m0',           // 脚本版本（随里程碑递增）
+  dataVersion: 1,                // 落盘 schema 版本（将来迁移用）
+  debug: false,                  // 暂定默认值：是否输出 [war][debug] 细节日志
+  team: {
+    maxMembers: 8,               // 暂定默认值：单队人数上限
+    friendlyFire: false,         // 暂定默认值：队内伤害（false = 关闭，队内免伤生效）
+    inviteExpireSeconds: 300,    // 暂定默认值：邀请有效期（秒）
+    nameMin: 2,                  // 暂定默认值：队名长度下限
+    nameMax: 16,                 // 暂定默认值：队名长度上限
+    defaultColor: 'blue',        // 暂定默认值：默认队伍颜色
+    colors: ['blue', 'green', 'red', 'yellow', 'gold', 'aqua', 'light_purple',
+             'dark_aqua', 'dark_green', 'dark_red', 'dark_blue', 'dark_purple',
+             'gray', 'dark_gray', 'white', 'black']
+  },
+  audit: {
+    bufferSize: 500              // 暂定默认值：审计环形缓冲条数（溢出即丢最旧并计数）
+  },
+  data: {
+    autosaveTicks: 6000,         // 暂定默认值：脏数据自动落盘间隔（20 tick = 1 秒 → 300 秒）
+    saveOnUnload: true           // 暂定默认值：服务器卸载时落盘
+  },
+  econ:  { currencyItem: 'war:credit', startBalance: 0 },  // 暂定默认值；账本 30_economy.js
+  spawn: { mode: 'cm-score', candidateRadius: 5000, tries: 64 }, // 暂定默认值；20_spawn.js
+  claim: { enabled: false, defaultRadius: 32 },            // 暂定默认值；40_base.js
+  base:  { enabled: false, maxPerTeam: 3 },                // 暂定默认值；40_base.js
+  trade: { enabled: false, taxRate: 0 },                   // 暂定默认值；50_trade.js
+  shop:  { enabled: false, catalogPath: 'war/shop/catalog.json' }, // 暂定默认值；60_shop.js
+  think: { enabled: false, intelTtlSeconds: 900 },         // 暂定默认值；70_think.js
+  admin: { commandPermissionLevel: 2 }                     // /war admin * 所需原版权限等级
+};
+
+// ============================================================================
+// 0. 公共工具
+// ============================================================================
+
+function warNow() { return Date.now(); }
+
+function warPad2(n) { return (n < 10 ? '0' : '') + n; }
+
+function warFmtTime(ms) {
+  try {
+    var d = new Date(ms);
+    return d.getFullYear() + '-' + warPad2(d.getMonth() + 1) + '-' + warPad2(d.getDate()) + ' ' +
+           warPad2(d.getHours()) + ':' + warPad2(d.getMinutes()) + ':' + warPad2(d.getSeconds());
+  } catch (e) { return String(ms); }
+}
+
+function warJ(v) {
+  try { return JSON.stringify(v); } catch (e) { console.error('[war] JSON 序列化失败：' + e); return null; }
+}
+
+function warParse(s, dft) {
+  if (s == null || s === '') return dft;
+  try { var v = JSON.parse(String(s)); return (v == null) ? dft : v; }
+  catch (e) {
+    console.error('[war] JSON 解析失败，回退默认值：' + e);
+    return dft;
+  }
+}
+
+function warToInt(v, dft) {
+  var n = parseInt(String(v), 10);
+  return isNaN(n) ? dft : n;
+}
+
+function warLog(msg) { console.info('[war] ' + msg); }
+
+function warDebug(msg, opts) { try { if (WAR_CONFIG.debug) console.info('[war][debug] ' + msg); } catch (e) { } }
+
+function warCountKeys(o) {
+  try { return (o == null) ? 0 : Object.keys(o).length; } catch (e) { return 0; }
+}
+
+// 玩家标识：优先 .uuid（KubeJS 属性），逐级回落到原版方法名。
+// ⚠ 全部为「离线不可判定、需实机确认」项：Rhino 的 mojmap→运行时映射在真机上才生效。
+function warUuid(p) {
+  if (p == null) return '';
+  try { var a = p.uuid; if (a != null) return String(a); } catch (e1) { }
+  try { var b = p.getUUID(); if (b != null) return String(b); } catch (e2) { }
+  try { var c = p.getStringUUID(); if (c != null) return String(c); } catch (e3) { }
+  return '';
+}
+
+function warName(p) {
+  if (p == null) return '?';
+  try { var a = p.username; if (a != null && String(a) !== '') return String(a); } catch (e1) { }
+  try { var b = p.getName().getString(); if (b != null && String(b) !== '') return String(b); } catch (e2) { }
+  try { var c = p.getScoreboardName(); if (c != null && String(c) !== '') return String(c); } catch (e3) { }
+  return '?';
+}
+
+function warHasPermission(source, level) {
+  try { return source.hasPermission(warToInt(level, 2)) === true; } catch (e) { return false; }
+}
+
+// 命令回显：控制台与玩家都可用。Text.string 已核实（TextWrapper.string(String)）。
+function warReply(source, msg) {
+  warLog(msg);
+  var comp = null;
+  try { comp = Text.string(String(msg)); } catch (e0) { comp = null; }
+  if (comp != null) {
+    try { source.sendSystemMessage(comp); return 1; } catch (e1) { }
+    try { source.sendSuccess(function () { return comp; }, false); return 1; } catch (e2) { }
+    try { source.sendFailure(comp); return 1; } catch (e3) { }
+  }
+  try { source.sendSystemMessage(String(msg)); return 1; } catch (e4) { }
+  return 1;
+}
+
+function warTell(player, msg) {
+  if (player == null) return false;
+  try { player.tell(Text.string(String(msg))); return true; } catch (e1) { }
+  try { player.tell(String(msg)); return true; } catch (e2) { }
+  return false;
+}
+
+// 执行原版命令（计分板队伍等）。静默执行，失败只记日志。
+function warRun(cmd) {
+  try {
+    if (WAR_DATA.server != null && WAR_DATA.server.runCommandSilent != null) {
+      WAR_DATA.server.runCommandSilent(String(cmd));
+      warDebug('run: ' + cmd);
+      return true;
+    }
+  } catch (e) { console.error('[war] 命令执行失败 [' + cmd + ']：' + e); }
+  return false;
+}
+
+// ============================================================================
+// 1. 数据层（L1 权威存储）：server.persistentData['war']
+// ============================================================================
+
+var WAR_DATA = {
+  server: null,
+  state: null,          // 内存镜像（唯一可写副本），落盘时才序列化
+  dirty: false,
+  warned: {},
+  lastLoadAt: 0,
+  lastSaveAt: 0,
+  javaOk: false,
+  CT: null,
+
+  newTag: function () {
+    if (!WAR_DATA.javaOk) {
+      try { WAR_DATA.CT = Java.loadClass('net.minecraft.nbt.CompoundTag'); WAR_DATA.javaOk = true; }
+      catch (e1) { WAR_DATA.javaOk = false; }
+    }
+    if (WAR_DATA.javaOk) {
+      try { return new WAR_DATA.CT(); } catch (e2) { }
+    }
+    try { return NBT.compoundTag(); } catch (e3) { }
+    return null;
+  },
+
+  defaultState: function () {
+    return {
+      version: WAR_CONFIG.version,
+      dataVersion: WAR_CONFIG.dataVersion,
+      createdAt: warNow(),
+      bootCount: 0,
+      savedAt: 0,
+      teams: { seq: 0, byId: {}, byPlayer: {} },
+      audit: { seq: 0, dropped: 0, items: [] },
+      econ:  { __stub: true, __owner: '30_economy.js', balance: {} },
+      spawn: { __stub: true, __owner: '20_spawn.js' },
+      claim: { __stub: true, __owner: '40_base.js' },
+      trade: { __stub: true, __owner: '50_trade.js' },
+      shop:  { __stub: true, __owner: '60_shop.js' },
+      base:  { __stub: true, __owner: '40_base.js' },
+      think: { __stub: true, __owner: '70_think.js' },
+      kv:    {}
+    };
+  },
+
+  bind: function (server) { WAR_DATA.server = server; return WAR_DATA.server != null; },
+
+  // 只读拿到权威 NBT 根；不存在或不可用返回 null
+  root: function () {
+    if (WAR_DATA.server == null) return null;
+    try {
+      var pd = WAR_DATA.server.persistentData;
+      if (pd.contains(WAR_NS)) return pd.getCompound(WAR_NS);
+    } catch (e) { warWarnOnce('pd-read', 'persistentData 读取不可用：' + e); }
+    return null;
+  },
+
+  // 结构防呆：JSON 载荷被外部改坏时仍能跑
+  normalize: function (st) {
+    if (st == null || typeof st !== 'object') st = WAR_DATA.defaultState();
+    if (typeof st.version !== 'string') st.version = WAR_CONFIG.version;
+    if (typeof st.dataVersion !== 'number') st.dataVersion = WAR_CONFIG.dataVersion;
+    if (typeof st.createdAt !== 'number' || st.createdAt <= 0) st.createdAt = warNow();
+    if (typeof st.bootCount !== 'number') st.bootCount = 0;
+    if (typeof st.savedAt !== 'number') st.savedAt = 0;
+    if (st.teams == null || typeof st.teams !== 'object') st.teams = { seq: 0, byId: {}, byPlayer: {} };
+    if (st.teams.byId == null || typeof st.teams.byId !== 'object') st.teams.byId = {};
+    if (st.teams.byPlayer == null || typeof st.teams.byPlayer !== 'object') st.teams.byPlayer = {};
+    if (typeof st.teams.seq !== 'number') st.teams.seq = warCountKeys(st.teams.byId);
+    if (st.audit == null || typeof st.audit !== 'object') st.audit = { seq: 0, dropped: 0, items: [] };
+    if (!(st.audit.items instanceof Array)) st.audit.items = [];
+    if (typeof st.audit.seq !== 'number') st.audit.seq = st.audit.items.length;
+    if (typeof st.audit.dropped !== 'number') st.audit.dropped = 0;
+    if (st.kv == null || typeof st.kv !== 'object') st.kv = {};
+    var domains = ['econ', 'spawn', 'claim', 'trade', 'shop', 'base', 'think'];
+    for (var i = 0; i < domains.length; i++) {
+      if (st[domains[i]] == null || typeof st[domains[i]] !== 'object') st[domains[i]] = { __stub: true };
+    }
+    return st;
+  },
+
+  load: function (server) {
+    if (server != null) WAR_DATA.bind(server);
+    var st = WAR_DATA.defaultState();
+    var root = WAR_DATA.root();
+    var firstBoot = (root == null);
+    if (root != null) {
+      try {
+        if (root.contains('version')) st.version = String(root.getString('version'));
+        if (root.contains('dataVersion')) st.dataVersion = warToInt(root.getInt('dataVersion'), WAR_CONFIG.dataVersion);
+        if (root.contains('createdAt')) st.createdAt = Number(root.getLong('createdAt'));
+        if (root.contains('bootCount')) st.bootCount = warToInt(root.getInt('bootCount'), 0);
+        if (root.contains('savedAt')) st.savedAt = Number(root.getLong('savedAt'));
+        st.teams = warParse(root.getString('teams'), st.teams);
+        st.audit = warParse(root.getString('audit'), st.audit);
+        st.econ  = warParse(root.getString('econ'),  st.econ);
+        st.spawn = warParse(root.getString('spawn'), st.spawn);
+        st.claim = warParse(root.getString('claim'), st.claim);
+        st.trade = warParse(root.getString('trade'), st.trade);
+        st.shop  = warParse(root.getString('shop'),  st.shop);
+        st.base  = warParse(root.getString('base'),  st.base);
+        st.think = warParse(root.getString('think'), st.think);
+        st.kv    = warParse(root.getString('kv'),    st.kv);
+      } catch (err) {
+        console.error('[war] 数据根读取异常，已回退默认值：' + err);
+      }
+    }
+    st = WAR_DATA.normalize(st);
+    WAR_DATA.state = st;
+    WAR_DATA.dirty = false;
+    WAR_DATA.lastLoadAt = warNow();
+    warLog('数据根载入：' + (firstBoot ? '首次启动（将创建键 ' + WAR_NS + '）' : '已存在')
+           + '｜schema v' + st.dataVersion + '｜bootCount=' + st.bootCount
+           + '｜队伍=' + warCountKeys(st.teams.byId) + '｜审计=' + st.audit.items.length);
+    return st;
+  },
+
+  save: function (reason) {
+    if (WAR_DATA.state == null) return false;
+    if (WAR_DATA.server == null) { warWarnOnce('no-server', '尚未绑定服务器，落盘跳过'); return false; }
+    var tag = WAR_DATA.newTag();
+    if (tag == null) { warWarnOnce('no-tag', '无法创建 CompoundTag，落盘跳过（内存数据仍在）'); return false; }
+    try {
+      var st = WAR_DATA.state;
+      tag.putString('version', String(st.version));
+      tag.putInt('dataVersion', warToInt(st.dataVersion, WAR_CONFIG.dataVersion));
+      tag.putLong('createdAt', Number(st.createdAt));
+      tag.putInt('bootCount', warToInt(st.bootCount, 0));
+      tag.putLong('savedAt', warNow());
+      tag.putString('teams', warJ(st.teams) || '{}');
+      tag.putString('audit', warJ(st.audit) || '{}');
+      tag.putString('econ',  warJ(st.econ)  || '{}');
+      tag.putString('spawn', warJ(st.spawn) || '{}');
+      tag.putString('claim', warJ(st.claim) || '{}');
+      tag.putString('trade', warJ(st.trade) || '{}');
+      tag.putString('shop',  warJ(st.shop)  || '{}');
+      tag.putString('base',  warJ(st.base)  || '{}');
+      tag.putString('think', warJ(st.think) || '{}');
+      tag.putString('kv',    warJ(st.kv)    || '{}');
+      WAR_DATA.server.persistentData.put(WAR_NS, tag);
+      WAR_DATA.lastSaveAt = warNow();
+      WAR_DATA.state.savedAt = WAR_DATA.lastSaveAt;
+      WAR_DATA.dirty = false;
+      warDebug('已落盘（' + reason + '）');
+      return true;
+    } catch (err) {
+      warWarnOnce('pd-write', 'persistentData 写入不可用，落盘失败（内存数据仍在）：' + err);
+      return false;
+    }
+  },
+
+  touch: function () { WAR_DATA.dirty = true; return true; },
+
+  // 一次改动包成事务样子：出错不落盘、不标记脏
+  mutate: function (label, fn) {
+    if (WAR_DATA.state == null) return { ok: false, error: '数据根未载入' };
+    try {
+      var ret = fn(WAR_DATA.state);
+      WAR_DATA.dirty = true;
+      return { ok: true, ret: ret };
+    } catch (err) {
+      console.error('[war] mutate[' + label + '] 失败：' + err);
+      return { ok: false, error: String(err) };
+    }
+  },
+
+  // 通用 KV（给还没独立成域的脚本用；持久化在 kv 键）
+  kv: {
+    get: function (k, dft) {
+      try { var v = WAR_DATA.state.kv[String(k)]; return (v === undefined) ? dft : v; } catch (e) { return dft; }
+    },
+    set: function (k, v) {
+      try { WAR_DATA.state.kv[String(k)] = v; WAR_DATA.dirty = true; return true; } catch (e) { return false; }
+    },
+    has: function (k) {
+      try { return WAR_DATA.state.kv.hasOwnProperty(String(k)); } catch (e) { return false; }
+    },
+    del: function (k) {
+      try { delete WAR_DATA.state.kv[String(k)]; WAR_DATA.dirty = true; return true; } catch (e) { return false; }
+    }
+  }
+};
+
+function warWarnOnce(tag, msg) {
+  var t = String(tag || '?');
+  if (WAR_DATA.warned[t] === true) return;
+  WAR_DATA.warned[t] = true;
+  console.error('[war] ' + msg);
+}
+
+// ============================================================================
+// 2. 审计日志（环形缓冲 + 结构化条目：时间/主体/动作/对象/结果）
+// ============================================================================
+
+var WAR_AUDIT = {
+  // actor = 谁（玩家名 / 'system' / 'cmd:console'），action = 做了什么，
+  // target = 对谁/对什么，result = 'ok' | 'fail' | 'deny' | ...，detail = 可选细节
+  append: function (actor, action, target, result, detail) {
+    if (WAR_DATA.state == null) return null;
+    try {
+      WAR_DATA.state.audit.seq = warToInt(WAR_DATA.state.audit.seq, 0) + 1;
+      var e = {
+        seq: WAR_DATA.state.audit.seq,
+        t: warNow(),
+        actor: String(actor == null ? '-' : actor),
+        action: String(action == null ? '-' : action),
+        target: String(target == null ? '-' : target),
+        result: String(result == null ? '-' : result)
+      };
+      if (detail != null) e.detail = String(detail);
+      WAR_DATA.state.audit.items.push(e);
+      var cap = warToInt(WAR_CONFIG.audit.bufferSize, 500);
+      if (cap < 1) cap = 1;
+      while (WAR_DATA.state.audit.items.length > cap) {
+        WAR_DATA.state.audit.items.shift();
+        WAR_DATA.state.audit.dropped = warToInt(WAR_DATA.state.audit.dropped, 0) + 1;
+      }
+      WAR_DATA.dirty = true;
+      return e;
+    } catch (err) { console.error('[war] 审计写入失败：' + err); return null; }
+  },
+
+  count: function () {
+    try { return WAR_DATA.state.audit.items.length; } catch (e) { return 0; }
+  },
+
+  tail: function (n) {
+    var k = warToInt(n, 20);
+    if (k < 1) k = 1;
+    try {
+      var a = WAR_DATA.state.audit.items;
+      return a.slice(Math.max(0, a.length - k));
+    } catch (e) { return []; }
+  },
+
+  last: function () {
+    try { var a = WAR_DATA.state.audit.items; return a.length ? a[a.length - 1] : null; } catch (e) { return null; }
+  },
+
+  text: function (n) {
+    var list = WAR_AUDIT.tail(n);
+    if (list.length === 0) return '审计为空';
+    var out = [];
+    for (var i = 0; i < list.length; i++) {
+      var e = list[i];
+      out.push('#' + e.seq + ' ' + warFmtTime(e.t) + ' ' + e.actor + ' ' + e.action +
+               ' -> ' + e.target + ' = ' + e.result + (e.detail ? '（' + e.detail + '）' : ''));
+    }
+    return out.join(' | ');
+  }
+};
+
+// ============================================================================
+// 3. 未实现域的 stub（按方案 §0.2 的拆档预留；实现时覆盖同名成员）
+// ============================================================================
+
+function warStub(domain, owner, note) {
+  return {
+    __stub: true,
+    __owner: owner,
+    __note: note,
+    status: function () { return { domain: domain, implemented: false, owner: owner, note: note }; }
+  };
+}
+
+var WAR_TEAM_STUB = {
+  __stub: true,
+  __owner: '10_team.js',
+  __note: '团队域：由 10_team.js 覆盖（create/invite/accept/leave/kick/list/disband/of/sameTeam）',
+  status: function () { return { domain: 'team', implemented: false, owner: '10_team.js', note: WAR_TEAM_STUB.__note }; },
+  of: function () { return null; },
+  sameTeam: function () { return false; },
+  isAlly: function () { return false; }
+};
+
+// ============================================================================
+// 4. 命令框架 + /war 命令树
+// ============================================================================
+
+var WAR_COMMANDS = {
+  nodes: [],   // 各域注册的节点工厂：function (Commands, Arguments, event) -> node
+  help: [],
+  add: function (factory) { WAR_COMMANDS.nodes.push(factory); return true; },
+  helpLine: function (usage, desc) { WAR_COMMANDS.help.push({ usage: usage, desc: desc }); return true; }
+};
+
+function warVersionText() {
+  var st = WAR_DATA.state;
+  var teams = 0, audit = 0, dropped = 0, boots = '-';
+  if (st != null) {
+    teams = warCountKeys(st.teams.byId);
+    audit = (st.audit.items instanceof Array) ? st.audit.items.length : 0;
+    dropped = st.audit.dropped;
+    boots = st.bootCount;
+  }
+  return '战服 v' + WAR_CONFIG.version + '（数据 schema v' + WAR_CONFIG.dataVersion + '）' +
+         ' | 就绪=' + (WAR.ready ? '是' : '否') +
+         ' | 权威存储=server.persistentData.' + WAR_NS + (WAR_DATA.root() != null ? '（已存在）' : '（待创建）') +
+         ' | 启动次数=' + boots + ' | 队伍=' + teams + ' 审计=' + audit + '（丢帧 ' + dropped + '）';
+}
+
+function warHelpText() {
+  var out = ['战服命令（' + WAR_COMMANDS.help.length + ' 条）：'];
+  for (var i = 0; i < WAR_COMMANDS.help.length; i++) {
+    out.push(WAR_COMMANDS.help[i].usage + ' —— ' + WAR_COMMANDS.help[i].desc);
+  }
+  return out.join(' | ');
+}
+
+function warAdminStatusText() {
+  var st = WAR_DATA.state;
+  var root = WAR_DATA.root();
+  var keys = '-';
+  try { if (root != null) keys = String(root.getAllKeys()); } catch (e) { }
+  var parts = [
+    'OP 自检',
+    'ready=' + (WAR.ready ? 'Y' : 'N'),
+    'java桥=' + (WAR_DATA.javaOk ? 'Y' : 'N'),
+    'dirty=' + (WAR_DATA.dirty ? 'Y' : 'N'),
+    '存储键=' + WAR_NS,
+    'NBT键=' + keys,
+    'bootCount=' + (st ? st.bootCount : '-'),
+    '队伍=' + (st ? warCountKeys(st.teams.byId) : 0),
+    '玩家映射=' + (st ? warCountKeys(st.teams.byPlayer) : 0),
+    '审计=' + (st ? st.audit.items.length : 0) + '/' + WAR_CONFIG.audit.bufferSize + '（丢帧 ' + (st ? st.audit.dropped : 0) + '）',
+    'lastLoad=' + (WAR_DATA.lastLoadAt ? warFmtTime(WAR_DATA.lastLoadAt) : '-'),
+    'lastSave=' + (WAR_DATA.lastSaveAt ? warFmtTime(WAR_DATA.lastSaveAt) : '-'),
+    'tick=' + WAR_TICK.n,
+    '定时器=' + WAR_TICK.timers.length
+  ];
+  return parts.join(' | ');
+}
+
+WAR_COMMANDS.helpLine('/war version', '版本与运行状态');
+WAR_COMMANDS.helpLine('/war help', '本帮助');
+WAR_COMMANDS.helpLine('/war admin status|audit [n]|save', 'OP' + WAR_CONFIG.admin.commandPermissionLevel + '：数据根自检 / 审计回看 / 手动落盘');
+
+ServerEvents.commandRegistry(function (event) {
+  try {
+    var Commands = event.commands;
+    var Arguments = event.arguments;
+
+    var root = Commands.literal('war')
+      .executes(function (ctx) { return warReply(ctx.source, warHelpText()); })
+      .then(Commands.literal('version').executes(function (ctx) {
+        return warReply(ctx.source, warVersionText());
+      }))
+      .then(Commands.literal('help').executes(function (ctx) {
+        return warReply(ctx.source, warHelpText());
+      }));
+
+    var admin = Commands.literal('admin')
+      .requires(function (src) { return warHasPermission(src, WAR_CONFIG.admin.commandPermissionLevel); })
+      .executes(function (ctx) { return warReply(ctx.source, '用法：/war admin status | audit [n] | save'); })
+      .then(Commands.literal('status').executes(function (ctx) {
+        return warReply(ctx.source, warAdminStatusText());
+      }))
+      .then(Commands.literal('audit')
+        .executes(function (ctx) { return warReply(ctx.source, WAR_AUDIT.text(20)); })
+        .then(Commands.argument('n', Arguments.INTEGER.create(event)).executes(function (ctx2) {
+          return warReply(ctx2.source, WAR_AUDIT.text(warToInt(Arguments.INTEGER.getResult(ctx2, 'n'), 20)));
+        })))
+      .then(Commands.literal('save').executes(function (ctx) {
+        var ok = WAR_DATA.save('manual');
+        WAR_AUDIT.append('cmd:' + warActorName(ctx.source), 'admin.save', WAR_NS, ok ? 'ok' : 'fail');
+        return warReply(ctx.source, ok ? '已落盘（reason=manual）' : '落盘失败：见服务器日志');
+      }));
+    root.then(admin);
+
+    // 各域脚本注册的命令节点（10_team.js 等）
+    for (var i = 0; i < WAR_COMMANDS.nodes.length; i++) {
+      try {
+        var node = WAR_COMMANDS.nodes[i](Commands, Arguments, event);
+        if (node != null) root.then(node);
+      } catch (e1) { console.error('[war] 命令节点注册失败 #' + i + '：' + e1); }
+    }
+
+    event.register(root);
+    warDebug('命令树已注册（域节点 ' + WAR_COMMANDS.nodes.length + ' 个）');
+  } catch (err) {
+    console.error('[war] 命令注册失败（JS API 不受影响）：' + err);
+  }
+});
+
+function warActorName(source) {
+  try {
+    var p = source.getPlayer();
+    if (p != null) return warName(p);
+  } catch (e) { }
+  return 'console';
+}
+
+// ============================================================================
+// 5. tick 分发器 + 启动/卸载钩子
+// ============================================================================
+
+// 注册一个周期任务（ticks = 间隔）；回调异常只记日志，不影响其它任务
+function warEvery(ticks, label, fn) {
+  WAR_TICK.timers.push({ ticks: Math.max(1, warToInt(ticks, 20)), last: WAR_TICK.n, label: String(label || '?'), fn: fn });
+  return true;
+}
+
+function warTick(server) {
+  WAR_TICK.n++;
+  for (var i = 0; i < WAR_TICK.timers.length; i++) {
+    var t = WAR_TICK.timers[i];
+    if ((WAR_TICK.n - t.last) >= t.ticks) {
+      t.last = WAR_TICK.n;
+      try { t.fn(server); } catch (err) { console.error('[war] 定时器[' + t.label + '] 异常：' + err); }
+    }
+  }
+  try {
+    if (WAR_DATA.dirty && (WAR_TICK.n - warLastAutosave) >= warToInt(WAR_CONFIG.data.autosaveTicks, 6000)) {
+      warLastAutosave = WAR_TICK.n;
+      WAR_DATA.save('autosave');
+    }
+  } catch (err2) { warWarnOnce('autosave', '自动落盘异常：' + err2); }
+}
+var warLastAutosave = 0;
+
+function warBoot(server) {
+  try {
+    if (server == null) return false;
+    WAR_DATA.bind(server);
+    WAR_DATA.load(server);
+    WAR_DATA.state.bootCount = warToInt(WAR_DATA.state.bootCount, 0) + 1;
+    WAR.ready = true;
+    WAR.bootAt = warNow();
+    WAR_AUDIT.append('system', 'server.boot', 'world', 'ok',
+                     'v' + WAR_CONFIG.version + ' boot#' + WAR_DATA.state.bootCount);
+    for (var i = 0; i < WAR_HOOKS.boot.length; i++) {
+      try { WAR_HOOKS.boot[i](server); } catch (e1) { console.error('[war] boot 钩子 #' + i + ' 异常：' + e1); }
+    }
+    WAR_DATA.save('boot');
+    warLog('核心就绪 v' + WAR_CONFIG.version + '｜' + warVersionText());
+    return true;
+  } catch (err) {
+    console.error('[war] boot 失败：' + err);
+    return false;
+  }
+}
+
+function warShutdown(server) {
+  try {
+    if (WAR_CONFIG.data.saveOnUnload) WAR_DATA.save('unload');
+    WAR_AUDIT.append('system', 'server.unload', 'world', 'ok');
+    WAR_DATA.save('unload-final');
+    WAR.ready = false;
+    warLog('已停服落盘');
+    return true;
+  } catch (err) { console.error('[war] 停服落盘失败：' + err); return false; }
+}
+
+ServerEvents.loaded(function (event) { warBoot(event.server); });
+ServerEvents.unloaded(function (event) { warShutdown(event.server); });
+ServerEvents.tick(function (event) { try { warTick(event.server); } catch (err) { warWarnOnce('tick', 'tick 异常：' + err); } });
+
+// ============================================================================
+// 6. 对外命名空间（唯一的写入口）
+// ============================================================================
+
+global.WAR = {
+  version: WAR_CONFIG.version,
+  config: WAR_CONFIG,
+  ready: false,
+  bootAt: 0,
+
+  // 核心三件套
+  data: WAR_DATA,
+  audit: WAR_AUDIT,
+
+  // 域（未实现的仍是 stub，见 §3）
+  team: WAR_TEAM_STUB,
+  econ:  warStub('econ',  '30_economy.js', '经济账本未实现；货币物品 war:credit 由 startup_scripts/war_items.js 注册'),
+  spawn: warStub('spawn', '20_spawn.js',   '出生点未实现；计划复用 chunk_metrics（global.CM）打分'),
+  claim: warStub('claim', '40_base.js',    '领地保护未实现'),
+  base:  warStub('base',  '40_base.js',    '基地管理未实现'),
+  trade: warStub('trade', '50_trade.js',   '玩家交易未实现'),
+  shop:  warStub('shop',  '60_shop.js',    '商店未实现'),
+  think: warStub('think', '70_think.js',   '思索/情报未实现'),
+
+  // 框架
+  commands: WAR_COMMANDS,
+  hooks: WAR_HOOKS,
+  every: warEvery,
+  tick: warTick,
+  boot: warBoot,
+  shutdown: warShutdown,
+
+  // 工具（域脚本可复用）
+  reply: warReply,
+  tell: warTell,
+  run: warRun,
+  uuidOf: warUuid,
+  nameOf: warName,
+  hasPermission: warHasPermission,
+  fmtTime: warFmtTime,
+  stubStatus: function () {
+    return {
+      team: WAR_TEAM_STUB.status(), econ: global.WAR.econ.status(), spawn: global.WAR.spawn.status(),
+      claim: global.WAR.claim.status(), base: global.WAR.base.status(), trade: global.WAR.trade.status(),
+      shop: global.WAR.shop.status(), think: global.WAR.think.status()
+    };
+  }
+};
+
+warLog('00_core.js 已加载 v' + WAR_CONFIG.version + '（等待 ServerEvents.loaded）');

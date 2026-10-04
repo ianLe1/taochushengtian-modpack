@@ -46,6 +46,32 @@
 # 键位轮盘定义（options.txt 不入库，理由见 README）
 !/minecraft/keybind_bundles.json
 
+# ---- 专用服产物（server-pack）：只跟文本交付物 ----
+!/server-pack/
+/server-pack/*
+!/server-pack/*.md
+!/server-pack/*.list
+!/server-pack/*.template
+!/server-pack/start.sh
+!/server-pack/user_jvm_args.txt
+!/server-pack/dist/
+/server-pack/dist/*
+!/server-pack/dist/*.md
+!/server-pack/dist/*.tsv
+!/server-pack/dist/*.sh
+!/server-pack/tools/
+/server-pack/tools/*
+!/server-pack/tools/*.py
+!/server-pack/tools/*.sh
+!/server-pack/ops/
+/server-pack/ops/*
+!/server-pack/ops/*.sh
+!/server-pack/ops/orphan-manifest-backup/
+/server-pack/ops/orphan-manifest-backup/*
+!/server-pack/ops/orphan-manifest-backup/*.md
+!/server-pack/ops/orphan-manifest-backup/*.toml
+# server-pack/reports/ 与 __pycache__ 不入库（快照/缓存，会随时间漂移）
+
 # =====================================================================
 #  黑名单（写在白名单之后，后写的规则生效）
 # =====================================================================

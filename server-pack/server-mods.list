@@ -1,0 +1,255 @@
+# 可上专用服模组：jar / modid / Modrinth server_side / 备注
+# 生成：server-pack/tools/scan_mods.py --offline
+AeroEngine-1.3.0.jar	aeroengineering	required	packwiz side=both
+BEB-NeoForge-1.21-6.0.0.jar	beb	required	packwiz side=both
+BTP-NeoForge-1.21.1-2.0.1.jar	beautiful_potions	required	packwiz side=both
+CBC-Military-Supplement-1.21.1-2.1.4.jar	cbcmoreshells	required	packwiz side=both
+CBCmoreshells-1.4.0.jar	cbc_enhanced_shells	unknown	packwiz side=server
+Chunky-NeoForge-1.4.23.jar	chunky	optional	packwiz side=both
+Clumps-neoforge-1.21.1-19.0.0.1.jar	clumps	optional	packwiz side=both
+CreateDragonsPlus-1.11.9.jar	create_dragons_plus	required	
+CreativeCore_NEOFORGE_v2.13.50_mc1.21.1.jar	creativecore	optional	
+Cucumber-1.21.1-8.0.16.jar	cucumber	required	packwiz side=both
+DungeonsArise-1.21.1-2.1.68-release.jar	dungeons_arise	required	packwiz side=server
+EpheroLib-1.21.1-NEO-FORGE-1.2.0.jar	epherolib	unknown	packwiz side=server
+Explorify v1.6.5.mod.jar	explorify,explorify	required	packwiz side=both
+FarmersDelight-1.21.1-1.3.4.jar	farmersdelight	required	packwiz side=both
+Female-Gender-Mod-neoforge-1.21-3.2.2.jar	wildfire_gender	optional	packwiz side=both
+GnKinetics-1.21.1-1.0m.jar	gnkinetics	required	packwiz side=both
+Iceberg-1.21.1-neoforge-1.3.2.jar	iceberg	required	packwiz side=both
+Jade-1.21.1-NeoForge-15.10.6.jar	jade	optional	packwiz side=both
+JadeAddons-1.21.1-NeoForge-6.1.1.jar	jadeaddons	optional	
+KotlinLangForge-2.14.1-k2.4.20-3.0+neoforge.jar	klf	optional	
+MysticalAgriculture-1.21.1-8.0.28.jar	mysticalagriculture	required	packwiz side=both
+NoChatReports-NEOFORGE-1.21.1-v2.9.1.jar	nochatreports	optional	packwiz side=both
+Northstar-0.6.6+1.21.1.jar	northstar	required	
+Oh-The-Trees-Youll-Grow-neoforge-1.21.1-5.3.2.jar	ohthetreesyoullgrow	required	packwiz side=server
+ParCool-1.21.1-4.0.0.6.jar	parcool	required	
+Paxi-1.21.1-NeoForge-5.1.3.jar	paxi	optional	packwiz side=both
+StreamsReflowing-1.21.1-neoforge-2.14.1.jar	streamsreflowing	required	
+Tellus-neoforge-1.21.1-0.8.3.jar	tellus	required	packwiz side=both
+Terralith_1.21.1_v2.6.2_Neoforge.jar	terralith	required	packwiz side=both
+Unwrecked Ships Plus 2.0.5.jar	ae8EZLiC	required	packwiz side=both
+VS-Sable-HoseConnectors-0.1.8-1.21.1.jar	vsfluidlink,vsfluidlink	required	packwiz side=both
+WRB-Armor-NeoForge-1.21.1-0.6.1.jar	warbornrenewed,warbornrenewed	unknown	packwiz side=server
+YungsApi-1.21.1-NeoForge-5.1.9.jar	yungsapi	required	
+YungsBetterCaves-1.21.1-NeoForge-3.1.6.jar	bettercaves	required	packwiz side=server
+YungsBetterDesertTemples-1.21.1-NeoForge-4.1.5.jar	betterdeserttemples	required	packwiz side=server
+YungsBetterDungeons-1.21.1-NeoForge-5.1.4.jar	betterdungeons	required	packwiz side=server
+YungsBetterEndIsland-1.21.1-NeoForge-3.1.2.jar	betterendisland	required	packwiz side=server
+YungsBetterJungleTemples-1.21.1-NeoForge-3.1.2.jar	betterjungletemples	required	packwiz side=server
+YungsBetterMineshafts-1.21.1-NeoForge-5.1.1.jar	bettermineshafts	required	packwiz side=server
+YungsBetterNetherFortresses-1.21.1-NeoForge-3.1.5.jar	betterfortresses	required	packwiz side=server
+YungsBetterOceanMonuments-1.21.1-NeoForge-4.1.2.jar	betteroceanmonuments	required	packwiz side=server
+YungsBetterStrongholds-1.21.1-NeoForge-5.1.3.jar	betterstrongholds	required	packwiz side=server
+YungsBetterWitchHuts-1.21.1-NeoForge-4.1.1.jar	betterwitchhuts	required	packwiz side=server
+YungsBridges-1.21.1-NeoForge-5.1.1.jar	yungsbridges	required	packwiz side=server
+YungsExtras-1.21.1-NeoForge-5.1.1.jar	yungsextras	required	packwiz side=server
+aeroengine_fuel_compat-0.0.2.jar	aeroengine_fuel_compat	required	packwiz side=server
+aerofade-0.1.0.jar	aerofade	unknown	packwiz side=server
+antiquetradingship-1.3.0-neoforge-1.21.1.jar	antiquetradingship,antiquetradingship	required	packwiz side=both
+appleskin-neoforge-mc1.21-3.0.9.jar	appleskin	optional	packwiz side=both
+architectury-13.0.11-neoforge.jar	architectury	required	packwiz side=both
+autopickup-neoforge-1.4.16+1.21.0-1.jar	autopickup	required	packwiz side=server
+azimuth-1.4.9.jar	azimuth	required	
+balm-neoforge-1.21.1-21.0.66.jar	balm	optional	
+bellsandwhistles-0.4.7-1.21.1.jar	bellsandwhistles	required	packwiz side=both
+better_fishing-1.0.0-neoforge-1.21.1.jar	better_fishing	unknown	
+bettercombat-neoforge-2.4.0+1.21.1.jar	bettercombat	required	packwiz side=both
+bits_n_bobs-2.3.5.jar	bits_n_bobs	required	
+bits_n_dyes-1.1.2.jar	bits_n_dyes	required	packwiz side=both
+blockdurability-1.1.0-neoforge.jar	blockdurability	required	packwiz side=both
+caelus-neoforge-7.0.1+1.21.1.jar	caelus	required	packwiz side=both
+cannoncompressedarmor-1.0.0.jar	cannoncompressedarmor	required	packwiz side=both
+carrasconlib-neoforge-1.21.1-0.1.jar	carrasconlib	required	packwiz side=both
+cbc_at_Neoforge_1.21.1_0.1.4c.jar	cbc_at	required	packwiz side=both
+cbc_terminal_ballistics-0.3.5-neoforge.jar	cbc_terminal_ballistics	required	packwiz side=both
+cbcmodernwarfare-0.0.6v+mc.1.21.1-neoforge.jar	cbcmodernwarfare	unknown	packwiz side=server
+cc-tweaked-1.21.1-forge-1.120.2.jar	computercraft	required	packwiz side=both
+ccbr-1.2.1-neoforge-1.21.1.jar	ccbr	required	packwiz side=both
+cccbridge-mc1.21.1-v1.7.3-neoforge.jar	cccbridge	required	packwiz side=both
+ccpe-1.1.6-1.21.1.jar	ccpe	required	
+chemica-1.21.1-0.7.0.jar	chemica	required	
+climbable_ropes-2.1.4.jar	climbable_ropes	required	
+cloth-config-15.0.140-neoforge.jar	cloth_config	optional	packwiz side=both
+cnbridge-1.0.0.jar	cnbridge	required	packwiz side=both
+coastersengineered-1.21.1-1.1.1.jar	coastersengineered	required	
+coastersmagnetized-1.1.0.jar	coastersmagnetized	required	packwiz side=both
+coasterssimulatedextratypes-1.2.0.jar	coasterssimulatedextratypes	required	
+collective-1.21.1-8.41.jar	collective,collective	optional	
+connector-2.0.0-beta.17+1.21.1-full.jar	-	unknown	manual: Sinytra Connector：Modrinth 项目 connector client_side=optional / server_side=optional；本包内为 Fabric 兼容层（META-INF/jarjar 内嵌 c
+coolrain-1.21.1-NeoForge-1.0.2.jar	coolrain	unknown	
+copycats-3.0.9+mc.1.21.1-neoforge.jar	copycats	required	
+coroutil-neoforge-1.21.0-1.3.8.jar	coroutil	required	packwiz side=both
+cratedelight-26.07.01-1.21-neoforge.jar	cratedelight	required	packwiz side=both
+cratedelightcroptopia-24.12.27-1.21-neoforge.jar	cratedelightcroptopia	required	packwiz side=both
+create-1.21.1-6.0.10.jar	create	required	packwiz side=both
+create-aeronautics-bundled-1.21.1-1.3.2.jar	aeronautics_bundled	required	packwiz side=both
+create-central-kitchen-2.6.2.jar	create_central_kitchen	required	
+create-enchantment-industry-2.5.4.jar	create_enchantment_industry	required	
+create-extended-wrenches-1.21.1-2.0.2.jar	extendedwrenches	required	packwiz side=both
+create-fire-control-0.7.9.jar	create_fire_control	unknown	packwiz side=server
+create-jadeaddon-tfmg-compat-1.0.0.jar	jadeaddontfmgcompat	unknown	packwiz side=client
+create_aeronautics_easy_assembly-1.1.0.jar	create_aeronautics_easy_assembly	unknown	packwiz side=server
+create_biotech-1.21.1-2.0.0-beta.2.jar	create_biotech	required	
+create_bitterballen+1.21.1-1.0.4.jar	create_bic_bit	required	
+create_connected-1.3.3-mc1.21.1.jar	create_connected	required	packwiz side=both
+create_hand_made-0.2.0-beta.jar	create_hand_made	unknown	packwiz side=server
+create_item_drawers-mc1.21.1+1.2.2.jar	create_item_drawers	required	packwiz side=both
+create_mechanical_extruder-1.21.1-2.2.2-6.0.10.jar	create_mechanical_extruder	required	packwiz side=both
+create_optical-0.4.2.jar	create_optical	required	packwiz side=both
+create_parachute-1.1.3b.jar	create_parachute	required	
+create_ratatouille-1.21.1-1.4.0.jar	ratatouille	required	
+create_rns-1.3.1-1.21.1-6.jar	create_rns	required	packwiz side=both
+create_submarine-3.3.0.jar	create_submarine,create_abyss	required	
+create_train_parts-0.5.2-1.21.1-6.0.10-281.jar	create_train_parts	required	packwiz side=both
+createbigcannons-5.11.7+mc.1.21.1.jar	createbigcannons	required	packwiz side=both
+createdeco-2.1.3.jar	createdeco	required	packwiz side=both
+createenchantablemachinery-3.6.0+mc1.21.1-neoforge.jar	createenchantablemachinery	required	packwiz side=both
+createfirefightingadd-0.2.5-beta-fix2.jar	createfirefightingadd	required	
+createimp-1.4.2.jar	createimp	required	
+createmetalogistics-1.21.1-0.4.7.jar	createmetalogistics	required	packwiz side=both
+createnucleartech-1.0s.jar	createnucleartech	required	packwiz side=both
+createpropulsion-1.1.5.jar	createpropulsion	required	packwiz side=both
+createrailwaysnavigator-neoforge-1.21.1-beta-0.10.0-C6.jar	createrailwaysnavigator	required	
+cristellib-neoforge-1.21.1-3.1.7.jar	cristellib	required	packwiz side=both
+cropsloverain-3.2.1.jar	cropsloverain	required	packwiz side=server
+croptopia-neoforge-1.21.1-4.2.4.jar	croptopia	unknown	packwiz side=server
+croptopiadelight-1.0.1.jar	croptopiadelight	required	packwiz side=both
+crowns-1.21.1-2.2.5.jar	crowns	required	packwiz side=both
+curios-neoforge-9.5.1+1.21.1.jar	curios	required	packwiz side=both
+curios_for_ammo_box-1.21.1-1.2.0.jar	curios_for_ammo_box,${mod_id}	required	packwiz side=both
+dangerous_shafts-1.0.0.jar	dangerous_shafts	required	packwiz side=both
+deeperdarker-neoforge-1.21.1-1.4.1.jar	deeperdarker	required	packwiz side=both
+diagonal_leaves-neoforge-1.21.1-0.1.1.jar	diagonal_leaves	required	packwiz side=server
+do_a_barrel_roll-neoforge-3.7.3+1.21.jar	do_a_barrel_roll	optional	packwiz side=both
+dragonlib-neoforge-1.21.1-beta-3.0.28.jar	dragonlib	required	packwiz side=both
+elytraslot-neoforge-9.0.2+1.21.1.jar	elytraslot	required	packwiz side=both
+emi-1.1.24+1.21.1+neoforge.jar	emi	optional	packwiz side=both
+emi_loot-0.7.9+1.21+neoforge.jar	emi_loot	required	packwiz side=both
+emi_ores-1.3+1.21.1+neoforge.jar	emi_ores	required	packwiz side=both
+enchanted_fishing_line-1.0.0-neoforge-1.21.1.jar	enchanted_fishing_line	unknown	
+epic-terrain_compatible-1.0.3.jar	sc69VpnK	required	packwiz side=both
+epicterrain-0.1.4.jar	7qSJGSHp	required	packwiz side=both
+escalated-1.3.2+mc.1.21.1.jar	escalated	required	packwiz side=both
+farmers_croptopia-1.21.1-3.2.4.jar	farmers_croptopia	required	packwiz side=both
+ferritecore-7.0.3-neoforge.jar	ferritecore	optional	packwiz side=both
+flowing_fluids-1.0.6-1.21-neoforge.jar	flowing_fluids	required	packwiz side=both
+fluidlogistics-1.3.1-mc1.21.1.jar	fluidlogistics	required	
+forgified-fabric-api-0.116.15+2.3.5+1.21.1.jar	fabric_api,forgified_fabric_api	required	packwiz side=both
+formicapi-1.21.1-2.4.2.jar	formicapi	required	packwiz side=both
+ftb-library-neoforge-2101.1.37.jar	ftblibrary	unknown	packwiz side=server
+ftb-ultimine-neoforge-2101.1.15.jar	ftbultimine	unknown	
+fzzy_config-0.7.7+1.21+neoforge.jar	fzzy_config	required	
+gauged_wires-1.0.6a.jar	gauged_wires	required	packwiz side=both
+geckolib-neoforge-1.21.1-4.9.3.jar	geckolib	optional	
+gundb-2.2.2-1.21.1.jar	gundb	required	packwiz side=both
+hlps_1.4.3.jar	hlps	required	packwiz side=both
+interiors-1.21.1-neoforge-0.6.1.jar	interiors	required	packwiz side=both
+jei-1.21.1-neoforge-19.57.0.450.jar	jei	optional	
+keywheel-neoforge-1.1.7-1.21.1-java21.jar	keywheel	unknown	packwiz side=server
+kleeslabs-neoforge-1.21.1-21.1.11.jar	kleeslabs	required	packwiz side=both
+kotlinforforge-5.12.0-all.jar	-	unknown	manual: Kotlin for Forge：Modrinth 项目 kotlin-for-forge client_side=optional / server_side=optional；库模组（纯 jar-in-jar：kotlin-stdlib
+kubejs-create-neoforge-2101.3.1-build.18.jar	kubejs_create	required	packwiz side=both
+kubejs-neoforge-2101.7.2-build.377.jar	kubejs	optional	
+ldlib2-neoforge-1.21.1-2.2.41-all.jar	ldlib2	required	
+linguaperipherals-1.21.1-neoforge-2.0.1.jar	linguaperipherals	required	packwiz side=both
+lithium-neoforge-0.15.4+mc1.21.1.jar	lithium	optional	packwiz side=both
+lithostitched-1.8.0-neoforge-21.1.jar	lithostitched	required	packwiz side=server
+locometal_armor-1.1.0.jar	locometal_armor	required	packwiz side=server
+mcpskins-1.1.2-neoforge-1.21.1.jar	mcpskins	required	
+mechanicals-1.21.1-1.1.6.jar	mechanicals	required	packwiz side=both
+mianbaos_modernwarfare-2.5.3-neoforge.jar	mianbaos_modernwarfare	unknown	packwiz side=server
+middgard-1.2.2-1.21.1.jar	middgard	required	packwiz side=both
+midnightlib-neoforge-1.9.3+1.21.1.jar	midnightlib	optional	packwiz side=both
+modernfix-neoforge-5.27.24+mc1.21.1.jar	modernfix	optional	packwiz side=both
+monolib-neoforge-1.21.1-4.1.0.jar	monolib	required	packwiz side=both
+more_beautiful_torches-merged-1.21.1-3.1.1.jar	more_beautiful_torches	required	
+moregenerators-0.0.2.jar	moregenerators	required	packwiz side=both
+mru-1.0.41+1.21.1-neoforge.jar	mru	optional	
+overpressure-0.1.7.4.jar	overpressure	required	
+pinout-0.2.1.jar	pinout	required	packwiz side=both
+pipesnphysics-3.2.1.jar	pipesnphysics	required	
+plasmovoice-neoforge-1.21.1-2.2.0-beta.1.jar	plasmovoice	required	packwiz side=both
+player-animation-lib-forge-2.0.4+1.21.1.jar	playeranimator	required	packwiz side=both
+pmweather-1.21.1-0.17.14-alpha.jar	pmweather	required	packwiz side=both
+pmweather_aeronautics-0.9.0b.jar	pmweather_aeronautics	required	packwiz side=both
+pmweatherflowingfluidscompat-0.3.0a-all.jar	pmweatherflowingfluidscompat	required	packwiz side=server
+polymorph-neoforge-1.2.0+1.21.1.jar	polymorph	required	
+ponderer-1.21.1-neoforge-1.10.6.1.jar	ponderer	optional	packwiz side=both
+potentials-neoforge-1.21-0.7.1.jar	potentials	required	packwiz side=both
+powerchip-2.1.2.jar	powerchip	required	
+powergrid-mc1.21.1-0.6.2.jar	powergrid	required	
+punchy_puppies-2.0.1-neoforge-1.21.1.jar	punchy_puppies	required	packwiz side=both
+pv-addon-lavaplayer-lib-1.2.3.jar	pv_addon_lavaplayer_lib,pv_addon_lavaplayer_lib	required	packwiz side=server
+pv-addon-nickname-2.1.3.jar	pv_addon_nickname,pv_addon_nickname	required	packwiz side=server
+pv-addon-priority-1.1.0.jar	pv_addon_priority,pv_addon_priority	required	packwiz side=server
+pv-addon-spectator-1.1.0.jar	pv_addon_spectator,pv_addon_spectator	required	packwiz side=server
+pv-addon-voice-messages-1.0.0-beta.4-all.jar	pv_addon_voice_messages,pv_addon_voice_messages	required	packwiz side=server
+pv-addon-walkietalkie-1.1.2.jar	walkietalkie	required	packwiz side=both
+pv-addon-whisper-1.1.0.jar	pv_addon_whisper,pv_addon_whisper	required	packwiz side=server
+ragdoll_corpse-1.21.1-0.3.0.jar	ragdoll_corpse	required	packwiz side=both
+ragdollpushmod-1.1.jar	ragdollpushmod	required	packwiz side=both
+railways-0.3.0-beta.2+neoforge-mc1.21.1.jar	railways	required	packwiz side=both
+ratatouille_fried_delights-1.0.4.jar	ratatouille_fried_delights	required	packwiz side=both
+realism-0.6.6-mc1.21.1-neoforge.jar	realism	required	packwiz side=both
+replantingcrops-1.21.1-5.7.jar	replantingcrops,replantingcrops	required	
+resourcefullib-neoforge-1.21-3.0.12.jar	resourcefullib	required	packwiz side=both
+reterraforged-neoforge-1.21.1.jar	reterraforged	unknown	
+rhino-2101.2.8-build.91.jar	rhino,rhino	optional	packwiz side=both
+ritchiesprojectilelib-2.1.2+mc.1.21.1-neoforge.jar	ritchiesprojectilelib	unknown	
+ritchiesprojectilelib-2.1.2-mc.1.21.1-neoforge.jar	ritchiesprojectilelib	required	packwiz side=both
+roadweaver-neoforge-2.3.1-1.21.1-hotfix.jar	roadweaver	required	packwiz side=both
+sable-dynamic-lights-1.21.1-2.0.1.jar	sabledynlights	required	packwiz side=both
+sable-neoforge-1.21.1-2.0.5.jar	sable	required	packwiz side=both
+sable-photomancy-1.0.1.jar	sable_schematic_api	required	packwiz side=both
+sable-physics-tree-0.1.2.jar	sable_physics_tree	required	
+sable_fix_mod-1.1.0.jar	sable_fix_mod	required	packwiz side=server
+sable_player_ragdoll-1.21.1-0.7.5.jar	sable_player_ragdoll	required	packwiz side=both
+sable_player_ragdoll_patch-1.21.1-1.9.jar	sable_player_ragdoll_patch	required	packwiz side=both
+sable_ragdoll_dummies-1.0.0-neoforge-1.21.1.jar	sable_ragdoll_dummies	required	packwiz side=both
+sable_ragdoll_revival-1.2.2.jar	sable_ragdoll_revival	required	packwiz side=both
+sable_weighted_create_deco-1.21.1-1.0.1-d.jar	sable_weighted_createdeco	required	
+sablebeyond-neoforge-1.21.1-v0.5.0.jar	sable_beyond	required	packwiz side=both
+sableexplosionfix-1.0.0.jar	sableexplosionfix	required	packwiz side=both
+sablefloaters-1.0.1.jar	sablefloaters	required	
+sablephysicscompat-1.3.0.jar	sablephysicscompat	required	packwiz side=server
+shulkerboxtooltip-neoforge-5.1.9+1.21.1.jar	shulkerboxtooltip	optional	packwiz side=both
+simulatedcoasters-0.1.5.jar	simulatedcoasters	required	packwiz side=both
+simulatedcoasters-backport-0.1.2+sable1.2.1.jar	simulatedcoasters	required	packwiz side=both
+simurail-0.1.0+mc1.21.1+76f9008.jar	simurail	unknown	manual: Create Simurail：Modrinth 无此项目（仅 CurseForge）；jar 内 neoforge.mods.toml 未声明任何 side；含 assets/217 + data/76（有服务端内容），依赖 minecr
+sliceanddice-4.3.4-neoforge.jar	sliceanddice	required	
+sound-physics-remastered-neoforge-1.21.1-1.5.1.jar	sound_physics_remastered	optional	packwiz side=both
+spawn-animations-compats-17.0.jar	ofDka6PS	required	packwiz side=both
+spawnanimations-v1.11.6-mc1.17-26.3.9-mod.jar	spawnanimations,spawnanimations	required	packwiz side=both
+structurecredits-1.21.1-3.0.jar	structurecredits	required	packwiz side=both
+struts-1.3.1.jar	struts	required	
+t_and_t-fabric-neoforge-1.13.11.jar	t_and_t	required	packwiz side=both
+taa-1.4.3-hotfix+1.21.1.jar	taa	required	
+tacz-neoforge-1.21.1-1.1.8-hotfix-r7.jar	tacz	required	
+tacz-pack-upgrader-2.1.3.jar	taczpackupgrader	optional	packwiz side=both
+tacz-tweaks-3.0.0-alpha.10+1.21.1-neoforge.jar	tacztweaks	required	packwiz side=both
+tacz_aero_compat-1.8.0.jar	tacz_aero_compat	required	packwiz side=both
+tacz_tactical_breaching-neoforge-1.21.1-1.0.5.jar	tacz_tactical_breaching	required	packwiz side=both
+tacz_x_guns_lights_addon-neoforge-1.21.1-2.8.2.jar	tacz_x_guns_lights_addon	optional	packwiz side=both
+taczaddon-1.1.8-fix2-1.21.1-neoforge.jar	taczaddon	required	packwiz side=both
+takesapillage-neoforge-1.0.13+mc1.21.1.jar	takesapillage	required	
+tectonic-3.0.28-neoforge-21.1.jar	tectonic	required	packwiz side=both
+tellus-atlas-wildlife-0.9.12.jar	tellus_atlas_wildlife	required	packwiz side=both
+tfmc-1.0.2-neoforge-1.21.1.jar	tfmc	required	packwiz side=both
+tfmg-1.21.1-1.3.2a-community.jar	tfmg	required	
+tfmg_automation-0.0.1.jar	tfmg_automation	required	packwiz side=both
+tfmg_energy_connector-26.03.jar	tfmg_energy_connector	required	packwiz side=both
+tfmgjs-1.21.1-1.2.0.jar	tfmgjs	required	
+tongdarailway-1.1.5+mc21.1.jar	tongdarailway	unknown	packwiz side=server
+toroidal_world-0.19.3+mc1.21.1.jar	toroidal_world_bundle	required	
+true_impact-0.5.7-delta.jar	true_impact	required	packwiz side=both
+txnilib-neoforge-1.0.24-1.21.1.jar	txnilib,txnilib	required	packwiz side=both
+ultimine_rewind-2.1.0.jar	ultimine_rewind	required	packwiz side=both
+veinminer-neoforge-2.11.2+1.21.1.jar	veinminer	required	packwiz side=both
+wakes-1.21.1-NeoForge-1.4.1.jar	wakes	required	
+watut-neoforge-1.21.0-1.2.7.jar	watut	required	packwiz side=both
+worldgenfeaturefix-neoforge-1.21-1.0.1.jar	worldgenfeaturefix	required	packwiz side=server
+xaerominimap-neoforge-1.21.1-26.5.0.jar	xaerominimap	optional	
+xaeroworldmap-neoforge-1.21.1-1.46.0.jar	xaeroworldmap	optional	
+yet_another_config_lib_v3-3.8.2+1.21.1-neoforge.jar	yet_another_config_lib_v3	optional	packwiz side=both

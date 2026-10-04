@@ -1,0 +1,57 @@
+# 必须真机开服才能定的模组：jar / modid / server_side / 为什么要实测
+# 生成：server-pack/tools/scan_mods.py --offline
+CBCmoreshells-1.4.0.jar	cbc_enhanced_shells	no-metadata	server_side=absent≠required ⇒ 是否需要在服务端保留需实测
+Chunky-NeoForge-1.4.23.jar	chunky	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+Clumps-neoforge-1.21.1-19.0.0.1.jar	clumps	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+CreativeCore_NEOFORGE_v2.13.50_mc1.21.1.jar	creativecore	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+EpheroLib-1.21.1-NEO-FORGE-1.2.0.jar	epherolib	no-metadata	server_side=absent≠required ⇒ 是否需要在服务端保留需实测
+Female-Gender-Mod-neoforge-1.21-3.2.2.jar	wildfire_gender	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+Jade-1.21.1-NeoForge-15.10.6.jar	jade	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+JadeAddons-1.21.1-NeoForge-6.1.1.jar	jadeaddons	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+KotlinLangForge-2.14.1-k2.4.20-3.0+neoforge.jar	klf	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+NoChatReports-NEOFORGE-1.21.1-v2.9.1.jar	nochatreports	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+Paxi-1.21.1-NeoForge-5.1.3.jar	paxi	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+WRB-Armor-NeoForge-1.21.1-0.6.1.jar	warbornrenewed,warbornrenewed	no-metadata	server_side=absent≠required ⇒ 是否需要在服务端保留需实测
+aerofade-0.1.0.jar	aerofade	no-metadata	server_side=absent≠required ⇒ 是否需要在服务端保留需实测
+appleskin-neoforge-mc1.21-3.0.9.jar	appleskin	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+balm-neoforge-1.21.1-21.0.66.jar	balm	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+better_fishing-1.0.0-neoforge-1.21.1.jar	better_fishing	unknown	server_side=unknown≠required ⇒ 是否需要在服务端保留需实测
+cbcmodernwarfare-0.0.6v+mc.1.21.1-neoforge.jar	cbcmodernwarfare	no-metadata	server_side=absent≠required ⇒ 是否需要在服务端保留需实测
+cloth-config-15.0.140-neoforge.jar	cloth_config	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+collective-1.21.1-8.41.jar	collective,collective	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+connector-2.0.0-beta.17+1.21.1-full.jar	-	no-metadata	无元数据/人工判定
+coolrain-1.21.1-NeoForge-1.0.2.jar	coolrain	unknown	server_side=unknown≠required ⇒ 是否需要在服务端保留需实测
+create-fire-control-0.7.9.jar	create_fire_control	no-metadata	server_side=absent≠required ⇒ 是否需要在服务端保留需实测
+create-jadeaddon-tfmg-compat-1.0.0.jar	jadeaddontfmgcompat	unknown	server_side=unknown≠required ⇒ 是否需要在服务端保留需实测
+create_aeronautics_easy_assembly-1.1.0.jar	create_aeronautics_easy_assembly	no-metadata	server_side=absent≠required ⇒ 是否需要在服务端保留需实测
+create_hand_made-0.2.0-beta.jar	create_hand_made	no-metadata	server_side=absent≠required ⇒ 是否需要在服务端保留需实测
+croptopia-neoforge-1.21.1-4.2.4.jar	croptopia	no-metadata	server_side=absent≠required ⇒ 是否需要在服务端保留需实测
+do_a_barrel_roll-neoforge-3.7.3+1.21.jar	do_a_barrel_roll	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+emi-1.1.24+1.21.1+neoforge.jar	emi	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+enchanted_fishing_line-1.0.0-neoforge-1.21.1.jar	enchanted_fishing_line	unknown	server_side=unknown≠required ⇒ 是否需要在服务端保留需实测
+ferritecore-7.0.3-neoforge.jar	ferritecore	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+ftb-library-neoforge-2101.1.37.jar	ftblibrary	no-metadata	server_side=absent≠required ⇒ 是否需要在服务端保留需实测
+ftb-ultimine-neoforge-2101.1.15.jar	ftbultimine	no-metadata	server_side=absent≠required ⇒ 是否需要在服务端保留需实测
+geckolib-neoforge-1.21.1-4.9.3.jar	geckolib	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+jei-1.21.1-neoforge-19.57.0.450.jar	jei	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+keywheel-neoforge-1.1.7-1.21.1-java21.jar	keywheel	no-metadata	server_side=absent≠required ⇒ 是否需要在服务端保留需实测
+kotlinforforge-5.12.0-all.jar	-	no-metadata	无元数据/人工判定
+kubejs-neoforge-2101.7.2-build.377.jar	kubejs	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+lithium-neoforge-0.15.4+mc1.21.1.jar	lithium	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+mianbaos_modernwarfare-2.5.3-neoforge.jar	mianbaos_modernwarfare	no-metadata	server_side=absent≠required ⇒ 是否需要在服务端保留需实测
+midnightlib-neoforge-1.9.3+1.21.1.jar	midnightlib	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+modernfix-neoforge-5.27.24+mc1.21.1.jar	modernfix	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+mru-1.0.41+1.21.1-neoforge.jar	mru	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+ponderer-1.21.1-neoforge-1.10.6.1.jar	ponderer	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+reterraforged-neoforge-1.21.1.jar	reterraforged	no-metadata	server_side=absent≠required ⇒ 是否需要在服务端保留需实测
+rhino-2101.2.8-build.91.jar	rhino,rhino	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+ritchiesprojectilelib-2.1.2+mc.1.21.1-neoforge.jar	ritchiesprojectilelib	no-metadata	server_side=absent≠required ⇒ 是否需要在服务端保留需实测
+shulkerboxtooltip-neoforge-5.1.9+1.21.1.jar	shulkerboxtooltip	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+simurail-0.1.0+mc1.21.1+76f9008.jar	simurail	no-metadata	无元数据/人工判定
+sound-physics-remastered-neoforge-1.21.1-1.5.1.jar	sound_physics_remastered	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+tacz-pack-upgrader-2.1.3.jar	taczpackupgrader	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+tacz_x_guns_lights_addon-neoforge-1.21.1-2.8.2.jar	tacz_x_guns_lights_addon	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+tongdarailway-1.1.5+mc21.1.jar	tongdarailway	no-metadata	server_side=absent≠required ⇒ 是否需要在服务端保留需实测
+xaerominimap-neoforge-1.21.1-26.5.0.jar	xaerominimap	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+xaeroworldmap-neoforge-1.21.1-1.46.0.jar	xaeroworldmap	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
+yet_another_config_lib_v3-3.8.2+1.21.1-neoforge.jar	yet_another_config_lib_v3	optional	server_side=optional≠required ⇒ 是否需要在服务端保留需实测
