@@ -822,6 +822,76 @@ function cmAnalyzeChunk(level, cx, cz, cfg) {
 
 function cmKey(cx, cz) { return cx + ',' + cz; }
 
+// 批量接口的面积上限（防御：避免一个手滑的 radius 触发 (2r+1)^2 次读取）
+var CM_READ_MAX_AREA_RADIUS = 32;
+
+// 读一次数据根，供单点/批量接口复用：批量接口靠它把「数据根遍历」从 N 次降到 1 次。
+// 返回 { ok, has, chunks, reason }：ok=false 表示 persistentData 读取**失败**，与「没有记录」是两回事。
+function cmReadChunks(level) {
+  try {
+    var root = level.persistentData.getCompound(CM_NS);
+    if (!root.contains('chunks')) return { ok: true, has: false, chunks: null, reason: '' };
+    return { ok: true, has: true, chunks: root.getCompound('chunks'), reason: '' };
+  } catch (err) {
+    cmWarnOnce('pd', 'level.persistentData 读取不可用，退回内存缓存：' + err);
+    return { ok: false, has: false, chunks: null, reason: String(err) };
+  }
+}
+
+// 解析一条记录 tag。light=true 时不读 'r' 分量明细（省 31 次键读取；只取 D/A 打分时用不到）
+function cmParseTag(level, t, cx, cz, light) {
+  var out = {
+    cx: cx,
+    cz: cz,
+    dim: String(level.dimension().location()),
+    d: t.getDouble('d'),
+    a: t.getDouble('a'),
+    ts: t.getLong('t'),
+    partial: t.getInt('p') === 1,
+    v: t.getInt('v'),                  // 记录格式版本
+    rev: t.getInt('rev'),              // 写入时的自然表版本
+    stale: t.getInt('rev') !== CM_REV,
+    raw: {}
+  };
+  if (!light && t.contains('r')) {
+    var rr = t.getCompound('r');
+    rr.getAllKeys().forEach(function (key) {
+      out.raw[String(key)] = rr.getDouble(String(key));
+    });
+  }
+  return out;
+}
+
+// 单个候选的读取（复用已解析的数据根 r）。status: ok / no-record / read-fail
+function cmReadCandidate(level, r, cx, cz, light) {
+  var dim = String(level.dimension().location());
+  if (r.ok && r.has) {
+    try {
+      var kk = cmKey(cx, cz);
+      if (r.chunks.contains(kk)) {
+        var rec = cmParseTag(level, r.chunks.getCompound(kk), cx, cz, light);
+        rec.status = 'ok';
+        rec.source = 'disk';
+        rec.pd = 'ok';
+        return rec;
+      }
+    } catch (err) {
+      return { cx: cx, cz: cz, dim: dim, status: 'read-fail', source: 'none', pd: 'fail',
+               reason: String(err), d: null, a: null, ts: 0, partial: false, v: 0,
+               rev: null, stale: null, raw: {} };
+    }
+  }
+  var mem = CM_MEM.get(cmMemKey(level, cx, cz));
+  if (mem !== undefined) {
+    return { cx: cx, cz: cz, dim: dim, status: 'ok', source: 'mem', pd: r.ok ? 'ok' : 'fail',
+             d: mem.d, a: mem.a, ts: mem.ts, partial: !!mem.partial, v: CM_VERSION,
+             rev: null, stale: !!mem.stale, raw: light ? {} : (mem.raw || {}) };
+  }
+  return { cx: cx, cz: cz, dim: dim, status: r.ok ? 'no-record' : 'read-fail', source: 'none',
+           pd: r.ok ? 'ok' : 'fail', reason: r.reason, d: null, a: null, ts: 0, partial: false,
+           v: 0, rev: null, stale: null, raw: {} };
+}
+
 // 内存兜底：万一 level.persistentData 在某些版本/环境不可用，仍能读到本次会话的统计
 var CM_MEM = new Map();
 
@@ -889,24 +959,7 @@ function cmGetDisk(level, cx, cz) {
     var kk = cmKey(cx, cz);
     if (!chunks.contains(kk)) return null;
     var t = chunks.getCompound(kk);
-    var out = {
-      cx: cx,
-      cz: cz,
-      dim: String(level.dimension().location()),
-      d: t.getDouble('d'),
-      a: t.getDouble('a'),
-      ts: t.getLong('t'),
-      partial: t.getInt('p') === 1,
-      stale: t.getInt('rev') !== CM_REV,
-      raw: {}
-    };
-    if (t.contains('r')) {
-      var rr = t.getCompound('r');
-      rr.getAllKeys().forEach(function (key) {
-        out.raw[String(key)] = rr.getDouble(String(key));
-      });
-    }
-    return out;
+    return cmParseTag(level, t, cx, cz, false);
   } catch (err) {
     cmWarnOnce('pd', 'level.persistentData 读取不可用，退回内存缓存：' + err);
     return null;
@@ -1224,6 +1277,59 @@ function cmGetAt(level, blockX, blockZ) {
   return cmGet(level, Math.floor(blockX / 16), Math.floor(blockZ / 16));
 }
 
+// 状态查询：明确区分「有记录 / 无记录 / 读取失败」，并带 stale 与 rev（对应接口缺口 1）。
+// 返回 { ok, status, source, pd, cx, cz, dim, d, a, ts, partial, v, rev, curRev, stale, raw }
+//   ok     : 查询本身是否成功（只有读取失败时为 false）
+//   status : 'ok' 有记录 | 'no-record' 该区块没有记录 | 'read-fail' persistentData 读取失败
+//   source : 'disk' 落盘记录 | 'mem' 内存兜底 | 'none'
+function cmGetStatus(level, cx, cz) {
+  var rec = cmReadCandidate(level, cmReadChunks(level), cx, cz, false);
+  rec.ok = (rec.status !== 'read-fail');
+  rec.curRev = CM_REV;
+  if (rec.status === 'ok' && rec.rev === null) rec.rev = CM_REV;   // 内存兜底记录无版本号：按当前版本看待
+  return rec;
+}
+
+// 批量候选读数：一次遍历数据根，返回区域内**每个**区块的 { status, stale, d, a, rev }。
+// 不调用 analyze、不触发区块加载（只读 persistentData 与内存缓存）。
+// opts.raw      = true 时同时解析 31 键分量明细（默认 false：打分只用 D/A，省掉这部分读取）
+// opts.freshOnly= true 时只返回非 stale 的有效记录（默认 false：stale 记录也返回但带 stale=true，
+//                 绝不当作有效数据；调用方用 counts.fresh / rec.stale 自行取舍）
+function cmScoreArea(level, cx, cz, radius, opts) {
+  opts = opts || {};
+  var rIn = Number(radius);
+  radius = (radius === undefined || radius === null || isNaN(rIn)) ? 0 : Math.floor(rIn);
+  if (radius < 0) radius = 0;
+  if (radius > CM_READ_MAX_AREA_RADIUS) radius = CM_READ_MAX_AREA_RADIUS;
+  var light = opts.raw !== true;
+  var freshOnly = opts.freshOnly === true;
+  var r = cmReadChunks(level);
+  var cands = [];
+  var counts = { ok: 0, fresh: 0, stale: 0, noRecord: 0, readFail: 0, mem: 0 };
+  for (var x = cx - radius; x <= cx + radius; x++) {
+    for (var z = cz - radius; z <= cz + radius; z++) {
+      var rec = cmReadCandidate(level, r, x, z, light);
+      if (rec.status === 'ok') {
+        counts.ok++;
+        if (rec.source === 'mem') counts.mem++;
+        if (rec.stale) counts.stale++; else counts.fresh++;
+      } else if (rec.status === 'no-record') {
+        counts.noRecord++;
+      } else {
+        counts.readFail++;
+      }
+      if (freshOnly && !(rec.status === 'ok' && !rec.stale)) continue;
+      cands.push(rec);
+    }
+  }
+  return {
+    ok: true,                        // 批量读取本身完成（单条的成功/失败在各自 status 里）
+    pd: r.ok ? 'ok' : 'fail',        // 数据根是否可读；fail 时所有候选只能靠内存缓存
+    cx: cx, cz: cz, radius: radius, width: radius * 2 + 1, curRev: CM_REV,
+    candidates: cands, counts: counts, usable: counts.fresh
+  };
+}
+
 function cmRank(level, cx, cz, radius, opts) {
   opts = opts || {};
   var wD = (opts.wD === undefined) ? 0.5 : opts.wD;
@@ -1231,17 +1337,25 @@ function cmRank(level, cx, cz, radius, opts) {
   var minA = (opts.minA === undefined) ? 0 : opts.minA;
   var maxD = (opts.maxD === undefined) ? 1 : opts.maxD;
   var limit = opts.limit || 64;
+  // 口径显式化（对应接口缺口 3）：
+  //   order='desc'（默认）= 分数越大越好（与旧行为完全一致，spawn 域在用）
+  //   order='asc'        = 分数越小越好（= 越原始 / 越无人味）
+  // 旧的「传负 wA」写法仍然有效，但不再推荐（语义不自明）；两者等价需保持 |权重| 一致。
+  var order = (String(opts.order === undefined ? 'desc' : opts.order).toLowerCase() === 'asc') ? 'asc' : 'desc';
+  // skipStale 默认 false = 保持旧行为（stale 记录照样参与、不标注）；true 时直接排除过期记录。
+  var skipStale = opts.skipStale === true;
   var out = [];
   for (var x = cx - radius; x <= cx + radius; x++) {
     for (var z = cz - radius; z <= cz + radius; z++) {
       var m = cmGet(level, x, z);
       if (m == null) continue;
+      if (skipStale && m.stale) continue;
       if (m.a < minA || m.d > maxD) continue;
       m.score = wA * m.a - wD * m.d;
       out.push(m);
     }
   }
-  out.sort(function (p, q) { return q.score - p.score; });
+  out.sort(function (p, q) { return (order === 'asc') ? (p.score - q.score) : (q.score - p.score); });
   if (out.length > limit) out = out.slice(0, limit);
   return out;
 }
@@ -1258,6 +1372,9 @@ global.CM = {
   ensure: cmEnsure,
   get: cmGet,
   getAt: cmGetAt,
+  getStatus: cmGetStatus,            // 区分「无记录 / 读取失败 / 有记录」，带 stale 与 rev
+  scoreArea: cmScoreArea,            // 批量候选读数（一次遍历数据根；不 analyze、不加载区块；默认不读分量明细）
+  readAreaRadiusMax: CM_READ_MAX_AREA_RADIUS,
   enqueue: cmEnqueue,
   scanArea: cmEnqueueArea,
   rank: cmRank,

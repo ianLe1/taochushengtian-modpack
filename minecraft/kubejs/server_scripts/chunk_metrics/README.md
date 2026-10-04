@@ -118,6 +118,29 @@ level.persistentData
 const m = global.CM.get(level, chunkX, chunkZ)
 const m2 = global.CM.getAt(level, blockX, blockZ)   // 按方块坐标取所在区块
 
+// 状态查询：明确区分「无记录 / 读取失败 / 有记录」，并带 stale 与 rev。
+// get / getAt 拿到 null 时分不清是哪种，出生点这类要给玩家原因的逻辑用这个。
+const s = global.CM.getStatus(level, chunkX, chunkZ)
+s.status    // 'ok' 有记录 | 'no-record' 还没扫过 | 'read-fail' world data 读取失败
+s.source    // 'disk' 落盘记录 | 'mem' 内存兜底 | 'none'
+s.ok        // 只有 read-fail 时为 false（查询本身失败）
+s.stale     // 计算时的自然表版本与当前不等 => 过期
+s.rev, s.curRev, s.d, s.a, s.raw
+
+// 批量候选读数：一次遍历 world data 读一整个方形区域。
+// 不调用 analyze、不加载/生成区块；逐条给出状态，绝不把过期记录混进可用数。
+const area = global.CM.scoreArea(level, chunkX, chunkZ, 1)   // 半径 1 => 3×3
+area.candidates   // 每个 { cx, cz, status, stale, source, d, a, rev }
+area.counts       // { ok, fresh, stale, noRecord, readFail, mem }
+area.usable       // = counts.fresh（非 stale 的有效记录数）
+area.pd           // 'ok' | 'fail'：数据根是否可读
+global.CM.scoreArea(level, chunkX, chunkZ, 1, { freshOnly: true })   // 只返回有效记录
+global.CM.scoreArea(level, chunkX, chunkZ, 1, { raw: true })         // 附带 31 键分量明细
+global.CM.readAreaRadiusMax      // 半径上限（32），超出自动钳制
+
+// 与逐点读取的差别（实测于合成世界、625 条记录）：区域读取只付一次数据根遍历的代价，
+// 默认还省掉分量明细，比「逐点 get × N」快约 8 倍。要读一批候选区块时优先用它。
+
 // 有则读、无则立刻算并落盘（未加载区块默认不计算，返回 null）
 const m3 = global.CM.ensure(level, chunkX, chunkZ)
 
@@ -131,7 +154,9 @@ const list = global.CM.rank(level, chunkX, chunkZ, 8, {
   wD: 0.5,      // 破坏程度权重（越大越回避被挖烂的区域）
   minA: 0.2,    // 只要人工程度 >= 0.2 的区块
   maxD: 0.6,    // 排除破坏程度 > 0.6 的区块
-  limit: 20
+  limit: 20,
+  order: 'desc',  // 'desc'（默认，分数大的排前）| 'asc'（分数小的排前 = 越原始越前）
+  skipStale: false // true 时排除过期记录（默认 false 与旧行为一致）
 })
 list[0].score, list[0].cx, list[0].cz, list[0].d, list[0].a
 
@@ -146,8 +171,10 @@ global.CM.queueSize(), global.CM.rev(), global.CM.learned()
 ```js
 // 例：想要「有点人味但没被挖烂」的地方
 const candidates = global.CM.rank(level, spawnCx, spawnCz, 8, { wA: 1.0, wD: 0.8, minA: 0.15, maxD: 0.5 })
-// 例：想要「完全原始」的地方（D 与 A 都接近 0）
-const wild = global.CM.rank(level, spawnCx, spawnCz, 8, { wA: -0.5, wD: 1.0 })
+// 例：想要「完全原始」的地方（D 与 A 都接近 0）——用显式 order，别靠负权重
+const wild = global.CM.rank(level, spawnCx, spawnCz, 8, { wA: 1.0, wD: 0.5, order: 'asc' })
+// 旧的负权重写法仍然有效，但要与 order:'asc' 等价必须两个权重都取负（如 { wA: -1.0, wD: -0.5 }），
+// 语义不自明，新代码请用 order。
 ```
 
 ### 4.3 命令（需要 OP，权限等级 2）
@@ -190,7 +217,7 @@ const wild = global.CM.rank(level, spawnCx, spawnCz, 8, { wA: -0.5, wD: 1.0 })
 
 1. 找一个**没被玩家动过的区域**（新生成的、离基地远的），站到中间。
 2. 执行 `/cm calib 8`。它在半径 8 区块里统计「出现在 ≥60% 区块中的方块」，判定为自然，写入世界数据并让自然表版本 +1。
-3. 已有记录会被标记过期（读出来 `stale = true`），`/cm scan` 重扫即可。
+3. 已有记录会被标记过期（读出来 `stale = true`），`/cm scan` 重扫即可。程序侧判断过期用 `global.CM.getStatus(...).stale`，读一批用 `global.CM.scoreArea(...)` 的逐条标注，`rank` 也可传 `skipStale: true` 直接跳过（见 4.2）。
 
 为什么这样不会破坏可重复性：标定表存进世界数据并只增加版本号，运行期是冻结的；只要自然表版本不变，同一区块重算结果就一致。`CM_CONFIG.classifier.naturalSuffixes` 默认是空数组，宁可漏判也不误判——你要给自家模组加后缀规则，在那里加。
 
@@ -201,6 +228,9 @@ const wild = global.CM.rank(level, spawnCx, spawnCz, 8, { wA: -0.5, wD: 1.0 })
 | 新区块（还没生成） | 不生成。`scan.onlyLoadedChunks = true`（默认）时，`isLoaded` 为假直接跳过，不会为了统计去加载区块。设成 false 才会主动加载。 |
 | 未加载区块 | `get` 返回 null；`ensure` 也不计算（默认）。**不会拿不到数据就瞎猜一个值。** |
 | 无相关数据的区块 | `get` 返回 null，`rank` 自动跳过。 |
+| 读取失败 vs 没有记录 | `get` / `getAt` 都只给 null，分不清两者；要区分用 `getStatus`：`status='no-record'`（该区块还没扫过）或 `status='read-fail'`（`level.persistentData` 读取失败，此时 `ok=false`、`pd='fail'`）。 |
+| 批量读取会不会加载区块 | 不会。`scoreArea` 只读 world data 与内存缓存，不调用 analyze、不触发区块加载或生成（自检里 `getChunk` 调用数为 0）。 |
+| 过期（stale）记录 | 默认读取接口照样返回；`scoreArea` 逐条标 `stale` 并给出 `counts.fresh` / `usable`（过期绝不混进可用数），`rank` 可传 `skipStale: true`，`getStatus` 同时给 `rev` 与 `curRev`。 |
 | 参考面邻区块缺失 | 中值滤波窗口**自适应缩小**（最多降到 3x3），只有连 3x3 都不完整的列才放弃，并置 `partial = true` 供下游判断可信度。 |
 | 跨区块的大型建筑 | 每个区块只统计自己那部分，连通体在区块边界被截断，因此大型建筑的单区块 A 会偏低。补偿办法：用 `rank` 的 3x3 / NxN 范围汇总，或自己把相邻区块的 A 相加。**这是已知的、有意为之的取舍**（区块独立、可并行、可缓存）。 |
 | 未打标签的模组地形方块 | 默认按人工处理，但会被「人工形态 + 占比」门槛挡住，人工程度不会因此虚高（自测里 8960 格未打标签岩石 A = 0.0000）。 |

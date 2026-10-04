@@ -72,6 +72,14 @@
 !/server-pack/ops/orphan-manifest-backup/*.toml
 # server-pack/reports/ 与 __pycache__ 不入库（快照/缓存，会随时间漂移）
 
+
+# ---- 离线自检 harness（.cmtest / .wartest）：纯文本 .js，防丢失 ----
+!/.cmtest/
+/.cmtest/*
+!/.cmtest/*.js
+!/.wartest/
+/.wartest/*
+!/.wartest/*.js
 # =====================================================================
 #  黑名单（写在白名单之后，后写的规则生效）
 # =====================================================================
