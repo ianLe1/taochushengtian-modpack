@@ -573,7 +573,9 @@ var c10b = runPath(['spawn', 'admin', 'radius'], srcOp, { n: 1000 });
 assert(c10b.ok === true, 'OP 执行 /war spawn admin radius 1000');
 assert(SPS.config.maxRadius === 1000, '外半径写入 maxRadius = 1000');
 var clampMsg = WAR.spawn.radius(srcOp, 10);
-assert(SPS.config.maxRadius === 64 && String(clampMsg).indexOf('64') >= 0, '半径钳制：10 被 clamp 到 64 格');
+var echo10 = parseInt(String(clampMsg).replace(/^[^0-9]*(\d+).*$/, '$1'), 10);
+assert(SPS.config.maxRadius === 80 && echo10 === SPS.config.maxRadius && String(clampMsg).indexOf('80') >= 0,
+  '半径 10：钳到下限 64 再受 minRadius+16 不变量抬到 80，回显 == 落盘值（80，修复 quirk 前这里说 64 而实际 80）');
 WAR.spawn.radius(srcOp, 1000);
 assert(SPS.config.maxRadius === 1000, '半径恢复为 1000');
 var srcNonOp = new FakeSource(0, null);
@@ -700,12 +702,23 @@ var src16 = new FakeSource(2, alice);
 var clamp0 = clampCalls;
 var msg16 = WAR.spawn.radius(src16, 10);
 assert(clampCalls > clamp0, 'admin radius 的钳位走 00_core 的 WAR.clampInt（新增调用 ' + (clampCalls - clamp0) + '）');
-// radius 10 → WAR.clampInt 钳到下限 64 → 再被 spNormConfig 的既有不变量
-// 「maxRadius ≥ minRadius + 16」抬到 80。两条都是替换前就有的行为（见 :349）。
+// radius 10 → WAR.clampInt 钳到下限 64 → 再被不变量「maxRadius ≥ minRadius + 16」抬到 80。
+// 钳位与不变量都保留；本次修的是「回显与落盘不一致」（改前回显 64、实际 80）。
 var cfg16r = WAR.spawn.status().config;
 assert(cfg16r.minRadius === 64, '环带内边界 minRadius = 64（下面按它推不变量）');
-assert(cfg16r.maxRadius === cfg16r.minRadius + 16, 'radius 10 钳到 64 再被不变量抬到 80（既有行为，非本次改动引入）');
-assert(String(msg16).indexOf('64') >= 0, '命令回显用的是钳位后的值（64）——与读回的 80 有 16 的差，属既有 quirk，已记录待 lead 定夺');
+assert(cfg16r.maxRadius === cfg16r.minRadius + 16, 'radius 10 钳到 64 再被不变量抬到 80（钳位+不变量行为不变）');
+var echo16 = parseInt(String(msg16).replace(/^[^0-9]*(\d+).*$/, '$1'), 10);
+assert(echo16 === cfg16r.maxRadius, '回显数字 === 读回的 maxRadius（' + echo16 + '），不再说 64 而实际 80');
+assert(String(msg16).indexOf('请求 10') >= 0, '请求值 10 与调整原因一并告知（不静默改数）');
+// 最强的一条：回显数字 === 真正落盘后重启读回的 maxRadius
+WAR.data.touch();
+assert(WAR.data.save('radius-echo') === true, '回显一致性：save 落盘成功');
+WAR.data.server = null; WAR.data.state = null; WAR.data.dirty = false;
+var serverR = new FakeServer(); serverR.persistentData = fakeServer.persistentData;
+REG.loaded[0]({ server: serverR });
+assert(WAR.data.state.spawn.config.maxRadius === echo16,
+  '回显数字 === 持久化后重启读回的 maxRadius（' + echo16 + '，跨 server 实例）');
+WAR.spawn.radius(new FakeSource(2, alice), 1000); // 复原，避免影响后续断言
 WAR.clampInt = clampKeep;
 // (c) admin 谓词来自 WAR.opPredicate()（重注册一次命令树观察；00_core 自身 admin 子树也会调它）
 var opCalls = 0, opKeep = WAR.opPredicate;

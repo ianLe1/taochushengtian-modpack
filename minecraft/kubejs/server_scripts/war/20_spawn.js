@@ -963,13 +963,19 @@ function spSetCenter(source, x, z) {
 }
 function spSetRadius(source, r) {
   if (!(r > 0)) return '半径必须是正整数。';
+  // 回显必须 == 落盘值：先归一化 → 钳位 → 再归一化，把「maxRadius ≥ minRadius + 16」的不变量
+  // 当场写进配置，而不是等下次读取时才由 spNormConfig 抬高（否则会对玩家说错话：说 64、实际 80）。
   var mut = spMutate('radius', function (sp) {
+    sp.config = spNormConfig(sp.config);
     sp.config.maxRadius = global.WAR.clampInt(r, 64, 100000, sp.config.maxRadius);
+    sp.config = spNormConfig(sp.config);
     return sp.config.maxRadius;
   });
   spAudit(warActor(source), 'spawn.admin.radius', String(r), mut.ok ? 'ok' : 'fail');
   if (!mut.ok) return '保存失败：' + mut.error;
-  return '环带外半径已设为 ' + mut.ret + ' 格。';
+  if (mut.ret === r) return '环带外半径已设为 ' + mut.ret + ' 格。';
+  return '环带外半径已设为 ' + mut.ret + ' 格（请求 ' + r + '，受半径下限 ' + spConfig().minRadius +
+    ' 格与「外半径至少比内半径大 16 格」约束，已按 ' + mut.ret + ' 生效并写入存档）。';
 }
 function warActor(source) {
   try {
