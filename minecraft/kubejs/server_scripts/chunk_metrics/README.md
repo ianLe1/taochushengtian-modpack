@@ -259,3 +259,128 @@ const wild = global.CM.rank(level, spawnCx, spawnCz, 8, { wA: 1.0, wD: 0.5, orde
 | `scan.chunksPerTick` / `maxMillisPerTick` | 1 / 8 | 扫描节流 |
 
 改完 `CM_CONFIG` 后 `/reload`，再 `/cm clear` + `/cm scan` 重扫一遍，分数才会按新权重更新。
+
+---
+
+## 8. 口径一页纸：a / d 契约（并入自草案台 · 2026-10-04）
+
+- 作者：chunk-metrics｜2026-10-04｜供 M3（基地隐性子模型：区域多块 a 持续高 ⇒ 据点）与出生点硬门共用
+- 证据来源：minecraft/kubejs/server_scripts/chunk_metrics/chunk_metrics.js（md5 6e16ba7d408306d58819b4f3f59da121 / 1389 行）逐行核对，非回忆
+- 行号/口径以本文为准；配套接口判定见 §6
+
+### 0. 结论先行（四问四答）
+
+| 问题 | 结论 |
+|---|---|
+| 1) 值域与饱和 | **d, a ∈ [0, 1]**，连续值，**有饱和**（不是原始计数，也不是 0–100） |
+| 2) 是否按面积/体积归一 | **不归一**：是「本区块内认定的人工/破坏体量的饱和映射」；只有 A 的 C5 是面积分数。**同一建筑跨区块会被切开、每块各自变小** |
+| 3) rev 何时推进 + stale 定义 | **只有 /cm calib 会 rev++**；重扫不推进。**stale = 该记录是用旧版自然基线表算的**（值仍有效，口径可能过时） |
+| 4) 未知返回什么 | 未扫描 ⇒ **null**；读取失败 ⇒ **null + status=read-fail**；**「未标定」当前没有独立状态（缺口）**；任何情况都**不用 0 冒充未知** ✔ |
+
+### 1. 值域与饱和（问题 1）
+
+公式（chunk_metrics.js）：
+- `D = clamp01(0.30·B1 + 0.25·B2 + 0.25·B3 + 0.10·B4 + 0.10·B5)`（:755-756）
+- `A = clamp01(0.35·C1 + 0.25·C2 + 0.20·C3 + 0.10·C4 + 0.10·C5)`（:781-782）
+- 每个分量先过饱和映射 `cmSat(x, k) = x/(x+k)`（x≤0 时 0，:320），再 `cmClamp01` 夹到 [0,1]（:321）
+- 两组权重各自**恰好和为 1.00**（D: .30+.25+.25+.10+.10；A: .35+.25+.20+.10+.10）
+
+给 M3 的用法：阈值（aMin / d 上限）按 **[0,1] 小数**写（0.5 不是 50）；`a === 0` 是**精确 0**，正是出生点硬门要的合格值。
+
+### 2. 是否按面积/体积归一（问题 2）——不归一
+
+A 的五个分量（都在**单区块**内计算；连通体 quality/members 见 :640-652）：
+
+| 分量 | 表达式 | 归一口径 |
+|---|---|---|
+| C1 结构体量 | `cmSat(goodMass, structureSatK=260)`，goodMass = Σ(体素数×质量)（:648-651, :760） | **本区块内绝对体量**（不除面积） |
+| C2 机械 | `cmSat(machScore, machinerySatK)` × `clamp01(maxGood/32)`（:763） | 绝对计数 × 体积门槛 |
+| C3 成片度 | `min(1, maxGood / max(1, min(manTotal,128))) × g`（:764） | 区块内比例（再被 C1 门控） |
+| C4 垂直发展 | `(0.5·min(1, goodSec.size/6) + 0.5·min(1, span/32)) × g`（:772） | 层数/跨度（非面积） |
+| C5 地面铺装 | `cmSat(pavedSet.size / 256, 0.5) × g`（:778） | **面积分数**（铺装列数 / 256 列） |
+
+⇒ **同一座房子在 1 个区块里 a 高；拆到 4 个区块后连通体被切断，每块的 goodMass/maxGood/span 都变小 ⇒ 每块 a 显著下降**（C5 受影响最小）。
+D 同样是混合口径：B2 = 地下空腔比例（归一）、B3 = 每列削减均值（:750-753）、B4 = 抽样外推（:742）、B1/B5 = 计数饱和（:747, :754）。
+
+给 M3 的直接含义：不能指望「单块 a 高」= 据点；必须**在区域尺度聚合多块**（这正是隐性子模型的方向），且区域窗口要覆盖建筑可能跨的 1–2 块边界。
+
+### 3. rev 推进时机与 stale 精确含义（问题 3）
+
+- `CM_REV` 初值 0（:171），启动时从 `persistentData.calib.rev` 读入；没有 calib 就保持 0（:971-976）。
+- **只有 `/cm calib`（cmCalibrate :1190-1236）会 `CM_REV++`（:1227）并写回 calib（:1231）**。`/cm scan` **不推进** rev——它只是**按当前 rev 重写**记录（`rec.rev = CM_REV`，:792）。
+- 每条磁盘记录带 rev；读取时 `stale = t.getInt('rev') !== CM_REV`（:853）。内存兜底记录没有 rev，按「当前版本」看待（:1289）。
+- ⇒ **stale 的精确含义：这条 d/a 是在上一版自然基线表下算出来的**（标定改了基线 ⇒ 旧记录没重算）。**stale ≠ 值无效**，只用来说「口径可能过时」。
+- 批量读取：`CM.scoreArea` 默认**返回 stale 条目并标注 stale=true**（不静默丢弃），`counts.fresh` 才是「可用（未过期有效）」的权威计数；`opts.freshOnly=true` 时才直接过滤。
+
+### 4. 未知 / 未标定 / 读取失败分别返回什么（问题 4，含硬约束判定）
+
+| 状态 | d / a | 判别方式 | 证据 |
+|---|---|---|---|
+| 有记录（新鲜） | 数值 | `status='ok'` 且 `stale=false` | cmReadCandidate :868-877 |
+| 有记录但过期 | 数值 | `status='ok'` 且 `stale=true` | stale 判定 :853 |
+| **未扫描** | **null / null** | `status='no-record'`，`source='none'` | :890-892 |
+| **读取失败** | **null / null** | `status='read-fail'`，`ok=false` | :878-882 |
+| 内存兜底记录 | 数值 | `source='mem'`，`rev=null` | :884-889 |
+| **未标定** | —— | **当前没有独立状态**（缺口，见下） | —— |
+
+**硬约束判定：满足「未知必须是 null 或显式 stale」** ✔ —— `CM.getAt/cmGet` 对无记录返回 **null**（:947-952）；`CM.getStatus` 用 status 三态显式区分（:1291-1300）；`CM.scoreArea` 的 candidates 逐个带 status/stale，未知块 d/a 一律 null。**本项目没有任何地方用 0 冒充未知。**
+
+**一个真实缺口（请 lead 定夺是否单开一轮修）：没有「未标定」状态。**
+CM_REV=0 / 无 calib 时，analyze 用 `CM_CONFIG.destruction.naturalVoidFraction=0.030` 等**默认基线**照常算，记录有 d/a、rev=0、stale=false ⇒ 数据上**分不出「按默认基线算」与「按本世界标定算」**。出生点影响有限，但对 M3 的「阈值是否可信」有影响。
+最小修法（**设计建议，未实现**）：`cmGetStatus/cmScoreArea` 增加只读字段 `calib:{calibrated:boolean, rev:number}`（不改 d/a 语义），`/cm stats` 同步显示——不新增 API、不改量纲。
+
+### 4b. 出生点侧残余风险（写这份口径时发现，已单报 lead）
+出生点候选读数是 **3×3 聚合**，`no-record` 与 `stale` **不参与均值**（20_spawn.js:493-499），且有覆盖率下限 `minScored`（默认 5/9）。⇒ 仍存在「9 块里只有 5 块扫过且那 5 块 a=0」而通过硬门的情形。**不是本次硬门引入的**，但「a===0 必须」的本意是「整片都没有人工建造物」；若要更严，建议把覆盖率门槛单列（例如 fresh ≥ 7/9），单开一轮。
+
+### 5. 契约页（M3 与出生点共用）
+
+**① 只读保证**：`get/getAt/getStatus/scoreArea/rank/stats` 全部只读——不 analyze、不触发区块加载/生成（`onlyLoadedChunks=true`）、不写 persistentData。只有 `/cm scan`、`/cm calib`、`ensure` 会写。
+
+**② 重入语义（M3 低频扫描 vs 本域 tick 驱动）**：
+- 本域扫描队列每 tick 最多完成 `chunksPerTick=1` 块、预算 8 ms；**读侧不受写侧影响**：读到「还没扫到」就是 no-record。
+- 同区块并发读+写：写是**整条记录替换**（cmStore 先算完再 put，:914-916），读要么旧要么新，**不会读到半条**；但可能刚好跨过一次标定。⇒ **不要假设 rev 在一次读中恒定**：请用 `cmGetStatus` 返回的 `curRev`（本次读取时的当前 rev）。
+- 内存兜底：`persistentData` 不可用时退回会话内缓存并 `cmWarnOnce('pd', …)`，此时 `source='mem'`、`rev=null`、重启即丢 ⇒ 按 source 区分，别当持久数据。
+
+**③ 过期 / 未标定取值**：过期 ⇒ 数值照给 + `stale=true`（可用计数 = `counts.fresh`）；未标定 ⇒ **当前无状态字段**（缺口，见 §4）。
+
+**④ 字段表**：
+
+| 字段 | 单位/值域 | 来源 |
+|---|---|---|
+| d | [0,1] 小数（有饱和） | 区块内 D 公式（§1） |
+| a | [0,1] 小数（有饱和）；`a===0` = 认定人工体量为 0 | 区块内 A 公式（§1） |
+| rev | 整数（写记录时的自然基线版本） | :792 |
+| curRev | 整数（读取时的当前版本） | :1294 |
+| stale | 布尔 = `rev !== CM_REV` | :853 |
+| status | ok / no-record / read-fail | :866-892 |
+| source | disk / mem / none | 同上 |
+| partial | 布尔（该块部分扫描，覆盖 < 9/9 子格） | cmParseTag |
+| ts | 毫秒时间戳（0 = 无） | cmStore |
+
+**⑤ 离线自检样例（T21 骨架，供 kubejs-crafting）**：
+
+```js
+// 目标：把 CM.scoreArea 当「区域读取」用，只依赖已声明契约
+var area = CM.scoreArea(fakeLevel, 0, 0, 2, { freshOnly: false });
+assert(area.ok === true && area.candidates.length === 25, '区域槽位 = (2r+1)^2');
+var fresh = area.candidates.filter(function (c) { return c.status === 'ok' && c.stale !== true; });
+assert(area.counts.fresh === fresh.length, 'counts.fresh 就是可用块数（权威口径）');
+assert(area.candidates.every(function (c) {
+  return c.status !== 'no-record' || (c.d === null && c.a === null);
+}), '未扫描必须是 null —— 绝不许用 0 冒充未知');
+assert(area.candidates.every(function (c) { return c.d === null || (c.d >= 0 && c.d <= 1); }), 'd 值域 [0,1]');
+assert(area.candidates.every(function (c) { return c.a === null || (c.a >= 0 && c.a <= 1); }), 'a 值域 [0,1]');
+assert(typeof area.curRev === 'number', '带 curRev（判定 stale 用它，不要缓存 rev）');
+```
+
+### 6. 接口判定：scoreArea 能否直接充当 M3 的「一次取整片」？——能，且零新增 API
+
+**结论：M3 不需要新的 regionArea，也不需要 chunkStats。只补文档与 opts 契约。**
+
+- 证据：`CM.scoreArea(level, cx, cz, radius, opts)` **一次遍历数据根**返回 **(2r+1)² 个区块**的 `{status, stale, source, rev, d, a, partial}` + `counts{ok,fresh,stale,noRecord,readFail,mem}` + `usable=counts.fresh`；`radius` 钳到 `CM_READ_MAX_AREA_RADIUS=32`（单次最多 65×65=4225 块）；`opts.raw=false`（默认）跳过 31 键分量明细。**这正是「一次取整片」。**
+- 性能预算：合成世界实测 625 槽位（radius 12、light）**0.44 ms**（README §4.2）；真实世界按命中记录数线性。M3 低频（如每 30 s 一片）预算充裕。不 analyze、不加载区块。
+- 与 `CM.chunkStats(dim,cx,cz)` 的关系：**同一份能力已被 `CM.getStatus(level,cx,cz)` 覆盖**（返回 `{ok,status,source,pd,cx,cz,dim,d,a,ts,partial,v,rev,curRev,stale}`，轻读、不含 31 键）⇒ 按「新增接口必须有具体消费者与具体缺陷」的规矩，**chunkStats 不新增**（否则是同一能力的第二个名字，两份文档将来会漂移）。
+- 唯一签名差异（要写进契约）：**本域 API 一律取 `level` 而非 `dim` 字符串**（数据在 `level.persistentData`；`dim→level` 需要未验证的 `server.getLevel`）。若 M3 手上只有 dim：①在调用点顺手拿 level；②将来单独授权我加 dim→level 解析（需实机验证）。
+- 已知限制（写进文档，不当缺陷）：方形区域（不规则形状自行裁剪）；radius ≤ 32（更大分片调用）；stale 语义与「未标定」缺口见 §3/§4。
+
+> 2026-10-04 更新：出生点覆盖度门槛 coverMin=7/9 已实现（拒绝码 SPAWN_COVERAGE，见 war/20_spawn.js）；getStatus/scoreArea 的 calib:{calibrated,rev} 只读字段与 /cm stats 同步显示待实现（下一轮）。

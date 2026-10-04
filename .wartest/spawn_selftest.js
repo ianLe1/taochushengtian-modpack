@@ -439,18 +439,30 @@ var r4b = WAR.spawn.roll(carol, { level: lvl, op: true });
 assert(r4b.ok === false && r4b.code === 'NO_SCANNED_CANDIDATE', '全 stale ⇒ 同样按「未扫描」拒绝（stale 不参与均值）');
 assert(r4b.detail != null && r4b.detail.stale === 9, '分解计数 stale=9');
 
-// 5 fresh + 4 stale：只按非 stale 计（覆盖 5/9 ≥ minScored=5）⇒ 应成功
+// 5 fresh + 4 stale：过旧口径的 minScored=5，但**过不了新的覆盖度门槛 7/9** ⇒ SPAWN_COVERAGE
 var seenKeys = {};
 CM._fn = function (bx, bz) {
   var k = Math.floor((bx - 8) / 16) + ',' + Math.floor((bz - 8) / 16);
   if (seenKeys[k] == null) seenKeys[k] = Object.keys(seenKeys).length;
-  return cmRec(0.02, 0.0, seenKeys[k] < 4, false);
+  return cmRec(seenKeys[k] < 4 ? 0.9 : 0.02, 0.0, seenKeys[k] < 4, false);
 };
 var dave = new FakePlayer('dave', 'uuid-d');
 dave.level = lvl;
 var r4c = WAR.spawn.roll(dave, { level: lvl, op: true });
-assert(r4c.ok === true && r4c.coverage === 5, '5 fresh + 4 stale ⇒ 用 5 条算均值（覆盖 5/9）');
-assert(r4c.ok && near(r4c.d, 0.02) && near(r4c.a, 0), '均值只含非 stale 记录（D̄=0.02 Ā=0；stale 的 0.9 未混入）');
+assert(r4c.ok === false && r4c.code === 'SPAWN_COVERAGE', '5 fresh + 4 stale：过旧 minScored=5 但不过覆盖度 7/9 ⇒ SPAWN_COVERAGE（新门槛生效）');
+assert(r4c.detail != null && r4c.detail.coverage === 1 && r4c.detail.readable === 1, '分解计数 readable=1 / coverage=1');
+assert(String(r4c.message).indexOf('扫得还不够密') >= 0, 'SPAWN_COVERAGE 文案把「扫得不密」与「没扫」分开说');
+// 7 fresh + 2 stale：过覆盖度门槛 ⇒ 用 7 条算均值，且 stale 的大 d 不混入
+var seenKeys2 = {};
+CM._fn = function (bx, bz) {
+  var k = Math.floor((bx - 8) / 16) + ',' + Math.floor((bz - 8) / 16);
+  if (seenKeys2[k] == null) seenKeys2[k] = Object.keys(seenKeys2).length;
+  var st = seenKeys2[k] < 2;
+  return cmRec(st ? 0.9 : 0.02, 0.0, st, false);
+};
+var r4d = WAR.spawn.roll(new FakePlayer('dave2', 'uuid-d2'), { level: lvl, op: true });
+assert(r4d.ok === true && r4d.coverage === 7, '7 fresh + 2 stale ⇒ 覆盖 7/9 正好过门（边界），用 7 条算均值');
+assert(r4d.ok && near(r4d.d, 0.02) && near(r4d.a, 0), '均值只含非 stale 记录（D̄=0.02 Ā=0；stale 的 0.9 未混入）');
 
 // ---- T5 getAt 抛异常 → 不崩，按未扫描处理 ----
 console.log('\n--- T5 CM.getAt 抛异常：不崩、按未扫描处理 ---');
@@ -890,7 +902,7 @@ var st18 = WAR.spawn.text(new FakeSource(2, null)).join(' ｜ ');
 assert(st18.indexOf('人为化(a>0) 命中') >= 0 && st18.indexOf('破坏度(d>阈值) 命中') >= 0, '⑤ status 分别报出两条命中计数（不再分不清「没扫」）');
 assert(st18.indexOf('候选') >= 0 && st18.indexOf('过门') >= 0 && st18.indexOf('刷掉') >= 0, '⑤ status 给出候选总数、过门数与刷掉数');
 assert(st18.indexOf('SPAWN_DESTROYED') >= 0, '⑤ status 带上上次掷点的结果码');
-assert(st18.indexOf('硬门=a 必须为 0 且 d≤') >= 0, '⑤ 配置行里能看到当前阈值（玩家可核对）');
+assert(st18.indexOf('硬门=覆盖度≥') >= 0 && st18.indexOf('/9 且 a=0 且 d≤') >= 0, '⑤ 配置行里能看到覆盖度与阈值（玩家可核对）');
 // ⑥ dcalib：分位数函数 + 命令输出 + 空数据退化
 assert(near(spQuantile([0, 1, 2, 3, 4], 0.5), 2) && near(spQuantile([0, 1, 2, 3, 4], 0.75), 3) && spQuantile([], 0.5) === null,
   '⑥ spQuantile 线性插值正确（p50=2 / p75=3 / 空数组返回 null）');
@@ -918,6 +930,58 @@ assert(txt18.indexOf('WAR_CONFIG.spawn.dMax') >= 0, '⑥ 给出写回 00_core �
 CM.rank = keepRank18;
 WAR.data.state.spawn.config.dMax = keepDMax18;     // 恢复真实阈值（注意 spEnsure 会换新对象，必须从 state 现取）
 assert(near(WAR.spawn.status().config.dMax, keepDMax18, 1e-12), '④ 边界用例收尾：dMax 已恢复为 ' + keepDMax18);
+CM._fn = function (bx, bz) { return cmRec(0.04, 0.0, false, false); };
+
+// ---- T19 覆盖度门槛（先于 a/d 硬门；假放行是「人为化不为 0 不行」的最坏失效模式）----
+console.log('\n--- T19 覆盖度门槛 coverMin ---');
+assert(WAR.spawn.status().config.coverMin === 7, '覆盖度门槛可读：coverMin=7/9（00_core 缺键时保底；core 有键以 core 为准）');
+// (a) 6/9（3 块 no-record）⇒ SPAWN_COVERAGE，且文案与「未扫描」「硬门刷掉」都不同
+var n19 = 0;
+CM._fn = function () { n19++; return (((n19 - 1) % 9) < 3) ? null : cmRec(0, 0, false, false); };
+var r19a = WAR.spawn.roll(new FakePlayer('ca', 'uuid-c19a'), { level: lvl, op: true });
+assert(r19a.ok === false && r19a.code === 'SPAWN_COVERAGE', '(a) 6/9 覆盖度 ⇒ SPAWN_COVERAGE（实测 ' + r19a.code + '）');
+assert(String(r19a.message).indexOf('扫得还不够密') >= 0, '(a) 文案把「扫得不密」与「没扫」分开说');
+assert(String(r19a.message).indexOf('全部没过出生点硬门') < 0, '(a) 与「硬门刷掉」的文案不混用');
+assert(r19a.detail != null && r19a.detail.coverage >= 1 && r19a.detail.passed === 0, '(a) 分解计数：coverage≥1、passed=0');
+// (b) 7/9 正好过门（边界）⇒ 通过
+var n19b = 0;
+CM._fn = function () { n19b++; return (((n19b - 1) % 9) < 2) ? null : cmRec(0, 0, false, false); };
+var r19b = WAR.spawn.roll(new FakePlayer('cb', 'uuid-c19b'), { level: lvl, op: true });
+assert(r19b.ok === true && r19b.coverage === 7, '(b) 7/9 正好过门（含等号边界）⇒ 通过，coverage=' + (r19b.coverage));
+// (c) 混合：候选1 覆盖 6/9（覆盖不足），候选2 覆盖 9/9 但 a=0.01（硬门刷掉）⇒ 两类原因都出现在文案里
+//     harness 全局把 tries 压成 1（T2/T13 为确定性），这里临时放到 3 才造得出「多候选、零通过」
+var keepTries19 = WAR.data.state.spawn.config.tries;
+WAR.data.state.spawn.config.tries = 3;
+var n19c = 0;
+CM._fn = function () {
+  n19c++;
+  if (n19c <= 3) return null;                          // 第一轮 3 块 no-record
+  if (n19c <= 12) return cmRec(0, 0.01, false, false); // 第一轮余下 6 块 + 之后所有块：a>0
+  return cmRec(0, 0.01, false, false);
+};
+var r19c = WAR.spawn.roll(new FakePlayer('cc', 'uuid-c19c'), { level: lvl, op: true });
+WAR.data.state.spawn.config.tries = keepTries19;   // 恢复（spEnsure 会换新对象，必须从 state 现取）
+assert(WAR.data.state.spawn.config.tries === keepTries19, '(c) tries 已恢复为 ' + keepTries19);
+assert(r19c.ok === false && r19c.code === 'SPAWN_ARTIFICIAL', '(c) 混合原因：主因是硬门 ⇒ code=SPAWN_ARTIFICIAL（实测 ' + r19c.code + '）');
+assert(r19c.detail != null && r19c.detail.coverage >= 1 && r19c.detail.filtered >= 1, '(c) 分解计数同时含 coverage 与 filtered（' + JSON.stringify({coverage: r19c.detail.coverage, filtered: r19c.detail.filtered}) + '）');
+assert(String(r19c.message).indexOf('人为化') >= 0 && String(r19c.message).indexOf('覆盖不足') >= 0, '(c) 文案同时给出两类原因（硬门 + 覆盖不足）');
+// (d) status 硬门行显示覆盖度
+var st19 = WAR.spawn.text(new FakeSource(2, null)).join(' ｜ ');
+assert(st19.indexOf('覆盖度 ≥ 7/9') >= 0, '(d) status 硬门行显示覆盖度门槛');
+assert(st19.indexOf('覆盖不足') >= 0 && st19.indexOf('过门') >= 0, '(d) status 报出覆盖不足与过门计数');
+// (e) dcalib 给出 3×3 覆盖度分布（用于标定 coverMin）
+var keepRank19 = CM.rank;
+CM.rank = function () {
+  var out = [];
+  for (var x = 0; x < 3; x++) for (var z = 0; z < 3; z++) out.push({ cx: x, cz: z, d: 0.02, a: 0, stale: false });
+  return out;
+};
+var src19 = new FakeSource(2, null);
+runPath(['spawn', 'admin', 'dcalib'], src19, { r: 4 });
+var txt19 = src19.messages.join(' ｜ ');
+assert(txt19.indexOf('3×3 覆盖度') >= 0 && txt19.indexOf('coverMin(7)') >= 0, '(e) dcalib 报出 3×3 覆盖度分布与 coverMin 占比');
+assert(txt19.indexOf('%') >= 0, '(e) 覆盖度以百分比给出（可读）');
+CM.rank = keepRank19;
 CM._fn = function (bx, bz) { return cmRec(0.04, 0.0, false, false); };
 
 // ================================================================ 汇总

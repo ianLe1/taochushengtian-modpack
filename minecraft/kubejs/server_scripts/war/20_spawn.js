@@ -127,7 +127,14 @@ var SP_FALLBACK = { maxRadius: 5000, tries: 64 };
 //       用来判断这个门在你们服务器上有多严——比例过低说明 A 把太多自然物算成了人工。
 // ============================================================================
 var SP_D_MAX_FALLBACK = 0.05;      // 仅 core 缺键时的保底（会 warWarnOnce 点名）
+var SP_COVER_MIN_FALLBACK = 7;     // 3×3 覆盖度门槛（fresh 块数，1..9）；暂定 7/9，用 dcalib 的覆盖度分布标定
 var SP_DCALIB_R_MAX = 32;          // dcalib 的半径上限（区块）
+// 覆盖度门槛（coverMin）为什么必须先于 a/d 硬门：
+//   候选的 a/d 是 3×3 聚合，且 no-record / stale **不参与均值**（spChunkAvgBatch）。
+//   若只看 minScored=5/9，就会出现「只有 5 块扫过、恰好都是 a=0」而通过 a===0 的假放行，
+//   而剩下 4 块里可能正是一座基地 —— 这在「人为化不为 0 不行」这条规格下是最坏的失效模式。
+//   标定：/cm scan 后用 /war spawn admin dcalib，看「3×3 窗口里 fresh ≥ coverMin 的占比」，
+//   占比过低说明门槛偏严（会把还没扫密的区域全判为覆盖不足）。
 
 // 接口缺口（task ⑤ 要求列出；扩 CM 属 chunk_metrics.js 改动，须单独授权）
 // 2026-10-04 的 CM 扩展已兑现其中三条（getStatus / scoreArea / rank 的 order+skipStale，
@@ -335,6 +342,7 @@ function spDefaultConfig() {
     maxSlope: SP_CONFIG.maxSlope,
     allowFluidGround: SP_CONFIG.allowFluidGround,
     dMax: SP_D_MAX_FALLBACK,        // 硬门：破坏程度上限（暂定，标定流程见文件顶部）
+    coverMin: SP_COVER_MIN_FALLBACK, // 硬门前置：3×3 fresh 覆盖度门槛（暂定，用 dcalib 标定）
     rankRadiusMax: SP_CONFIG.rankRadiusMax,
     rings: spCopyRings(SP_CONFIG.rings)
   };
@@ -356,6 +364,11 @@ function spDefaultConfig() {
       c.dMax = spClampNum(core.dMax, 0, 1, c.dMax);
     } else {
       warWarnOnce('spawn-cfg-dmax', '00_core 的 WAR_CONFIG.spawn.dMax 缺失：出生点破坏度硬门回落到 ' + c.dMax + '（暂定值，需按 20_spawn.js 顶部「标定流程」实机标定）');
+    }
+    if (core != null && core.coverMin != null) {
+      c.coverMin = global.WAR.clampInt(core.coverMin, 1, 9, c.coverMin);
+    } else {
+      warWarnOnce('spawn-cfg-covermin', '00_core 的 WAR_CONFIG.spawn.coverMin 缺失：出生点覆盖度门槛回落到 ' + c.coverMin + '/9（暂定值，需按 20_spawn.js 顶部「标定流程」用 dcalib 标定）');
     }
     if (core != null && core.mode != null) c.mode = String(core.mode);
   } catch (e) { }
@@ -384,6 +397,7 @@ function spNormConfig(prev) {
   out.allowFluidGround = (src.allowFluidGround === true);
   out.rings = spCopyRings(src.rings);
   out.dMax = spClampNum(src.dMax, 0, 1, d.dMax);
+  out.coverMin = global.WAR.clampInt(src.coverMin, 1, 9, d.coverMin);
   return out;
 }
 
@@ -776,7 +790,7 @@ function spRoll(player, opts) {
   var seed = (cfg.rngSeed > 0) ? cfg.rngSeed : (warNow() & 0x7fffffff);
   var rng = spRngNew(seed);
   var stat = { banned: 0, notLoaded: 0, notScanned: 0, readFail: 0, noTerrain: 0, chunkErr: 0, noRecord: 0, stale: 0, budget: false, tried: 0, ok: null,
-               passed: 0, artificial: 0, destroyed: 0, filtered: 0 };
+               passed: 0, artificial: 0, destroyed: 0, filtered: 0, readable: 0, coverage: 0 };
   for (var i = 0; i < cfg.tries; i++) {
     if (warNow() - t0 > cfg.maxMillis) { stat.budget = true; break; }
     stat.tried++;
@@ -792,6 +806,9 @@ function spRoll(player, opts) {
       stat.notScanned++; stat.noRecord += avg.nul; stat.stale += avg.stale;
       continue;
     }
+    // —— 覆盖度门槛（先于 a/d 硬门：覆盖不足时 a/d 不可信；假放行是最坏失效模式）——
+    stat.readable++;
+    if (avg.n < cfg.coverMin) { stat.coverage++; continue; }
     // —— 硬门（用户规格：人为化程度不为 0 不行；破坏程度较大不行）——
     // a 必须**恰好为 0**（不是「低」）：有任何被计入人工的建造物就出局；
     // d 必须 <= cfg.dMax（含等号）。两条都在**打分之前**，通过后再按原有排序打分。
@@ -832,17 +849,32 @@ function spRoll(player, opts) {
         '出生点打分不可用：候选区块的 world data 读取失败 —— 这不是「还没扫描」。' + why +
         '。请管理员查服务端日志里的 [CM] 警告与存档完整性，修好后重试。', stat, actor);
     }
-    // 候选**读得出来但全被硬门刷掉** ⇒ 这是「扫了但都不合格」，与「还没扫描」是两件事
+    var gateStat0 = spGateStat(stat, cfg);
+    // 情况一：读得到，但**都没过覆盖度门槛** ⇒ SPAWN_COVERAGE（与「未扫描」是两件事：
+    //   这里是「扫得不够密」，正确动作是继续扫或换中心，而不是「这里没有已扫描区块」）
+    if (stat.readable > 0 && stat.passed === 0) {
+      gateStat0.code = 'SPAWN_COVERAGE';
+      SP_MEM.lastGate = gateStat0;
+      return spDeny('SPAWN_COVERAGE',
+        '候选区块读得到，但 3×3 **覆盖度都不够**（每块需要 ≥ ' + cfg.coverMin + '/9 条有效记录）：共 ' + stat.readable +
+        ' 个候选全部覆盖不足（其中未扫描 ' + stat.notScanned + ' / 过期 ' + stat.stale + '）。' +
+        '这不是「一块都没扫过」，而是**扫得还不够密**：请继续 /cm scan（或换中心点/扩大半径）后再试。',
+        gateStat0, actor);
+    }
+    // 情况二：有候选过了覆盖度，但**全被 a/d 硬门刷掉** ⇒ 按命中组合给码
     if (stat.passed > 0 && stat.filtered === stat.passed) {
       var gateCode = (stat.destroyed === 0) ? 'SPAWN_ARTIFICIAL'
                    : ((stat.artificial === 0) ? 'SPAWN_DESTROYED' : 'SPAWN_ALL_FILTERED');
       var gateStat = spGateStat(stat, cfg);
       gateStat.code = gateCode;
+      // 注：passed>0 时「没过硬门」与「通过覆盖度」的计数必然相等（未通过者都已计入 filtered），
+      // 所以这里就是「混合原因」的唯一出口：文案按需追加 coverage 计数，不需要第三分支。
       SP_MEM.lastGate = gateStat;
       return spDeny(gateCode,
         '候选区块都读到了，但**全部没过出生点硬门**（这不是「还没扫描」）：共 ' + stat.passed + ' 个候选 / 刷掉 ' + stat.filtered +
         ' 个；其中 人为化(a>0) 命中 ' + stat.artificial + ' 个、破坏度(d>' + spFmtNum(cfg.dMax, 4) + ') 命中 ' + stat.destroyed +
         ' 个（同一条可同时命中两条）。' +
+        (stat.coverage > 0 ? ('另外还有 ' + stat.coverage + ' 个候选是**覆盖不足**被刷掉（需 ≥ ' + cfg.coverMin + '/9）——两类原因要分开处理。') : '') +
         '下一步：换中心点或扩大扫描范围；或先 /war spawn admin dcalib 看真实 a/d 分布标定 dMax。',
         gateStat, actor);
     }
@@ -918,7 +950,7 @@ function spCfgText(cfg) {
          '｜冷却=' + Math.round(cfg.cooldownMs / 1000) + 's｜次数上限=' + cfg.maxRolls +
          '｜保护=' + Math.round(cfg.protectionMs / 1000) + 's｜种子=' + (cfg.rngSeed > 0 ? cfg.rngSeed : '时间') +
          '｜采样=' + cfg.sampleGrid + '×' + cfg.sampleGrid + '｜最大高差=' + cfg.maxSlope +
-         '｜硬门=a 必须为 0 且 d≤' + spFmtNum(cfg.dMax, 4) + '(暂定待标定)';
+         '｜硬门=覆盖度≥' + cfg.coverMin + '/9 且 a=0 且 d≤' + spFmtNum(cfg.dMax, 4) + '(暂定待标定)';
 }
 
 // —— dMax 标定与硬门统计（全部只读：不 analyze、不加载区块、不写 pd）——
@@ -935,8 +967,9 @@ function spQuantile(sortedArr, q) {
 }
 
 function spGateStat(stat, cfg) {
-  return { tried: stat.tried, passed: stat.passed, filtered: stat.filtered,
-           artificial: stat.artificial, destroyed: stat.destroyed, dMax: cfg.dMax };
+  return { tried: stat.tried, readable: stat.readable, coverage: stat.coverage, passed: stat.passed,
+           filtered: stat.filtered, artificial: stat.artificial, destroyed: stat.destroyed,
+           dMax: cfg.dMax, coverMin: cfg.coverMin };
 }
 
 // /war spawn admin dcalib [<半径区块>]：读**已有记录**给出 a/d 分布，用来标定 dMax。
@@ -961,13 +994,14 @@ function spDCalib(source, radiusArg) {
   if (list == null || list.length === 0) {
     return ['半径 ' + r + ' 区块内没有任何已扫描记录 —— 先 /cm scan ' + r + '（或更大）再做标定。'];
   }
-  var ds = [], as = [], staleN = 0, unknownN = 0, zeroA = 0, n = 0;
+  var ds = [], as = [], fkeys = [], staleN = 0, unknownN = 0, zeroA = 0, n = 0;
   for (var i = 0; i < list.length; i++) {
     var e = list[i];
     if (e == null) continue;
     if (e.stale === true) { staleN++; continue; }
     if (e.d == null || e.a == null) { unknownN++; continue; }   // 未知不许当 0（口径硬约束）
     ds.push(Number(e.d)); as.push(Number(e.a)); n++;
+    if (e.cx != null && e.cz != null) fkeys.push(Number(e.cx) + ',' + Number(e.cz));
     if (Number(e.a) === 0) zeroA++;
   }
   if (n === 0) {
@@ -984,6 +1018,23 @@ function spDCalib(source, radiusArg) {
            '｜a===0 比例=' + Math.round(100 * zeroA / n) + '%（这个比例就是 a 硬门放行率）');
   out.push('d: min=' + spFmtNum(spQuantile(ds, 0)) + ' p25=' + spFmtNum(spQuantile(ds, 0.25)) + ' 中位=' + spFmtNum(spQuantile(ds, 0.5)) +
            ' p75=' + spFmtNum(spQuantile(ds, 0.75)) + ' max=' + spFmtNum(spQuantile(ds, 1)) + '（p75 即自然底噪）');
+  // 3×3 覆盖度分布（标定 coverMin 用）：以每条 fresh 记录为中心，数它 3×3 邻域里有几条 fresh
+  var fset = {};
+  for (var fi = 0; fi < fkeys.length; fi++) fset[fkeys[fi]] = 1;
+  var hist = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], atLeast = 0;
+  for (var fj = 0; fj < fkeys.length; fj++) {
+    var pr = fkeys[fj].split(','), qx = warToInt(pr[0], 0), qz = warToInt(pr[1], 0), cnt = 0;
+    for (var dx2 = -1; dx2 <= 1; dx2++) {
+      for (var dz2 = -1; dz2 <= 1; dz2++) if (fset[(qx + dx2) + ',' + (qz + dz2)] === 1) cnt++;
+    }
+    hist[cnt]++;
+    if (cnt >= cfg.coverMin) atLeast++;
+  }
+  var htxt = [];
+  for (var hi = 1; hi <= 9; hi++) htxt.push(hi + ':' + hist[hi]);
+  out.push('3×3 覆盖度（fresh 条数:窗口数）' + htxt.join(' ') +
+           '｜fresh ≥ coverMin(' + cfg.coverMin + ') 的窗口占比 = ' + Math.round(100 * atLeast / n) +
+           '%（占比过低＝门槛偏严，会把没扫密的区域全判成覆盖不足）');
   out.push('结论：' + (p75 > dMax
     ? ('d 的底噪 p75=' + spFmtNum(p75, 4) + ' **高于**当前 dMax=' + spFmtNum(dMax, 4) + ' ⇒ 阈值低于自然底噪，出生点会几乎永远刷不出来；建议 dMax ≥ ' + spFmtNum(p75, 4) + '（再留余量），并写回 00_core 的 WAR_CONFIG.spawn.dMax。')
     : ('d 的底噪 p75=' + spFmtNum(p75, 4) + ' ≤ 当前 dMax=' + spFmtNum(dMax, 4) + ' ⇒ 阈值尚高于底噪；放行率由 a===0 比例（' + Math.round(100 * zeroA / n) + '%）决定。')));
@@ -1033,12 +1084,13 @@ function spStatusLines(source) {
   // 硬门统计（上次掷点）：让玩家分清「没扫」与「扫了但都不合格」
   var lg = SP_MEM.lastGate;
   if (lg != null) {
-    out.push('上次掷点硬门（a 必须为 0，d ≤ ' + spFmtNum(lg.dMax, 4) + '）：候选 ' + lg.tried + ' 个 / 过门 ' + lg.passed +
-             ' / 刷掉 ' + spNum(lg.filtered, 0) +
+    out.push('上次掷点硬门（先看覆盖度 ≥ ' + spNum(lg.coverMin, 0) + '/9，再看 a 必须为 0 且 d ≤ ' + spFmtNum(lg.dMax, 4) + '）：候选 ' + lg.tried +
+             ' 个 / 读到 ' + spNum(lg.readable, 0) + ' / 覆盖不足 ' + spNum(lg.coverage, 0) + ' / 过门 ' + spNum(lg.passed, 0) +
+             ' / 硬门刷掉 ' + spNum(lg.filtered, 0) +
              '｜人为化(a>0) 命中 ' + lg.artificial + '｜破坏度(d>阈值) 命中 ' + lg.destroyed + '（可重叠）' +
              (lg.code != null ? ('｜结果 ' + lg.code) : ''));
   } else {
-    out.push('硬门（a 必须为 0，d ≤ ' + spFmtNum(cfg.dMax, 4) + '，暂定待标定）：还没有掷点记录 —— 掷一次点后这里会给出两条刷掉计数（用于区分「没扫」与「扫了但都不合格」）');
+    out.push('硬门（覆盖度 ≥ ' + cfg.coverMin + '/9，且 a 必须为 0、d ≤ ' + spFmtNum(cfg.dMax, 4) + '，暂定待标定）：还没有掷点记录 —— 掷一次点后这里会给出覆盖不足与两条命中的计数（用于区分「没扫」「扫得不密」「扫了但都不合格」）');
   }
   // 自己的保护剩余
   try {
