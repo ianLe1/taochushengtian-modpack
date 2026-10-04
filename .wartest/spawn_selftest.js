@@ -785,9 +785,66 @@ coreSpawn.candidateRadius = keepCR; coreSpawn.tries = keepT;
 WAR.data.warned['spawn-cfg-maxradius'] = undefined; WAR.data.warned['spawn-cfg-tries'] = undefined;
 var dcfg16d = global.spDefaultConfig();
 assert(dcfg16d.maxRadius === keepCR && dcfg16d.tries === keepT, '恢复 core 值后默认配置回到 ' + keepCR + ' / ' + keepT);
-// (f) A4：删掉 warActor 里那段无效空 try 后，审计主体取名两态不变
-assert(global.warActor(new FakeSource(2, null)) === 'console', 'A4 删死代码后：无玩家 ⇒ 审计主体 console');
-assert(global.warActor(new FakeSource(2, alice)) === 'alice', 'A4 删死代码后：有玩家 ⇒ 审计主体取玩家名');
+// ---- T17 步骤 4b：actor 取名归 core（WAR.actorName）+ 审计端到端 + 结构断言 ----
+console.log('\n--- T17 步骤 4b：warActor → WAR.actorName(source) ---');
+// 旧实现只留在测试里当对拍 oracle（产品代码里已删除）
+function oldWarActor(source) {
+  try {
+    var p = source.getPlayer();
+    if (p != null) return warName(p);
+  } catch (e) { }
+  return 'console';
+}
+assert(typeof WAR.actorName === 'function', 'WAR.actorName 已由 00_core 导出（步骤 4a）');
+var weirdPlayer = new FakePlayer('w', 'uuid-w');
+weirdPlayer.username = '';
+weirdPlayer.getName = function () { throw new Error('no name'); };   // username/getName 都拿不到 ⇒ warName 兜底到 '?'
+var actorCases = [
+  { label: '有玩家', src: new FakeSource(2, alice), expect: 'alice' },
+  { label: '无玩家', src: new FakeSource(2, null), expect: 'console' },
+  { label: 'getPlayer 抛异常', src: { getPlayer: function () { throw new Error('boom'); } }, expect: 'console' },
+  { label: 'source 为 null', src: null, expect: 'console' },
+  { label: '玩家名退化链（username 为空 + getName 抛异常 + getScoreboardName 也空）', src: new FakeSource(2, weirdPlayer), expect: '?' }
+];
+var actorDiff = [], actorBad = [];
+for (var ai2 = 0; ai2 < actorCases.length; ai2++) {
+  var o1 = oldWarActor(actorCases[ai2].src), n1 = WAR.actorName(actorCases[ai2].src);
+  if (o1 !== n1) actorDiff.push(actorCases[ai2].label + '（旧 ' + o1 + ' ≠ 新 ' + n1 + '）');
+  if (n1 !== actorCases[ai2].expect) actorBad.push(actorCases[ai2].label + '（新 ' + n1 + ' ≠ 期望 ' + actorCases[ai2].expect + '）');
+}
+assert(actorDiff.length === 0, '新旧并跑对拍：5 种 source 输入下 warActor 与 WAR.actorName 返回值完全相同' + (actorDiff.length ? ('（差异：' + actorDiff.join('；') + '）') : ''));
+assert(actorBad.length === 0, '新函数 5 种输入的返回值符合预期（玩家名 / console / 退化链）' + (actorBad.length ? ('（' + actorBad.join('；') + '）') : ''));
+// 端到端：审计条目的 actor 字段
+var zoe = new FakePlayer('zoe', 'uuid-z1');
+var c17a = runPath(['spawn'], new FakeSource(0, zoe));
+var a17a = WAR.audit.last();
+assert(c17a.ok === true && a17a != null && a17a.action === 'spawn.roll' && a17a.result === 'ok' && a17a.actor === 'zoe',
+  '审计端到端：玩家 /war spawn ⇒ actor = 玩家名 zoe（实测 ' + (a17a ? a17a.actor + '/' + a17a.action + '/' + a17a.result : 'null') + '）');
+var c17b = runPath(['spawn', 'admin', 'center'], new FakeSource(2, alice), { x: 7, z: 8 });
+var a17b = WAR.audit.last();
+assert(c17b.ok === true && a17b != null && a17b.action === 'spawn.admin.center' && a17b.actor === 'cmd:alice',
+  '审计端到端：玩家执行 admin ⇒ actor = cmd:alice（实测 ' + (a17b ? a17b.actor : 'null') + '，与 00_core admin.save 的 cmd: 约定一致）');
+var c17c = runPath(['spawn', 'admin', 'radius'], new FakeSource(2, null), { n: 1000 });
+var a17c = WAR.audit.last();
+assert(c17c.ok === true && a17c != null && a17c.action === 'spawn.admin.radius' && a17c.actor === 'cmd:console',
+  '审计端到端：控制台执行 admin ⇒ actor = cmd:console（实测 ' + (a17c ? a17c.actor : 'null') + '）');
+// 结构断言：直接读产品源码文本，防旧实现/死代码被复制回来
+var spawnSrc17 = fs.readFileSync(path.join(WAR_DIR, '20_spawn.js'), 'utf8');
+assert(spawnSrc17.indexOf('function warActor') < 0, '结构：20_spawn.js 已无 function warActor（不再自备取名实现）');
+assert(spawnSrc17.indexOf("typeof global.WAR.hasPermission === 'function'") < 0, '结构：空壳 hasPermission 调用已绝迹（防止被复制回来）');
+assert(spawnSrc17.indexOf('WAR.actorName(') >= 0, '结构：20_spawn.js 确实调用 WAR.actorName(');
+assert(spawnSrc17.indexOf("'cmd:' + global.WAR.actorName(source)") >= 0, '结构：admin 审计 actor 走 cmd: + WAR.actorName(source)');
+// 更强：把每个 spAudit(...) 的第一个实参抠出来，逐个查来源 —— 防止只在一处偷偷内联私有实现
+var auditArgs17 = [], re17 = /spAudit\(([^,]*),/g, m17;
+while ((m17 = re17.exec(spawnSrc17)) !== null) auditArgs17.push(m17[1].trim());
+var allowed17 = ["'cmd:' + global.WAR.actorName(source)", 'actor', "actor || 'system'"];
+var badActor17 = [];
+for (var q17 = 0; q17 < auditArgs17.length; q17++) if (allowed17.indexOf(auditArgs17[q17]) < 0) badActor17.push(auditArgs17[q17]);
+assert(auditArgs17.length >= 4 && badActor17.length === 0,
+  '结构：所有 spAudit 的 actor 实参只允许 WAR.actorName/执行者 actor（' + auditArgs17.length + ' 个调用点：' + auditArgs17.join(' | ') + '）' + (badActor17.length ? ('（越界：' + badActor17.join(' / ') + '）') : ''));
+var cmdCount17 = 0;
+for (var r17 = 0; r17 < auditArgs17.length; r17++) if (auditArgs17[r17] === "'cmd:' + global.WAR.actorName(source)") cmdCount17++;
+assert(cmdCount17 === 2, '结构：两个 admin 审计点（center/radius）都用 cmd: + WAR.actorName(source)（实测 ' + cmdCount17 + ' 处）');
 
 // ================================================================ 汇总
 console.log('\n=== 汇总：PASS ' + passN + ' / FAIL ' + failN + ' ===');

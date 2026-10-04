@@ -957,7 +957,7 @@ function spSetCenter(source, x, z) {
     sp.config.centerZ = Math.floor(z);
     return true;
   });
-  spAudit(warActor(source), 'spawn.admin.center', x + ',' + z, mut.ok ? 'ok' : 'fail');
+  spAudit('cmd:' + global.WAR.actorName(source), 'spawn.admin.center', x + ',' + z, mut.ok ? 'ok' : 'fail');
   if (!mut.ok) return '保存失败（内存数据仍在）：' + mut.error;
   return '环带中心已设为 ' + Math.floor(x) + ', ' + Math.floor(z) + '（对全体玩家生效，已落盘待自动保存）';
 }
@@ -971,19 +971,16 @@ function spSetRadius(source, r) {
     sp.config = spNormConfig(sp.config);
     return sp.config.maxRadius;
   });
-  spAudit(warActor(source), 'spawn.admin.radius', String(r), mut.ok ? 'ok' : 'fail');
+  spAudit('cmd:' + global.WAR.actorName(source), 'spawn.admin.radius', String(r), mut.ok ? 'ok' : 'fail');
   if (!mut.ok) return '保存失败：' + mut.error;
   if (mut.ret === r) return '环带外半径已设为 ' + mut.ret + ' 格。';
   return '环带外半径已设为 ' + mut.ret + ' 格（请求 ' + r + '，受半径下限 ' + spConfig().minRadius +
     ' 格与「外半径至少比内半径大 16 格」约束，已按 ' + mut.ret + ' 生效并写入存档）。';
 }
-function warActor(source) {
-  try {
-    var p = source.getPlayer();
-    if (p != null) return warName(p);
-  } catch (e2) { }
-  return 'console';
-}
+// actor 取名统一走 00_core 的 WAR.actorName(source)（步骤 4b）。旧 warActor 已删除：
+// 两处实现逐字相同，留着只会漂移；死代码（空壳 hasPermission 判断）随之消失。
+// 注意：这里取的是「命令来源」的显示名（无玩家 => 'console'，审计里再前缀 'cmd:'）；
+// 而 /war spawn 掷点路径记的是「动作执行者」本人（warName(player)），不是命令来源。
 
 // ============================================================================
 // 8. 域对象 + 命令节点注册（照 00_core 的命令工厂写法）
