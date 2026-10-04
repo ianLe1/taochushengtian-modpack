@@ -274,7 +274,7 @@ function cmRec(d, a, stale, partial) {
 var CM = {
   version: 1,
   nGetAt: 0, nRank: 0, nStats: 0, nScoreArea: 0, nGetStatus: 0,
-  _fn: function (bx, bz) { return cmRec(0.1, 0.2, false, false); },
+  _fn: function (bx, bz) { return cmRec(0.04, 0.0, false, false); },
   _pd: 'ok',
   _statusFn: null,
   getAt: function (level, bx, bz) { this.nGetAt++; return this._fn(bx, bz); },
@@ -375,7 +375,7 @@ assert(SPS != null && SPS.config != null && SPS.log != null && SPS.used != null 
 // ---- T2 已扫描 → 正常掷点 ----
 console.log('\n--- T2 已扫描：正常掷点（tries=1 / 固定种子 / 中心 0,0）---');
 global.CM = CM;
-CM._fn = function (bx, bz) { return cmRec(0.1, 0.2, false, false); };
+CM._fn = function (bx, bz) { return cmRec(0.04, 0.0, false, false); };
 SPS.config.tries = 1;
 SPS.config.rngSeed = 12345;
 SPS.config.maxRadius = 5000;
@@ -392,10 +392,10 @@ assert(r2 != null && r2.ok === true, '掷点成功（ok=true）' + (r2 && r2.mes
 assert(CM.nScoreArea - beforeSA === 1, '一次候选恰好 1 次 CM.scoreArea（批量读 3×3）：' + (CM.nScoreArea - beforeSA));
 assert(CM.nGetAt - before === 0, '批量路径完全不调 CM.getAt（旧路径要 9 次）：' + (CM.nGetAt - before));
 assert(r2.ok && r2.scoredVia === 'batch', '返回体标注读数路径 scoredVia=batch');
-assert(r2.ok && near(r2.d, 0.1) && near(r2.a, 0.2), 'D̄=' + (r2.d) + ' Ā=' + (r2.a) + '（= 假 CM 的 0.1/0.2）');
+assert(r2.ok && near(r2.d, 0.04) && near(r2.a, 0), 'D̄=' + (r2.d) + ' Ā=' + (r2.a) + '（= 假 CM 的 0.04/0；a=0 且 d<阈值 ⇒ 过硬门）');
 assert(r2.ok && r2.coverage === 9, '覆盖率 9/9');
-// S = (0.6·(1-0.1) + 1.0·(1-0.2)) / 1.6 - 0.35·0 = 1.34/1.6 = 0.8375
-assert(r2.ok && near(r2.score, 0.8375, 1e-9), '评分 S=' + (r2.ok ? r2.score : '?') + '（期望 0.8375 = (0.6·0.9+1.0·0.8)/1.6）');
+// S = (0.6·(1-0.04) + 1.0·(1-0)) / 1.6 - 0.35·0 = 1.576/1.6 = 0.985
+assert(r2.ok && near(r2.score, 0.985, 1e-9), '评分 S=' + (r2.ok ? r2.score : '?') + '（期望 0.985 = (0.6·0.96+1.0·1.0)/1.6）');
 assert(r2.ok && r2.usedFrac === 0, 'usedFrac=0（该区块未被用过）');
 assert(r2.ok && r2.teleport === 'teleportToLevel', '传送走 teleportToLevel');
 assert(alice.tps.length === 1 && near(alice.tps[0].x - r2.x, 0.5), '落地坐标 = 落点 + 0.5（取方块中心）');
@@ -417,7 +417,7 @@ bob.level = lvl;
 var r3 = WAR.spawn.roll(bob, { level: lvl, op: true });
 assert(r3.ok === true, 'bob（OP 豁免冷却）掷点成功');
 assert(r3.ok && near(r3.usedFrac, 0.25), 'usedFrac = 1/4 = 0.25（usedScale=4）');
-assert(r3.ok && near(r3.score, 0.75, 1e-9), 'S 降为 0.75 = 0.8375 - 0.35·0.25');
+assert(r3.ok && near(r3.score, 0.8975, 1e-9), 'S 降为 0.8975 = 0.985 - 0.35·0.25');
 assert(r3.ok && r3.cx === r2.cx && r3.cz === r2.cz, '同种子 + 同中心 ⇒ 复现同一候选区块（方案 §2「可复现」）');
 assert(SPS.used[usedKey] === 2, 'used 计数递增到 2');
 
@@ -434,7 +434,7 @@ var denied0 = SPS.stats.denied;
 assert(denied0 >= 1, '被拒绝计入 stats.denied');
 
 var seen = {};
-CM._fn = function (bx, bz) { return cmRec(0.1, 0.2, true, false); };
+CM._fn = function (bx, bz) { return cmRec(0.9, 0.0, true, false); };
 var r4b = WAR.spawn.roll(carol, { level: lvl, op: true });
 assert(r4b.ok === false && r4b.code === 'NO_SCANNED_CANDIDATE', '全 stale ⇒ 同样按「未扫描」拒绝（stale 不参与均值）');
 assert(r4b.detail != null && r4b.detail.stale === 9, '分解计数 stale=9');
@@ -444,13 +444,13 @@ var seenKeys = {};
 CM._fn = function (bx, bz) {
   var k = Math.floor((bx - 8) / 16) + ',' + Math.floor((bz - 8) / 16);
   if (seenKeys[k] == null) seenKeys[k] = Object.keys(seenKeys).length;
-  return cmRec(0.2, 0.3, seenKeys[k] < 4, false);
+  return cmRec(0.02, 0.0, seenKeys[k] < 4, false);
 };
 var dave = new FakePlayer('dave', 'uuid-d');
 dave.level = lvl;
 var r4c = WAR.spawn.roll(dave, { level: lvl, op: true });
 assert(r4c.ok === true && r4c.coverage === 5, '5 fresh + 4 stale ⇒ 用 5 条算均值（覆盖 5/9）');
-assert(r4c.ok && near(r4c.d, 0.2) && near(r4c.a, 0.3), '均值只含非 stale 记录（D̄=0.2 Ā=0.3）');
+assert(r4c.ok && near(r4c.d, 0.02) && near(r4c.a, 0), '均值只含非 stale 记录（D̄=0.02 Ā=0；stale 的 0.9 未混入）');
 
 // ---- T5 getAt 抛异常 → 不崩，按未扫描处理 ----
 console.log('\n--- T5 CM.getAt 抛异常：不崩、按未扫描处理 ---');
@@ -471,7 +471,7 @@ assert(c6.ok === true && c6.ret === 1, '/war spawn 命令仍正常返回（不�
 assert(srcNp.messages.join(' ').indexOf('chunk_metrics') >= 0, '/war spawn 命令把 CM_MISSING 原因回给玩家');
 assert(WAR.spawn.status().cm === false, 'status().cm = false（CM 缺失时可自检）');
 global.CM = CM;
-CM._fn = function (bx, bz) { return cmRec(0.1, 0.2, false, false); };
+CM._fn = function (bx, bz) { return cmRec(0.04, 0.0, false, false); };
 
 // ---- T7 地形不合格 ----
 console.log('\n--- T7 地形不合格（危险地面）---');
@@ -634,7 +634,7 @@ assert(c12e.ok === true, '/war spawn（控制台/无玩家）不抛，给出提�
 // ---- T13 未实现的预览接口 + /war version 回归 ----
 console.log('\n--- T13 preview 只读接口 + 框架回归 ---');
 var pv = WAR.spawn.preview(lvl, 8, 8);
-assert(pv != null && pv.ok === true && near(pv.d, 0.1) && near(pv.a, 0.2), 'preview() 只读返回该区块 D/A（不改状态）');
+assert(pv != null && pv.ok === true && near(pv.d, 0.04) && near(pv.a, 0), 'preview() 只读返回该区块 D/A（不改状态）');
 var srcVer = new FakeSource(0, null);
 var verRet = runPath(['version'], srcVer);
 assert(verRet.ok === true && verRet.ret === 1, '/war version 仍可执行（未破坏 00_core 命令树）');
@@ -643,16 +643,16 @@ assert(WAR.ready === true, 'restart 后 WAR.ready = true（boot 钩子跑过）'
 
 // ---- T14 批量路径 vs 旧版 CM：自动退化 + 读数路径可观测 ----
 console.log('\n--- T14 CM.scoreArea 批量路径 / 旧版 CM 自动退化 ---');
-CM._fn = function (bx, bz) { return cmRec(0.1, 0.2, false, false); };
+CM._fn = function (bx, bz) { return cmRec(0.04, 0.0, false, false); };
 var pvBatch = WAR.spawn.preview(lvl, 8, 8);
-assert(pvBatch.ok === true && near(pvBatch.d, 0.1) && near(pvBatch.a, 0.2), '批量路径下 preview() 结果不变（D̄=0.1 Ā=0.2）');
+assert(pvBatch.ok === true && near(pvBatch.d, 0.04) && near(pvBatch.a, 0), '批量路径下 preview() 结果不变（D̄=0.04 Ā=0）');
 var saBefore = CM.nScoreArea, gaBefore = CM.nGetAt;
 WAR.spawn.preview(lvl, 8, 8);
 assert(CM.nScoreArea - saBefore === 1 && CM.nGetAt - gaBefore === 0, 'preview 走 1 次 scoreArea、0 次 getAt');
 var saKeep = CM.scoreArea;
 CM.scoreArea = undefined;                       // 模拟旧版 CM（只有 getAt）
 var pvLegacy = WAR.spawn.preview(lvl, 8, 8);
-assert(pvLegacy.ok === true && near(pvLegacy.d, 0.1) && near(pvLegacy.a, 0.2), '旧版 CM（无 scoreArea）自动退化为逐点 getAt，结果一致');
+assert(pvLegacy.ok === true && near(pvLegacy.d, 0.04) && near(pvLegacy.a, 0), '旧版 CM（无 scoreArea）自动退化为逐点 getAt，结果一致');
 assert(CM.nGetAt - gaBefore === 9, '退化路径恰好 9 次 getAt：' + (CM.nGetAt - gaBefore));
 var r14 = WAR.spawn.roll(new FakePlayer('erin', 'uuid-e2'), { level: lvl, op: true });
 assert(r14.ok === true && r14.scoredVia === 'legacy', '退化路径的 roll 也正常，scoredVia=legacy');
@@ -660,7 +660,7 @@ CM.scoreArea = saKeep;
 CM._fn = function () { throw new Error('scoreArea 内部炸（模拟）'); };
 var r14b = WAR.spawn.roll(new FakePlayer('frank', 'uuid-f2'), { level: lvl, op: true });
 assert(r14b.ok === false && r14b.code === 'NO_SCANNED_CANDIDATE', 'scoreArea 抛异常 ⇒ 退化为逐点读取（不冒泡）');
-CM._fn = function (bx, bz) { return cmRec(0.1, 0.2, false, false); };
+CM._fn = function (bx, bz) { return cmRec(0.04, 0.0, false, false); };
 
 // ---- T15 world data 读取失败（CM_READ_FAIL）≠ 未扫描 ----
 console.log('\n--- T15 读取失败 ⇒ CM_READ_FAIL（与「未扫描」区分）---');
@@ -683,7 +683,7 @@ var r15c = WAR.spawn.roll(new FakePlayer('ivy', 'uuid-i2'), { level: lvl, op: tr
 assert(r15c.ok === false && r15c.code === 'CM_READ_FAIL', 'scoreArea 报「无记录」但 getStatus 复核出读取失败 ⇒ 仍报 CM_READ_FAIL');
 assert(CM.nGetStatus >= 1, 'getStatus 被用来复核失败原因（累计 ' + CM.nGetStatus + ' 次）');
 CM._statusFn = null;
-CM._fn = function (bx, bz) { return cmRec(0.1, 0.2, false, false); };
+CM._fn = function (bx, bz) { return cmRec(0.04, 0.0, false, false); };
 var r15d = WAR.spawn.roll(new FakePlayer('jack', 'uuid-j2'), { level: lvl, op: true });
 assert(r15d.ok === true, '清掉读取失败注入后恢复成功（三类原因都只是当次判定）');
 
@@ -845,6 +845,80 @@ assert(auditArgs17.length >= 4 && badActor17.length === 0,
 var cmdCount17 = 0;
 for (var r17 = 0; r17 < auditArgs17.length; r17++) if (auditArgs17[r17] === "'cmd:' + global.WAR.actorName(source)") cmdCount17++;
 assert(cmdCount17 === 2, '结构：两个 admin 审计点（center/radius）都用 cmd: + WAR.actorName(source)（实测 ' + cmdCount17 + ' 处）');
+
+// ---- T18 出生点硬门（用户规格：人为化程度不为 0 不行 / 破坏程度较大不行）----
+console.log('\n--- T18 出生点硬门 a===0 且 d≤dMax ---');
+var DMAX18 = WAR.spawn.status().config.dMax;
+assert(near(DMAX18, 0.05, 1e-9), '阈值可读：dMax=' + DMAX18 + '（00_core 缺键时的保底 0.05；core 有键则以 core 为准）');
+// 「含等号」这条边界要钉死：候选的 d 是 3×3 求均值后再比较，用 0.05 这种二进制不可精确表示的值
+// 会让 == 边界在浮点上漂移（我第一版就被骗过：把 > 改成 >= 后测试依然全绿）。
+// 所以本段把 dMax 临时设成 0.0625（= 2^-4，9 个数求均值仍精确等于它），跑完恢复。
+var live18cfg = WAR.data.state.spawn.config;
+var keepDMax18 = live18cfg.dMax;
+live18cfg.dMax = 0.0625;
+assert(near(WAR.spawn.status().config.dMax, 0.0625, 1e-12), '④ 边界用例准备：dMax 临时设为可精确表示的 0.0625（读回 ' + WAR.spawn.status().config.dMax + '）');
+// ① a=0, d=0 通过
+CM._fn = function () { return cmRec(0, 0, false, false); };
+var r18a = WAR.spawn.roll(new FakePlayer('ha', 'uuid-h18a'), { level: lvl, op: true });
+assert(r18a.ok === true && r18a.code === 'ok', '① a=0,d=0 通过（code=' + r18a.code + '）');
+assert(near(r18a.a, 0) && near(r18a.d, 0), '① 通过时返回体带 a=0 d=0（不是 undefined）');
+// ② a=0.01, d=0 ⇒ SPAWN_ARTIFICIAL（边界就在「不为 0」）
+CM._fn = function () { return cmRec(0, 0.01, false, false); };
+var r18b = WAR.spawn.roll(new FakePlayer('hb', 'uuid-h18b'), { level: lvl, op: true });
+assert(r18b.ok === false && r18b.code === 'SPAWN_ARTIFICIAL', '② a=0.01,d=0 ⇒ SPAWN_ARTIFICIAL（实测 ' + r18b.code + '）');
+assert(String(r18b.message).indexOf('人为化') >= 0, '② 文案说明原因（人为化 a>0）');
+// ③ d=阈值+ε ⇒ SPAWN_DESTROYED
+CM._fn = function () { return cmRec(0.0626, 0, false, false); };   // 0.0626 > 0.0625（阈值）
+var r18c = WAR.spawn.roll(new FakePlayer('hc', 'uuid-h18c'), { level: lvl, op: true });
+assert(r18c.ok === false && r18c.code === 'SPAWN_DESTROYED', '③ a=0,d=阈值+ε(0.0626>0.0625) ⇒ SPAWN_DESTROYED（实测 ' + r18c.code + '）');
+// ④ d=阈值 正好通过（含等号边界）
+CM._fn = function () { return cmRec(0.0625, 0, false, false); };
+var r18d = WAR.spawn.roll(new FakePlayer('hd', 'uuid-h18d'), { level: lvl, op: true });
+assert(r18d.ok === true, '④ a=0,d=阈值(0.0625) 正好通过 —— 把门改成 > 或 >= 必须在这条上见红（含等号边界）');
+// ⑤ 两条都超 ⇒ 独立码，且文案与「未扫描」区分
+CM._fn = function () { return cmRec(0.9, 0.2, false, false); };
+var r18e = WAR.spawn.roll(new FakePlayer('he', 'uuid-h18e'), { level: lvl, op: true });
+assert(r18e.ok === false && r18e.code === 'SPAWN_ALL_FILTERED', '⑤ 两条都超 ⇒ SPAWN_ALL_FILTERED（实测 ' + r18e.code + '）');
+assert(String(r18e.message).indexOf('这不是「还没扫描」') >= 0, '⑤ 文案显式区分「没扫」与「扫了但都不合格」');
+assert(String(r18e.message).indexOf('请先扫描') < 0, '⑤ 文案不把玩家引向「先扫描」（不误报为未扫描）');
+// ⑤b 只有一条门触发时用专用码（不是 ALL_FILTERED）
+CM._fn = function () { return cmRec(0.3, 0, false, false); };   // d 超、a=0
+var r18f = WAR.spawn.roll(new FakePlayer('hf', 'uuid-h18f'), { level: lvl, op: true });
+assert(r18f.ok === false && r18f.code === 'SPAWN_DESTROYED', '⑤ 只有 d 超 ⇒ SPAWN_DESTROYED（不是 ALL_FILTERED）');
+// ⑤c /war spawn status 报出两条刷掉计数 + 上次结果码
+var st18 = WAR.spawn.text(new FakeSource(2, null)).join(' ｜ ');
+assert(st18.indexOf('人为化(a>0) 命中') >= 0 && st18.indexOf('破坏度(d>阈值) 命中') >= 0, '⑤ status 分别报出两条命中计数（不再分不清「没扫」）');
+assert(st18.indexOf('候选') >= 0 && st18.indexOf('过门') >= 0 && st18.indexOf('刷掉') >= 0, '⑤ status 给出候选总数、过门数与刷掉数');
+assert(st18.indexOf('SPAWN_DESTROYED') >= 0, '⑤ status 带上上次掷点的结果码');
+assert(st18.indexOf('硬门=a 必须为 0 且 d≤') >= 0, '⑤ 配置行里能看到当前阈值（玩家可核对）');
+// ⑥ dcalib：分位数函数 + 命令输出 + 空数据退化
+assert(near(spQuantile([0, 1, 2, 3, 4], 0.5), 2) && near(spQuantile([0, 1, 2, 3, 4], 0.75), 3) && spQuantile([], 0.5) === null,
+  '⑥ spQuantile 线性插值正确（p50=2 / p75=3 / 空数组返回 null）');
+var keepRank18 = CM.rank;
+CM.rank = function () { return []; };
+var src18 = new FakeSource(2, null);
+runPath(['spawn', 'admin', 'dcalib'], src18, {});
+assert(src18.messages.join(' ').indexOf('没有任何已扫描记录') >= 0, '⑥ dcalib 在无记录时提示先 /cm scan（不假装有数据）');
+CM.rank = function () {
+  return [
+    { cx: 0, cz: 0, d: 0.01, a: 0, stale: false }, { cx: 1, cz: 0, d: 0.03, a: 0, stale: false },
+    { cx: 2, cz: 0, d: 0.05, a: 0, stale: false }, { cx: 3, cz: 0, d: 0.07, a: 0, stale: false },
+    { cx: 4, cz: 0, d: 0.20, a: 0, stale: false }, { cx: 5, cz: 0, d: 0.02, a: 0.5, stale: false },
+    { cx: 6, cz: 0, d: 0.50, a: 0.9, stale: true }
+  ];
+};
+var src18b = new FakeSource(2, null);
+runPath(['spawn', 'admin', 'dcalib'], src18b, { r: 4 });
+var txt18 = src18b.messages.join(' ｜ ');
+assert(txt18.indexOf('有效记录 6') >= 0 && txt18.indexOf('剔除过期 1') >= 0, '⑥ dcalib 统计口径：6 条有效、剔除 1 条过期（stale 不当 0 用）');
+assert(txt18.indexOf('a===0 比例=83%') >= 0, '⑥ 报出 a===0 比例（5/6=83%，即硬门放行率）');
+assert(txt18.indexOf('底噪') >= 0 && txt18.indexOf('p75') >= 0, '⑥ 报出 d 的 p75（自然底噪）');
+assert(txt18.indexOf('高于') >= 0, '⑥ 底噪 p75≈0.065 > dMax=0.05 ⇒ 明确警告「阈值低于自然底噪，出生点会几乎永远刷不出来」');
+assert(txt18.indexOf('WAR_CONFIG.spawn.dMax') >= 0, '⑥ 给出写回 00_core 的落点（唯一真值源）');
+CM.rank = keepRank18;
+WAR.data.state.spawn.config.dMax = keepDMax18;     // 恢复真实阈值（注意 spEnsure 会换新对象，必须从 state 现取）
+assert(near(WAR.spawn.status().config.dMax, keepDMax18, 1e-12), '④ 边界用例收尾：dMax 已恢复为 ' + keepDMax18);
+CM._fn = function (bx, bz) { return cmRec(0.04, 0.0, false, false); };
 
 // ================================================================ 汇总
 console.log('\n=== 汇总：PASS ' + passN + ' / FAIL ' + failN + ' ===');

@@ -109,6 +109,26 @@ var SP_CONFIG = {
 // 00_core 缺 candidateRadius / tries 时的保底值；使用它一定会 warWarnOnce 点名（不是静默默认值）
 var SP_FALLBACK = { maxRadius: 5000, tries: 64 };
 
+// ============================================================================
+// SPAWN_D_MAX（出生点「破坏程度」硬门）—— 暂定值 + 标定流程（不要当结论用）
+// ============================================================================
+// 0.05 是**暂定值，不是结论**：离线拿不到真实 a/d 分布，任何拍出来的数都是猜。
+// 标定流程（一次实机 + 一次抄数）：
+//   1) /cm scan 8    —— 先在中心附近扫一个半径（区块数），让 CM 有真实记录；
+//   2) /war spawn admin dcalib 8
+//      —— 本域只读导出**仅来自已扫描记录**的分布：a 与 d 的 min/p25/中位/p75/max，
+//         以及 a===0 的比例；不 analyze、不加载区块、不写 pd（沿用 scoreArea 的铁律）；
+//   3) 读结论：**d 的天然底噪 p75 决定阈值下限**。
+//      自然悬崖/洞穴会被计入 B2/B3 ⇒ d 天然带非零底噪；阈值必须 **> 底噪**，
+//      否则几乎每个候选都被 SPAWN_DESTROYED 刷掉、出生点永远刷不出来。
+//      取值建议 = max(当前值, d 的 p75) 再加一点余量，然后写回 00_core 的
+//      WAR_CONFIG.spawn.dMax（core 是唯一真值源；本文件只保留缺键保底 + 警告）。
+// 注意：a 的硬门是 **a === 0**（不是「低」），与阈值无关；分布里的「a===0 比例」
+//       用来判断这个门在你们服务器上有多严——比例过低说明 A 把太多自然物算成了人工。
+// ============================================================================
+var SP_D_MAX_FALLBACK = 0.05;      // 仅 core 缺键时的保底（会 warWarnOnce 点名）
+var SP_DCALIB_R_MAX = 32;          // dcalib 的半径上限（区块）
+
 // 接口缺口（task ⑤ 要求列出；扩 CM 属 chunk_metrics.js 改动，须单独授权）
 // 2026-10-04 的 CM 扩展已兑现其中三条（getStatus / scoreArea / rank 的 order+skipStale，
 // 见 chunk_metrics/README.md §4.2），下面是**仍然存在**的缺口。
@@ -126,7 +146,8 @@ var SP_MEM = {
   heightType: null,   // 缓存 Heightmap$Types.WORLD_SURFACE
   msgAt: {},          // 保护提示节流：uuid -> 上次提示时间
   bootDim: '',        // boot 时解析到的维度键（仅供参考日志）
-  hurtReg: 'none'     // 伤害拦截注册方式：targeted / untargeted / none
+  hurtReg: 'none',    // 伤害拦截注册方式：targeted / untargeted / none
+  lastGate: null      // 上次掷点的硬门统计（给 status 报「分别刷掉多少」，见 spGateStat）
 };
 
 // ============================================================================
@@ -313,6 +334,7 @@ function spDefaultConfig() {
     sampleGrid: SP_CONFIG.sampleGrid,
     maxSlope: SP_CONFIG.maxSlope,
     allowFluidGround: SP_CONFIG.allowFluidGround,
+    dMax: SP_D_MAX_FALLBACK,        // 硬门：破坏程度上限（暂定，标定流程见文件顶部）
     rankRadiusMax: SP_CONFIG.rankRadiusMax,
     rings: spCopyRings(SP_CONFIG.rings)
   };
@@ -329,6 +351,11 @@ function spDefaultConfig() {
       c.tries = global.WAR.clampInt(core.tries, 1, 4096, c.tries);
     } else {
       warWarnOnce('spawn-cfg-tries', '00_core 的 WAR_CONFIG.spawn.tries 缺失：候选上限回落到 ' + c.tries + '（请查 00_core.js，勿静默依赖保底值）');
+    }
+    if (core != null && core.dMax != null) {
+      c.dMax = spClampNum(core.dMax, 0, 1, c.dMax);
+    } else {
+      warWarnOnce('spawn-cfg-dmax', '00_core 的 WAR_CONFIG.spawn.dMax 缺失：出生点破坏度硬门回落到 ' + c.dMax + '（暂定值，需按 20_spawn.js 顶部「标定流程」实机标定）');
     }
     if (core != null && core.mode != null) c.mode = String(core.mode);
   } catch (e) { }
@@ -356,6 +383,7 @@ function spNormConfig(prev) {
   out.earlyExitScore = spClampNum(src.earlyExitScore, 0, 1, d.earlyExitScore);
   out.allowFluidGround = (src.allowFluidGround === true);
   out.rings = spCopyRings(src.rings);
+  out.dMax = spClampNum(src.dMax, 0, 1, d.dMax);
   return out;
 }
 
@@ -747,7 +775,8 @@ function spRoll(player, opts) {
   // —— 候选采样 ——
   var seed = (cfg.rngSeed > 0) ? cfg.rngSeed : (warNow() & 0x7fffffff);
   var rng = spRngNew(seed);
-  var stat = { banned: 0, notLoaded: 0, notScanned: 0, readFail: 0, noTerrain: 0, chunkErr: 0, noRecord: 0, stale: 0, budget: false, tried: 0, ok: null };
+  var stat = { banned: 0, notLoaded: 0, notScanned: 0, readFail: 0, noTerrain: 0, chunkErr: 0, noRecord: 0, stale: 0, budget: false, tried: 0, ok: null,
+               passed: 0, artificial: 0, destroyed: 0, filtered: 0 };
   for (var i = 0; i < cfg.tries; i++) {
     if (warNow() - t0 > cfg.maxMillis) { stat.budget = true; break; }
     stat.tried++;
@@ -763,6 +792,15 @@ function spRoll(player, opts) {
       stat.notScanned++; stat.noRecord += avg.nul; stat.stale += avg.stale;
       continue;
     }
+    // —— 硬门（用户规格：人为化程度不为 0 不行；破坏程度较大不行）——
+    // a 必须**恰好为 0**（不是「低」）：有任何被计入人工的建造物就出局；
+    // d 必须 <= cfg.dMax（含等号）。两条都在**打分之前**，通过后再按原有排序打分。
+    stat.passed++;
+    // 两条独立判定（同一条候选可以同时命中两条 ⇒ 计数可重叠，filtered 才是「刷掉多少条」）
+    var badA = !(avg.a === 0), badD = (avg.d > cfg.dMax);
+    if (badA) stat.artificial++;
+    if (badD) stat.destroyed++;
+    if (badA || badD) { stat.filtered++; continue; }
     var usedFrac = spUsedFrac(root, key, cfg);
     var score = spScoreOf(avg.d, avg.a, usedFrac, cfg);
     var spot = spPickSpot(level, cx, cz, rng, cfg);
@@ -794,11 +832,28 @@ function spRoll(player, opts) {
         '出生点打分不可用：候选区块的 world data 读取失败 —— 这不是「还没扫描」。' + why +
         '。请管理员查服务端日志里的 [CM] 警告与存档完整性，修好后重试。', stat, actor);
     }
+    // 候选**读得出来但全被硬门刷掉** ⇒ 这是「扫了但都不合格」，与「还没扫描」是两件事
+    if (stat.passed > 0 && stat.filtered === stat.passed) {
+      var gateCode = (stat.destroyed === 0) ? 'SPAWN_ARTIFICIAL'
+                   : ((stat.artificial === 0) ? 'SPAWN_DESTROYED' : 'SPAWN_ALL_FILTERED');
+      var gateStat = spGateStat(stat, cfg);
+      gateStat.code = gateCode;
+      SP_MEM.lastGate = gateStat;
+      return spDeny(gateCode,
+        '候选区块都读到了，但**全部没过出生点硬门**（这不是「还没扫描」）：共 ' + stat.passed + ' 个候选 / 刷掉 ' + stat.filtered +
+        ' 个；其中 人为化(a>0) 命中 ' + stat.artificial + ' 个、破坏度(d>' + spFmtNum(cfg.dMax, 4) + ') 命中 ' + stat.destroyed +
+        ' 个（同一条可同时命中两条）。' +
+        '下一步：换中心点或扩大扫描范围；或先 /war spawn admin dcalib 看真实 a/d 分布标定 dMax。',
+        gateStat, actor);
+    }
     return spDeny('NO_SCANNED_CANDIDATE',
       '没找到「已扫描且地形安全」的落点。' + why +
       '。请先扫描：/cm scan <半径>（或用 Chunky 预生成环带后再 /cm scan）。', stat, actor);
   }
   var best = stat.ok;
+  var okGate = spGateStat(stat, cfg);
+  okGate.code = 'ok';
+  SP_MEM.lastGate = okGate;
 
   // —— 先记账（防刷计数/保护窗口），再传送 ——
   var now = warNow();
@@ -862,7 +917,77 @@ function spCfgText(cfg) {
          '｜候选上限=' + cfg.tries + '｜预算=' + cfg.maxMillis + 'ms｜已扫描门槛=' + cfg.minScored + '/9' +
          '｜冷却=' + Math.round(cfg.cooldownMs / 1000) + 's｜次数上限=' + cfg.maxRolls +
          '｜保护=' + Math.round(cfg.protectionMs / 1000) + 's｜种子=' + (cfg.rngSeed > 0 ? cfg.rngSeed : '时间') +
-         '｜采样=' + cfg.sampleGrid + '×' + cfg.sampleGrid + '｜最大高差=' + cfg.maxSlope;
+         '｜采样=' + cfg.sampleGrid + '×' + cfg.sampleGrid + '｜最大高差=' + cfg.maxSlope +
+         '｜硬门=a 必须为 0 且 d≤' + spFmtNum(cfg.dMax, 4) + '(暂定待标定)';
+}
+
+// —— dMax 标定与硬门统计（全部只读：不 analyze、不加载区块、不写 pd）——
+function spFmtNum(v, dg) { return (v == null) ? '?' : Number(v).toFixed(dg == null ? 3 : dg); }
+
+// 分位数（线性插值，输入必须是已升序排序的数组；空数组返回 null）
+function spQuantile(sortedArr, q) {
+  var n = sortedArr.length;
+  if (n === 0) return null;
+  if (n === 1) return sortedArr[0];
+  var pos = (n - 1) * q, lo = Math.floor(pos), hi = Math.ceil(pos);
+  if (lo === hi) return sortedArr[lo];
+  return sortedArr[lo] + (sortedArr[hi] - sortedArr[lo]) * (pos - lo);
+}
+
+function spGateStat(stat, cfg) {
+  return { tried: stat.tried, passed: stat.passed, filtered: stat.filtered,
+           artificial: stat.artificial, destroyed: stat.destroyed, dMax: cfg.dMax };
+}
+
+// /war spawn admin dcalib [<半径区块>]：读**已有记录**给出 a/d 分布，用来标定 dMax。
+// 结论口径（写死在文案里，避免「调参玄学」）：**d 的天然底噪 p75 决定阈值下限**。
+function spDCalib(source, radiusArg) {
+  var cm = spCm();
+  if (cm == null) return ['chunk_metrics 未加载（global.CM 缺失），无法标定。'];
+  if (typeof cm.rank !== 'function') return ['chunk_metrics 的 CM.rank 不可用，无法标定（标定需要读已扫描记录）。'];
+  var lvl = null;
+  try { lvl = source.getLevel(); } catch (e0) { }
+  if (lvl == null) return ['取不到维度，无法标定。'];
+  var cfg = spConfig();
+  var c = spResolveCenter(lvl, cfg);
+  if (!c.ok) return ['还不知道环带中心：先 /war spawn admin center（或站在中心执行）。'];
+  var r = warToInt(radiusArg, 8);
+  if (!(r > 0)) r = 8;
+  if (r > SP_DCALIB_R_MAX) r = SP_DCALIB_R_MAX;
+  var list = null;
+  try {
+    list = cm.rank(lvl, Math.floor(spNum(c.x, 0) / 16), Math.floor(spNum(c.z, 0) / 16), r, { wA: 1.0, wD: 0.0, limit: 8192 });
+  } catch (e1) { return ['CM.rank 读取失败：' + e1]; }
+  if (list == null || list.length === 0) {
+    return ['半径 ' + r + ' 区块内没有任何已扫描记录 —— 先 /cm scan ' + r + '（或更大）再做标定。'];
+  }
+  var ds = [], as = [], staleN = 0, unknownN = 0, zeroA = 0, n = 0;
+  for (var i = 0; i < list.length; i++) {
+    var e = list[i];
+    if (e == null) continue;
+    if (e.stale === true) { staleN++; continue; }
+    if (e.d == null || e.a == null) { unknownN++; continue; }   // 未知不许当 0（口径硬约束）
+    ds.push(Number(e.d)); as.push(Number(e.a)); n++;
+    if (Number(e.a) === 0) zeroA++;
+  }
+  if (n === 0) {
+    return ['半径 ' + r + ' 区块内有 ' + list.length + ' 条记录，但全部过期/未知（stale ' + staleN + '、未知 ' + unknownN + '）—— 先 /cm scan 重扫。'];
+  }
+  ds.sort(function (p, q) { return p - q; });
+  as.sort(function (p, q) { return p - q; });
+  var dMax = spNum(cfg.dMax, SP_D_MAX_FALLBACK);
+  var p75 = spQuantile(ds, 0.75);
+  var out = [];
+  out.push('[dMax 标定] 半径 ' + r + ' 区块｜有效记录 ' + n + '（剔除过期 ' + staleN + (unknownN > 0 ? ('、未知 ' + unknownN) : '') + '）｜当前 dMax=' + spFmtNum(dMax, 4) + '（暂定）');
+  out.push('a: min=' + spFmtNum(spQuantile(as, 0)) + ' p25=' + spFmtNum(spQuantile(as, 0.25)) + ' 中位=' + spFmtNum(spQuantile(as, 0.5)) +
+           ' p75=' + spFmtNum(spQuantile(as, 0.75)) + ' max=' + spFmtNum(spQuantile(as, 1)) +
+           '｜a===0 比例=' + Math.round(100 * zeroA / n) + '%（这个比例就是 a 硬门放行率）');
+  out.push('d: min=' + spFmtNum(spQuantile(ds, 0)) + ' p25=' + spFmtNum(spQuantile(ds, 0.25)) + ' 中位=' + spFmtNum(spQuantile(ds, 0.5)) +
+           ' p75=' + spFmtNum(spQuantile(ds, 0.75)) + ' max=' + spFmtNum(spQuantile(ds, 1)) + '（p75 即自然底噪）');
+  out.push('结论：' + (p75 > dMax
+    ? ('d 的底噪 p75=' + spFmtNum(p75, 4) + ' **高于**当前 dMax=' + spFmtNum(dMax, 4) + ' ⇒ 阈值低于自然底噪，出生点会几乎永远刷不出来；建议 dMax ≥ ' + spFmtNum(p75, 4) + '（再留余量），并写回 00_core 的 WAR_CONFIG.spawn.dMax。')
+    : ('d 的底噪 p75=' + spFmtNum(p75, 4) + ' ≤ 当前 dMax=' + spFmtNum(dMax, 4) + ' ⇒ 阈值尚高于底噪；放行率由 a===0 比例（' + Math.round(100 * zeroA / n) + '%）决定。')));
+  return out;
 }
 
 function spStatusLines(source) {
@@ -905,6 +1030,16 @@ function spStatusLines(source) {
   out.push('掷点统计：成功 ' + warToInt(root.stats.placed, 0) + ' / 拒绝 ' + warToInt(root.stats.denied, 0) +
            '｜已用区块 ' + warCountKeys(root.used) + '｜有记录的玩家 ' + warCountKeys(root.log) +
            '｜屏蔽区块 ' + warCountKeys(root.banned));
+  // 硬门统计（上次掷点）：让玩家分清「没扫」与「扫了但都不合格」
+  var lg = SP_MEM.lastGate;
+  if (lg != null) {
+    out.push('上次掷点硬门（a 必须为 0，d ≤ ' + spFmtNum(lg.dMax, 4) + '）：候选 ' + lg.tried + ' 个 / 过门 ' + lg.passed +
+             ' / 刷掉 ' + spNum(lg.filtered, 0) +
+             '｜人为化(a>0) 命中 ' + lg.artificial + '｜破坏度(d>阈值) 命中 ' + lg.destroyed + '（可重叠）' +
+             (lg.code != null ? ('｜结果 ' + lg.code) : ''));
+  } else {
+    out.push('硬门（a 必须为 0，d ≤ ' + spFmtNum(cfg.dMax, 4) + '，暂定待标定）：还没有掷点记录 —— 掷一次点后这里会给出两条刷掉计数（用于区分「没扫」与「扫了但都不合格」）');
+  }
   // 自己的保护剩余
   try {
     var p = source.getPlayer();
@@ -1081,6 +1216,20 @@ function spCommandNode(Commands, Arguments, event) {
         var n = iArg(ctx, 'n');
         if (isNaN(n)) return warReply(ctx.source, '半径必须是整数。');
         return warReply(ctx.source, spSetRadius(ctx.source, n));
+      })))
+    // dMax 标定入口：读已有记录给 a/d 分布，不 analyze、不加载区块
+    .then(Commands.literal('dcalib')
+      .executes(function (ctx) {
+        var lines = spDCalib(ctx.source, 8);
+        for (var i = 0; i < lines.length; i++) warReply(ctx.source, lines[i]);
+        return 1;
+      })
+      .then(Commands.argument('r', SI).executes(function (ctx) {
+        var n = iArg(ctx, 'r');
+        if (isNaN(n)) return warReply(ctx.source, '半径必须是整数。');
+        var lines2 = spDCalib(ctx.source, n);
+        for (var i2 = 0; i2 < lines2.length; i2++) warReply(ctx.source, lines2[i2]);
+        return 1;
       })));
   node.then(admin);
   return node;
@@ -1123,7 +1272,7 @@ try {
     global.WAR.spawn = SP_DOMAIN;
     global.WAR.commands.add(spCommandNode);
     global.WAR.commands.helpLine('/war spawn [roll|status|last|gaps]', '出生点：按 CM 的 D/A 选低破坏、低人工的已扫描落点 + 新手保护');
-    global.WAR.commands.helpLine('/war spawn admin center [<x> <z>] | radius <n>', 'OP' + WAR_CONFIG.admin.commandPermissionLevel + '：设置环带中心/外半径');
+    global.WAR.commands.helpLine('/war spawn admin center [<x> <z>] | radius <n> | dcalib [<r>]', 'OP' + WAR_CONFIG.admin.commandPermissionLevel + '：设置环带中心/外半径；dcalib 读已扫描记录给 a/d 分布以标定 dMax');
     global.WAR.hooks.boot.push(function (server) {
       try {
         var sp = null;
