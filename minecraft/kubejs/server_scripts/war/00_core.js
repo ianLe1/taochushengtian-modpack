@@ -81,7 +81,23 @@ var WAR_CONFIG = {
   //   ② **唯一真源** —— 20_spawn.js 侧的 SP_D_MAX_FALLBACK=0.05 只在 core 缺键时保底，并 warWarnOnce('spawn-cfg-dmax') 点名。
   spawn: { mode: 'cm-score', candidateRadius: 5000, tries: 64, dMax: 0.05 },
   claim: { enabled: false, defaultRadius: 32 },            // 暂定默认值；40_base.js
-  base:  { enabled: false, maxPerTeam: 3 },                // 暂定默认值；40_base.js
+  // 暂定默认值；据点域实现在 40_base.js（**隐性人工程度**模型）。**单位口径**（CM 口径一页纸）：
+  //   a/d ∈ [0,1] 小数、有饱和、不是计数；聚合口径 = 区域内**新鲜区块**（status=ok 且 stale=false）的 a 求和。
+  //   **下列数字全部是暂定值、待标定**（标定方法：/cm calib 定基线 → /cm scan 重扫 → 看区域 aSum/dSum 的真实分位数再定阈值）；
+  //   谁能把暂定值当结论，复核时会挑出来。
+  base: {
+    enabled: true,               // 暂定默认值：据点系统开关（**未标定时无论如何都拒绝工作**，见 40_base.js）
+    radiusChunks: 2,             // 暂定默认值：区域半径（区块）—— 必须覆盖 1–2 块边界，否则跨区建筑会被判丢
+    aSumMin: 1.2,                // 暂定默认值：据点门槛【单位 = 新鲜区块 a 求和；半径 2 ⇒ 25 槽、理论上限 25.0】
+    holdTicks: 1200,             // 暂定默认值：连续满足 aSumMin 的时长（tick）才算形成据点
+    aSumDrop: 0.4,               // 暂定默认值：aSum 相对峰值下降多少 ⇒ damaged
+    dSumMax: 2.0,                // 暂定默认值：d 求和上限（超过视为重破坏）
+    minFreshShare: 0.6,          // 暂定默认值：新鲜读数占槽位比例下限（低于此不判定、不登记）
+    absentTicks: 24000,          // 暂定默认值：主导者缺席多久算长期缺席（20 分钟）
+    captureRatio: 1.2,           // 暂定默认值：新主导者 ≥ 原主导者 × 该比例（近似期用「在场连续时长」比较）
+    scanInterval: 1200,          // 暂定默认值：扫描间隔（tick，60 秒）
+    maxBases: 64                 // 暂定默认值：单次扫描最多维护的据点数（防跑飞）
+  },
   trade: { enabled: false, taxRate: 0 },                   // 暂定默认值；50_trade.js
   shop:  { enabled: true, catalogPath: 'war/shop/catalog.json', spread: 0, maxPerTransaction: 64 }, // 暂定默认值；60_shop.js（唯一真源，域侧只读）
   think: { enabled: false, intelTtlSeconds: 900 },         // 暂定默认值；70_think.js

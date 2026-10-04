@@ -96,6 +96,41 @@ global.StartupEvents = {
   }
 };
 
+// ---------------------------------------------------------------- 假 CM（chunk_metrics）：只实现口径一页纸声明的只读契约
+var CM_FAKE = { rev: 0, calib: null, grid: {} };
+function cmFakeSet(cx, cz, a, d, opts) {
+  CM_FAKE.grid[cx + ',' + cz] = {
+    a: a, d: d,
+    status: (opts != null && opts.status != null) ? opts.status : 'ok',
+    stale: (opts != null && opts.stale === true),
+    rev: (opts != null && opts.rev != null) ? opts.rev : CM_FAKE.rev
+  };
+}
+function cmFakeClear() { CM_FAKE.grid = {}; }
+global.CM = {
+  rev: function () { return CM_FAKE.rev; },
+  getStatus: function (level, cx, cz) {
+    var g = CM_FAKE.grid[cx + ',' + cz];
+    if (g == null) return { ok: false, status: 'no-record', source: 'none', cx: cx, cz: cz, d: null, a: null, rev: null, curRev: CM_FAKE.rev, stale: false };
+    if (g.status === 'read-fail') return { ok: false, status: 'read-fail', source: 'disk', cx: cx, cz: cz, d: null, a: null, rev: g.rev, curRev: CM_FAKE.rev, stale: false };
+    return { ok: true, status: 'ok', source: 'disk', cx: cx, cz: cz, d: g.d, a: g.a, rev: g.rev, curRev: CM_FAKE.rev, stale: g.stale === true };
+  },
+  scoreArea: function (level, cx, cz, radius, opts) {
+    var r = Number(radius); if (isNaN(r) || r < 0) r = 2; r = Math.floor(r);
+    var cands = [], counts = { ok: 0, fresh: 0, stale: 0, noRecord: 0, readFail: 0, mem: 0 };
+    for (var dx = -r; dx <= r; dx++) {
+      for (var dz = -r; dz <= r; dz++) {
+        var key = (cx + dx) + ',' + (cz + dz), g = CM_FAKE.grid[key];
+        if (g == null) { cands.push({ status: 'no-record', stale: false, source: 'none', rev: null, d: null, a: null, partial: false }); counts.noRecord++; continue; }
+        if (g.status === 'read-fail') { cands.push({ status: 'read-fail', stale: false, source: 'disk', rev: g.rev, d: null, a: null, partial: false }); counts.readFail++; continue; }
+        cands.push({ status: 'ok', stale: g.stale === true, source: 'disk', rev: g.rev, d: g.d, a: g.a, partial: false });
+        counts.ok++; if (g.stale === true) counts.stale++; else counts.fresh++;
+      }
+    }
+    return { ok: true, cx: cx, cz: cz, radius: r, width: r * 2 + 1, curRev: CM_FAKE.rev, candidates: cands, counts: counts, usable: counts.fresh };
+  }
+};
+
 // ---------------------------------------------------------------- 假 Brigadier
 function FakeNode(kind, name) { this.kind = kind; this.name = name; this.children = []; this.executor = null; this.requires_ = null; this.argType = null; }
 FakeNode.prototype.requires = function (f) { this.requires_ = f; return this; };
@@ -176,6 +211,8 @@ FakeInventory.prototype.isEmpty = function () { return this.count() <= 0; };
 function FakePlayer(name, uuid) {
   this.username = name; this.uuid = uuid; this.persistentData = new FakeTag(); this.messages = [];
   this.inventory = new FakeInventory(36);
+  this.blockX = 0; this.blockZ = 0;                     // 40_base.js 的锚点要用（玩家所在区块）
+  this.level = { dim: 'minecraft:overworld', tag: new FakeTag(), isClientSide: false };   // CM 的 API 取 level 而非 dim 字符串
 }
 FakePlayer.prototype.getUUID = function () { return this.uuid; };
 FakePlayer.prototype.getStringUUID = function () { return this.uuid; };
@@ -204,7 +241,7 @@ FakeSource.prototype.sendFailure = function (c) { this.failures.push(String(c));
 // war/ 目录是多名成员共写的（例如 20_spawn.js 属出生点域，依赖 chunk_metrics 的 global.CM）——
 // 全量 glob 会把别人正在写的文件一起拉进来：既让本 harness 与他们的代码耦合，又会污染事件计数。
 // ⇒ 只加载本 harness 负责的文件（显式白名单），其余只报告不加载。
-var WAR_FILES = ['00_core.js', '10_team.js', '30_economy.js', '60_shop.js', '90_admin.js'];
+var WAR_FILES = ['00_core.js', '10_team.js', '30_economy.js', '40_base.js', '60_shop.js', '90_admin.js'];
 var present = fs.readdirSync(WAR_DIR).filter(function (f) { return /[.]js$/.test(f); }).sort();
 var skipped = present.filter(function (f) { return WAR_FILES.indexOf(f) < 0; });
 console.log('=== 加载 war/ 脚本（白名单）：' + WAR_FILES.join(', '));
@@ -1283,6 +1320,122 @@ for (var i21 = 0; i21 < lines21.length; i21++) {
 assert(lit21.length === 0, '20_spawn.js 里没有第二份 dMax 阈值字面量赋值（命中 ' + lit21.length + ' 行' + (lit21.length ? '：' + lit21.join(' | ') : '') + '）');
 assert(spawnSrc21.indexOf('core.dMax != null') >= 0 && spawnSrc21.indexOf('spawn-cfg-dmax') >= 0,
        '20_spawn.js 只在 core 缺键时回落，并 warnOnce 点名 spawn-cfg-dmax');
+
+// ================================================================ T21 CM.scoreArea 契约（照抄 chunk-metrics 的骨架）
+console.log('\n--- T21 CM 接口契约（a/d 口径）---');
+cmFakeClear();
+for (var gx = -2; gx <= 2; gx++) for (var gz = -2; gz <= 2; gz++) cmFakeSet(gx, gz, 0.5, 0.2);
+cmFakeSet(-2, -2, 0, 0, { status: 'read-fail' });        // 读取失败
+cmFakeSet(2, 2, 0.9, 0.9, { stale: true });              // 过期（stale ≠ 无效）
+delete CM_FAKE.grid['1,1'];                              // 未扫描 ⇒ no-record
+var area21 = CM.scoreArea(srvE.players[0].level, 0, 0, 2, { freshOnly: false });
+assert(area21.ok === true && area21.candidates.length === 25, '区域槽位 = (2r+1)^2 = 25');
+assert(area21.counts.fresh === 22 && area21.counts.stale === 1 && area21.counts.noRecord === 1 && area21.counts.readFail === 1,
+       'counts 分类正确（fresh 22 / stale 1 / no-record 1 / read-fail 1）');
+assert(area21.usable === area21.counts.fresh, 'usable == counts.fresh（fresh 才是权威可用计数）');
+assert(area21.candidates.every(function (c) { return (c.status !== 'no-record' && c.status !== 'read-fail') || (c.a === null && c.d === null); }),
+       '未知（no-record / read-fail）必须是 null —— 绝不许用 0 冒充');
+assert(area21.candidates.every(function (c) { return c.a === null || (c.a >= 0 && c.a <= 1); }) &&
+       area21.candidates.every(function (c) { return c.d === null || (c.d >= 0 && c.d <= 1); }), 'd/a 值域 [0,1]（不是 0–100、不是计数）');
+assert(area21.candidates.every(function (c) { return c.status !== 'ok' || c.rev !== null; }) && typeof area21.curRev === 'number',
+       '每条带 rev、区域带 curRev（stale 判据是 rev !== curRev，别缓存 rev）');
+
+// ================================================================ T22 据点域（隐性人工程度，40_base.js）
+console.log('\n--- T22 据点域（40_base.js）---');
+assert(WAR.base != null && WAR.base.__stub === false && typeof WAR.base.calib === 'function', 'WAR.base 已由 40_base.js 实现（含 calib()）');
+assert(typeof BASE_CONFIG !== 'undefined' && BASE_CONFIG === WAR.config.base, 'BASE_CONFIG 与 WAR.config.base 是同一对象引用（单一起源）');
+var baseSrc22 = fs.readFileSync(WAR_DIR + '/40_base.js', 'utf8');
+var assign22 = baseSrc22.split('\n').filter(function (ln) { return /^\s*BASE_CONFIG\./.test(ln); });
+assert(assign22.length === 0, '40_base.js 里没有 BASE_CONFIG.xxx = 赋值（域侧只读 core 的 CONFIG；命中 ' + assign22.length + ' 行）');
+assert(baseSrc22.indexOf('BASE_CONFIG.xxx = ') >= 0 && baseSrc22.indexOf('禁止用「单区块 a 高」当据点判据') >= 0,
+       '代码头写明：唯一真源 + 禁止单块判据（聚合窗口覆盖 1–2 块边界）');
+// 隔离：T22 用**专用服务器**（共享 srvE 里多个玩家默认都在区块 (0,0)，会污染锚点与归属）
+var srvB22 = new FakeServer();
+srvB22.players = [];
+WAR.data.state.base = { seq: 0, byId: {}, candidates: {}, presence: {}, runtime: {} };
+// —— ① 未标定：拒绝工作，不悄悄用默认基线跑 ——
+CM_FAKE.calib = null; CM_FAKE.rev = 0;
+var cal22 = WAR.base.calib();
+assert(cal22.ok === false && cal22.calibrated === false && cal22.source === 'rev-fallback',
+       '未标定判定：无 calib 字段且 rev=0 ⇒ 未标定（来源 rev-fallback）');
+var ref22 = WAR.base.scan(srvB22, { force: true });
+assert(ref22.ok === false && ref22.refused === true && String(ref22.reason).indexOf('/cm calib') >= 0,
+       '未标定 ⇒ 扫描拒绝 + 给出可执行提示（/cm calib）：' + ref22.reason);
+var sList22 = new FakeSource(0, null);
+runPath(registeredRoot, ['base', 'list'], sList22, {});
+assert(sList22.messages.join('').indexOf('据点系统未启用') >= 0, '未标定时 /war base list 给出可解释文案');
+// —— ② 标定后：区域聚合 + 形成据点 ——
+CM_FAKE.rev = 1;
+assert(WAR.base.calib().ok === true && WAR.base.calib().rev === 1, 'rev>0 ⇒ 视为已标定（calib 字段落地前的近似）');
+cmFakeClear();
+for (var bx = -2; bx <= 2; bx++) for (var bz = -2; bz <= 2; bz++) cmFakeSet(bx, bz, 0.15, 0.01);
+var pBase22 = new FakePlayer('founder', 'uuid-founder');
+pBase22.blockX = 8; pBase22.blockZ = 8;                 // 区块 (0,0)
+srvB22.players = [pBase22];
+var agg22 = WAR.base.area(pBase22.level, 0, 0);
+assert(agg22.ok === true && agg22.fresh === 25 && agg22.unknown === 0 && Math.abs(agg22.aSum - 3.75) < 1e-9,
+       '区域聚合：25 块 fresh、aSum = Σa = 3.75（**求和**，不是 max/平均）');
+var t0 = WAR_TICK.n;
+var scan1 = WAR.base.scan(srvB22, { force: true });
+assert(scan1.ok === true && scan1.formed === 0 && WAR.base.list().length === 0 && WAR.base.state().candidates['0,0'] != null,
+       '第一次扫描：只登记候选（未到 holdTicks，不形成据点）');
+WAR_TICK.n = t0 + warToInt(BASE_CONFIG.holdTicks, 1200);
+var scan2 = WAR.base.scan(srvB22, { force: true });
+var blist22 = WAR.base.list();
+assert(scan2.formed === 1 && blist22.length === 1 && blist22[0].state === 'intact', '连续满足 holdTicks ⇒ 形成据点（intact）');
+assert(blist22[0].owner != null && blist22[0].owner.name === 'founder' && blist22[0].owner.source === 'approx-activity',
+       '主导者 = founder（**近似**：ownerSource=approx-activity，不是方块归因）');
+var formedAudit = WAR.data.state.audit.items.filter(function (x) { return x.action === 'base.formed'; });
+assert(formedAudit.length === 1 && formedAudit[0].result === 'ok', '形成据点写审计 base.formed');
+// —— ③ 有效读数不足 ⇒ 不判定、不登记（unknown 不当 0） ——
+cmFakeClear();
+for (var cx3 = -2; cx3 <= 2; cx3++) for (var cz3 = -2; cz3 <= 2; cz3++) { if (Math.abs(cx3) + Math.abs(cz3) <= 2) cmFakeSet(cx3, cz3, 0.15, 0.01); }
+var agg22b = WAR.base.area(pBase22.level, 0, 0);
+assert(agg22b.ok === true && agg22b.fresh === 13 && agg22b.enough === false && agg22b.unknown === 12 && agg22b.aSum > 0,
+       '有效读数不足（13/25=0.52 < minFreshShare 0.6）⇒ enough=false（不判定、不登记，而不是把未知当 0）');
+assert(WAR.base.scan(srvB22, { force: true }).skipped >= 1, '读数不足的锚点在扫描里被跳过（skipped≥1）');
+// —— ④ a 下降 / d 上升 ⇒ damaged ——
+cmFakeClear();
+for (var dx4 = -2; dx4 <= 2; dx4++) for (var dz4 = -2; dz4 <= 2; dz4++) cmFakeSet(dx4, dz4, 0.02, 0.5);
+var scan4 = WAR.base.scan(srvB22, { force: true });
+assert(scan4.damaged === 1 && WAR.base.list()[0].state === 'damaged', 'aSum 跌破峰值-aSumDrop ⇒ damaged');
+assert(WAR.data.state.audit.items.filter(function (x) { return x.action === 'base.damaged'; }).length === 1,
+       'damaged 写审计（detail 注明「与自建时的正常破坏需数据标定区分」）');
+// —— ⑤ 缺席 + 新主导 ⇒ abandoned / captured（近似判定） ——
+var pChal22 = new FakePlayer('challenger', 'uuid-challenger');
+pChal22.blockX = 8; pChal22.blockZ = 8;
+srvB22.players = [pChal22];                              // 原主离开该区块（只留挑战者）
+var keepRatio = BASE_CONFIG.captureRatio;
+BASE_CONFIG.captureRatio = 999;                          // 先只验 abandoned：把夺取门槛抬到不可能
+var tAbs = WAR_TICK.n;
+WAR.base.scan(srvB22, { force: true });
+assert(WAR.base.list()[0].absentSince != null, '原主不在锚点 ⇒ 开始计缺席（absentSince 有值）');
+WAR_TICK.n = tAbs + warToInt(BASE_CONFIG.absentTicks, 24000) + 1;
+var scan5 = WAR.base.scan(srvB22, { force: true });
+assert(scan5.abandoned === 1 && WAR.base.list()[0].state === 'abandoned', 'damaged + 缺席超 absentTicks ⇒ abandoned');
+assert(WAR.data.state.audit.items.filter(function (x) { return x.action === 'base.abandoned'; }).length === 1, 'abandoned 写审计');
+BASE_CONFIG.captureRatio = keepRatio;
+var b22 = WAR.base.list()[0];
+b22.ownerSince = WAR_TICK.n - 1000;                       // 让「原主导在场时长」确定性地短于挑战者
+var scan6 = WAR.base.scan(srvB22, { force: true });
+assert(scan6.captured === 1 && b22.owner.name === 'challenger', '新主导连续在场 ≥ 原主导 × captureRatio 且原主长期缺席 ⇒ captured（近似）');
+var capAudit = WAR.data.state.audit.items.filter(function (x) { return x.action === 'base.captured'; });
+assert(capAudit.length === 1 && capAudit[0].detail.indexOf('approx-activity') >= 0, 'captured 审计写明依据 = 在场连续时长近似');
+// —— ⑥ 命令与权限 ——
+var sList22b = new FakeSource(0, pChal22);
+runPath(registeredRoot, ['base', 'list'], sList22b, {});
+assert(sList22b.messages.join('').indexOf('据点(1)') === 0 && sList22b.messages.join('').indexOf('近似') >= 0, '/war base list 列据点并标注主导者为近似');
+var sInfo22 = new FakeSource(0, pChal22);
+runPath(registeredRoot, ['base', 'info', 'id'], sInfo22, { id: b22.id });
+assert(sInfo22.messages.join('').indexOf('未证实') >= 0 && sInfo22.messages.join('').indexOf('BlockEvents.placed') >= 0,
+       '/war base info 明说主导者近似（真归因需 BlockEvents.placed）');
+var sPar22 = new FakeSource(0, pChal22);
+runPath(registeredRoot, ['base', 'params'], sPar22, {});
+assert(sPar22.messages.join('').indexOf('暂定') >= 0 && sPar22.messages.join('').indexOf('待标定') >= 0, '/war base params 明标「暂定、待标定」');
+var sScanLow = new FakeSource(1, null);
+runPath(registeredRoot, ['base', 'scan'], sScanLow, {});
+assert(sScanLow.messages.length === 0, 'level1 时 /war base scan 不可达（OP 门生效）');
+assert(WAR.econ.invariant().ok === true, 'T22 后账目恒等式仍成立');
 
 console.log('\n--- 汇总 ---');
 console.log('PASS=' + passN + ' FAIL=' + failN + ' SKIP=' + skipN);
